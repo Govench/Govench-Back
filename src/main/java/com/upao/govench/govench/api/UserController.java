@@ -20,23 +20,25 @@ public class UserController {
         try {
             userService.createUser(userDTO);
             return new ResponseEntity<>("Cuenta creada con éxito", HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers() {
         try {
             List<UserDTO> users = userService.getAllUsers();
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error al obtener la lista de usuarios", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> updateUser(@PathVariable("id") Integer id, @RequestBody UserDTO userDTO) {
         try {
             userService.updateUser(id, userDTO);
             return new ResponseEntity<>("Usuario actualizado con éxito", HttpStatus.OK);
@@ -46,7 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         try {
             userService.deleteUser(id);
             return new ResponseEntity<>("Usuario eliminado con éxito", HttpStatus.NO_CONTENT);
