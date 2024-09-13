@@ -1,6 +1,7 @@
 package com.upao.govench.govench.model.dto;
 
 
+import com.upao.govench.govench.model.entity.Location;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,5 +41,8 @@ public class EventRequestDTO {
     private String type;
 
     private BigDecimal cost;
+
+    @NotNull(message = "El id de la localizacion no puede estar vacia")
+    private Location location;
 
 }

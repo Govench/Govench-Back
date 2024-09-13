@@ -2,7 +2,10 @@ package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.entity.Location;
+import com.upao.govench.govench.repository.LocationRepository;
 import com.upao.govench.govench.service.impl.EventService;
+import com.upao.govench.govench.service.impl.LocationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,18 +26,17 @@ public class EventController {
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Long id) {
-        EventResponseDTO event = eventService.getEventById(id);
-        return new ResponseEntity<>(event, HttpStatus.OK);
-    }
-
-    //Hace conflicto con el GetMapping de arriba
-    //@GetMapping("/{tittle}")
-    //public ResponseEntity<EventResponseDTO> getEventByTittle(@PathVariable String tittle) {
-    //    EventResponseDTO event = eventService.getEventByName(tittle);
+    //@GetMapping("/{id}")
+    //public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Integer id) {
+    //    EventResponseDTO event = eventService.getEventById(id);
     //    return new ResponseEntity<>(event, HttpStatus.OK);
     //}
+
+    @GetMapping("/{tittle}")
+    public ResponseEntity<EventResponseDTO> getEventByTittle(@PathVariable String tittle) {
+        EventResponseDTO event = eventService.getEventByName(tittle);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
 
     @PostMapping
     public ResponseEntity<EventResponseDTO> createEvent(@RequestBody EventRequestDTO eventRequestDTO) {
@@ -43,14 +45,14 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventResponseDTO> updateEvent(@PathVariable Long id,
+    public ResponseEntity<EventResponseDTO> updateEvent(@PathVariable Integer id,
                                                         @RequestBody EventRequestDTO eventRequestDTO) {
         EventResponseDTO updatedEvent = eventService.updateEvent(id, eventRequestDTO);
         return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable Integer id) {
         eventService.deleteEvent(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

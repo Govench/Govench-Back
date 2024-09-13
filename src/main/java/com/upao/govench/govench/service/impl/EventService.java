@@ -5,7 +5,9 @@ import com.upao.govench.govench.mapper.EventMapper;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.Location;
 import com.upao.govench.govench.repository.EventRepository;
+import com.upao.govench.govench.repository.LocationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,9 @@ import java.util.List;
 @AllArgsConstructor
 public class EventService {
 
-    private EventRepository eventRepository;
-    private EventMapper eventMapper;
+    private final EventRepository eventRepository;
+    private final LocationRepository locationRepository;
+    private final EventMapper eventMapper;
 
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
@@ -26,7 +29,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDTO getEventById(Long id) {
+    public EventResponseDTO getEventById(Integer id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el numero de ID"+id));
         return eventMapper.convertToDTO(event);
@@ -42,12 +45,15 @@ public class EventService {
     @Transactional
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
         Event event = eventMapper.convertToEntity(eventRequestDTO);
+        Location location = locationRepository.findById(eventRequestDTO.getLocation().getId())
+                .orElseThrow(()-> new ResourceNotFoundException("La localizacion no existe"));
         eventRepository.save(event);
+
         return eventMapper.convertToDTO(event);
     }
 
     @Transactional
-    public EventResponseDTO updateEvent(Long id, EventRequestDTO eventRequestDTO) {
+    public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el numero de ID"+id));
         event.setTittle(eventRequestDTO.getTittle());
@@ -65,7 +71,7 @@ public class EventService {
     }
 
     @Transactional
-    public void deleteEvent(Long id) {
+    public void deleteEvent(Integer id) {
         eventRepository.deleteById(id);
     }
 }
