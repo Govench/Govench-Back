@@ -15,7 +15,7 @@ public class UtilityController {
     private EncryptionService encryptionService;
 
     @GetMapping("/encrypt/{userId}") //Este metodo recibe un id y me devuelve encryptado
-    public String getEncodedUserId(@PathVariable int userId) throws Exception {
+    public String getEncodedUserId(@PathVariable("userId") int userId) throws Exception {
         return encryptionService.encrypt(Integer.toString(userId));
     }
 }

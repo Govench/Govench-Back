@@ -1,6 +1,7 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,8 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community save(Community community) {
+    public Community save(Community community, User owner) {
+        community.setOwner(owner);
         return CommunityRepository.save(community);
     }
 

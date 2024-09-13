@@ -12,7 +12,7 @@ import java.util.Base64;
 public class EncryptionService {
 
     private static final String ALGORITHM = "AES";
-    private static final String SECRET_KEY = "mySuperSecretKey123"; // Debe ser almacenada de forma segura
+    private static final String SECRET_KEY = "mySuperSecretKey"; // Debe ser almacenada de forma segura
 
     public String encrypt(String data) throws Exception {
         SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
