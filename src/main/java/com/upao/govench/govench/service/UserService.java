@@ -11,7 +11,7 @@ public interface UserService {
 
     User createUser(UserDTO userDTO);
     User updateUser(Integer userId, UserDTO userDTO);
-
+    User getUserbyId(Integer userId);
     Optional<User> findByEmail(String email);
 
     void deleteUser(Integer userId);

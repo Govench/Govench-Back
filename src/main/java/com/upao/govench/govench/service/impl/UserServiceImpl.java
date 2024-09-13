@@ -21,6 +21,11 @@ public class UserServiceImpl implements UserService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
     @Override
+    public User getUserbyId(Integer userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
     public User createUser(UserDTO userDTO) {
 
         if (!EMAIL_PATTERN.matcher(userDTO.getEmail()).matches()) {
@@ -30,14 +35,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new RuntimeException("El correo ya está en uso");
         }
-
         User user = new User();
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
-
         user.setPassword(userDTO.getPassword());
-
         user.setBirthday(userDTO.getBirthday());
         user.setGender(userDTO.getGender());
         user.setProfileDesc(userDTO.getProfileDesc());
@@ -46,7 +48,6 @@ public class UserServiceImpl implements UserService {
         user.setSocialLinks(userDTO.getSocialLinks());
         user.setFollowers(userDTO.getFollowers());
         user.setFollowed(userDTO.getFollowed());
-
         return userRepository.save(user);
     }
 
