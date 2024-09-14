@@ -1,10 +1,14 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.IdCompuestoU_C;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.UserCommunity;
 import com.upao.govench.govench.service.CommunityService;
 import com.upao.govench.govench.service.EncryptionService;
+import com.upao.govench.govench.service.UserCommunityService;
 import com.upao.govench.govench.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,5 +80,39 @@ public class CommunityController {
         CommunityService.save(community,owner);
         return new ResponseEntity<>("Comunidad creada con éxito", HttpStatus.CREATED);
 
+    }
+
+    @AllArgsConstructor
+    @RestController
+
+    @RequestMapping("/admin/usercommunity")
+    public static class UserCommunityController {
+        @Autowired
+
+        private UserCommunityService userCommunityService;
+        @ResponseStatus(HttpStatus.OK)
+        @GetMapping
+        public List<UserCommunity> getAllUserCommunities() {
+            return userCommunityService.getAllUserCommunities();
+        }
+        @ResponseStatus(HttpStatus.OK)
+        @GetMapping("/{iduser}/{idcommunity}")
+        public UserCommunity getUserCommunityById(@PathVariable int iduser,@PathVariable int idcommunity) {
+            IdCompuestoU_C id =new IdCompuestoU_C(iduser, idcommunity);
+            return userCommunityService.searchUserCommunityById(id);
+        }
+
+        @ResponseStatus(HttpStatus.CREATED)
+        @PostMapping()
+        public UserCommunity createUserCommunity(@RequestBody UserCommunity userCommunity) {
+            UserCommunity detail = userCommunityService.searchUserCommunityById(userCommunity.getId());
+            return userCommunityService.addUserCommunity(userCommunity);
+        }
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        @DeleteMapping("/{iduser}/{idcommunity}")
+        public void deleteUserCommunity(@PathVariable int iduser,@PathVariable int idcommunity) {
+            IdCompuestoU_C id =new IdCompuestoU_C(iduser, idcommunity);
+            userCommunityService.removeUserCommunityById(id);
+        }
     }
 }
