@@ -15,6 +15,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "events")
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -44,8 +45,9 @@ public class Event {
     private BigDecimal cost;
 
     @ManyToOne
-    @JoinColumn(name = "loc_id_")
+    @JoinColumn(name = "loc_id_", nullable = true)
     private Location location;
+
 
     //Aca se agregaria la Entidad user, pero como no lo tengo implementado aun no
 }

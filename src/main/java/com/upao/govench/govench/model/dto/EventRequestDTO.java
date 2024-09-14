@@ -29,10 +29,10 @@ public class EventRequestDTO {
     private LocalDate date;
 
     @NotBlank(message = "La hora de inicio no puede estar vacía")
-    private LocalTime startDate;
+    private LocalTime startTime ;
 
     @NotBlank(message = "La hora de fin no puede estar vacía")
-    private LocalTime endDate;
+    private LocalTime endTime;
 
     @NotBlank(message = "El estado no puede estar vacío")
     private String state;
@@ -42,7 +42,6 @@ public class EventRequestDTO {
 
     private BigDecimal cost;
 
-    @NotNull(message = "El id de la localizacion no puede estar vacia")
     private Location location;
 
 }

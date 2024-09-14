@@ -45,10 +45,7 @@ public class EventService {
     @Transactional
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
         Event event = eventMapper.convertToEntity(eventRequestDTO);
-        Location location = locationRepository.findById(eventRequestDTO.getLocation().getId())
-                .orElseThrow(()-> new ResourceNotFoundException("La localizacion no existe"));
         eventRepository.save(event);
-
         return eventMapper.convertToDTO(event);
     }
 
@@ -59,8 +56,8 @@ public class EventService {
         event.setTittle(eventRequestDTO.getTittle());
         event.setDescription(eventRequestDTO.getDescription());
         event.setDate(eventRequestDTO.getDate());
-        event.setStartTime(eventRequestDTO.getStartDate());
-        event.setEndTime(eventRequestDTO.getEndDate());
+        event.setStartTime(eventRequestDTO.getStartTime());
+        event.setEndTime(eventRequestDTO.getEndTime());
         event.setState(eventRequestDTO.getState());
         event.setType(eventRequestDTO.getType());
         event.setCost(eventRequestDTO.getCost());
