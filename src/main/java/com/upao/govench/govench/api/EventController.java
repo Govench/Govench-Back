@@ -26,15 +26,15 @@ public class EventController {
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
-    //@GetMapping("/{id}")
-    //public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Integer id) {
-    //    EventResponseDTO event = eventService.getEventById(id);
-    //    return new ResponseEntity<>(event, HttpStatus.OK);
-    //}
-
     @GetMapping("/{tittle}")
     public ResponseEntity<EventResponseDTO> getEventByTittle(@PathVariable String tittle) {
         EventResponseDTO event = eventService.getEventByName(tittle);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
+    @GetMapping("/{exp}")
+    public ResponseEntity<EventResponseDTO> getEventByExp(@PathVariable String exp) {
+        EventResponseDTO event = eventService.getEventByExp(exp);
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 
