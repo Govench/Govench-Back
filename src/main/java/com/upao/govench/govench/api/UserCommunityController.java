@@ -1,4 +1,4 @@
-package com.upao.govench.govench.controllers;
+package com.upao.govench.govench.api;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
