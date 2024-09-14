@@ -1,18 +1,20 @@
 package com.upao.govench.govench.service;
 
-import com.upao.govench.govench.model.dto.UserDTO;
+import com.upao.govench.govench.model.dto.UserResponseDTO;
+import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<UserDTO> getAllUsers();
+    List<UserResponseDTO> getAllUsers();
 
-    User createUser(UserDTO userDTO);
-    User updateUser(Integer userId, UserDTO userDTO);
+    User createUser(UserRequestDTO userRequestDTO);
+    UserResponseDTO updateUser(Integer userId, UserRequestDTO userRequestDTO);
     User getUserbyId(Integer userId);
     Optional<User> findByEmail(String email);
 
     void deleteUser(Integer userId);
+    boolean authenticateUser(String email, String password);
 }

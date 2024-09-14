@@ -1,6 +1,8 @@
 package com.upao.govench.govench.api;
 
-import com.upao.govench.govench.model.dto.UserDTO;
+import com.upao.govench.govench.model.dto.LoginRequestDTO;
+import com.upao.govench.govench.model.dto.UserRequestDTO;
+import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,12 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    private LoginRequestDTO loginRequestDTO;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            userService.createUser(userDTO);
+            userService.createUser(userRequestDTO);
             return new ResponseEntity<>("Cuenta creada con éxito", HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -30,7 +33,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
-            List<UserDTO> users = userService.getAllUsers();
+            List<UserResponseDTO> users = userService.getAllUsers();
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Error al obtener la lista de usuarios", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -38,9 +41,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable("id") Integer id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestDTO userRequestDTO) {
         try {
-            userService.updateUser(id, userDTO);
+            userService.updateUser(id, userRequestDTO);
             return new ResponseEntity<>("Usuario actualizado con éxito", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -56,6 +59,20 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+        try {
+            boolean isAuthenticated = userService.authenticateUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+            if (isAuthenticated) {
+                return new ResponseEntity<>("Inicio de sesión exitoso", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Correo electrónico o contraseña incorrectos", HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error en el sistema", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
