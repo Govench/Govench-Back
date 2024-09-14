@@ -29,16 +29,16 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDTO getEventById(Integer id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el numero de ID"+id));
+    public EventResponseDTO getEventByName(String tittle) {
+        Event event = eventRepository.findAllByEventTittle(tittle)
+                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el titulo "+tittle));
         return eventMapper.convertToDTO(event);
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDTO getEventByName(String tittle) {
-        Event event = eventRepository.findAllByEventTittle(tittle)
-                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el titulo "+tittle));
+    public EventResponseDTO getEventByExp(String exp) {
+        Event event = eventRepository.findAllByEventExp(exp)
+                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el nivel de experiencia "+exp));
         return eventMapper.convertToDTO(event);
     }
 

@@ -40,6 +40,9 @@ public class EventRequestDTO {
     @NotBlank(message = "El tipo no puede estar vacio")
     private String type;
 
+    @NotBlank(message = "El nivel de experiencia no se puede estar vacio")
+    private String exp;
+
     private BigDecimal cost;
 
     private Location location;

@@ -44,6 +44,9 @@ public class Event {
     @Column(name = "eve_cos_mo", nullable = false)
     private BigDecimal cost;
 
+    @Column(name = "eve_lvl_exp_vc", nullable = false)
+    private String exp;
+
     @ManyToOne
     @JoinColumn(name = "loc_id_", nullable = true)
     private Location location;

@@ -23,5 +23,6 @@ public class EventResponseDTO {
     private String type;
     private BigDecimal cost;
     private LocationResponseDTO location;
+    private String exp;
 
 }
