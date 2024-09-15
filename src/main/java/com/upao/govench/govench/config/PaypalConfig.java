@@ -19,11 +19,6 @@ public class PaypalConfig {
 
     @Bean
     public PayPalHttpClient payPalHttpClient() {
-        PayPalEnvironment environment = new PayPalEnvironment.Sandbox(clientId, clientSecret); // Sandbox credentials
-        return new PayPalHttpClient(environment);
-    }
-}
-    /*public PayPalHttpClient payPalHttpClient() {
         PayPalEnvironment environment;
         if ("sandbox".equalsIgnoreCase(mode)) {
             environment = new PayPalEnvironment.Sandbox(clientId, clientSecret);
@@ -33,5 +28,7 @@ public class PaypalConfig {
             throw new IllegalArgumentException("Invalid PayPal mode: " + mode);
         }
         return new PayPalHttpClient(environment);
-    }*/
+    }
+}
+
 

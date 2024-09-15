@@ -2,19 +2,23 @@ package com.upao.govench.govench.api;
 
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.Order;
+import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.service.impl.EventService;
 import com.upao.govench.govench.service.PaypalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/admin/payments")
 public class PaypalController {
     @Autowired
     public PaypalService paypalService;
-
+    @Autowired
+    private EventService eventService;
 
     @PostMapping("/create-order")
     public String  createOrder(@RequestParam double totalAmount) {
@@ -57,5 +61,36 @@ public class PaypalController {
             //return new RedirectView("/error?status=error");
             return "Ocurrió un error durante el proceso de pago.";
         }
+    }
+
+    @GetMapping("/pay-event/{eventId}")
+    public String handleEventPayment(@PathVariable int eventId) {
+
+        // Retrieve event by ID
+        Event event = eventService.getEventById(eventId);
+
+        String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment";
+        String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
+
+        if (event == null) {
+            return "Event not found.";
+        }
+
+        // Check if the event has a price
+        BigDecimal eventPrice = event.getCost();
+
+        if (eventPrice.compareTo(BigDecimal.ZERO) == 0) {
+            return "This event is free.";
+        }
+        double eventPriceDouble = eventPrice.doubleValue();
+        // Generate the PayPal order for the event price
+        try {
+            String approvalUrl = paypalService.createOrder(eventPriceDouble, returnUrl, cancelUrl);
+            return "https://www.sandbox.paypal.com/checkoutnow?token=" + approvalUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred during payment process.";
+        }
+
     }
 }
