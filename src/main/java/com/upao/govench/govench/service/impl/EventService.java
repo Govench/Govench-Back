@@ -61,6 +61,7 @@ public class EventService {
         event.setState(eventRequestDTO.getState());
         event.setType(eventRequestDTO.getType());
         event.setCost(eventRequestDTO.getCost());
+        event.setLocation(eventRequestDTO.getLocation());
 
         event = eventRepository.save(event);
 

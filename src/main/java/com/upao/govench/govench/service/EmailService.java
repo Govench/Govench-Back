@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class EmailService {
 
-    @Autowired
     private JavaMailSender mailSender;
 
     public String sendEmail(String to, String subject, String text) {
@@ -25,7 +24,8 @@ public class EmailService {
             mailSender.send(message);
             return "Email sent";
         } catch (Exception e) {
-            return "Email not sent" + e.getMessage();
+            e.printStackTrace();
+            return "Error al enviar el correo: " + e.getMessage();
         }
     }
 }

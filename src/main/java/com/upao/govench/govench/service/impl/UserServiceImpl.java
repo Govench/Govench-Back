@@ -6,19 +6,18 @@ import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserMapper userMapper;
 
-    @Autowired
     private UserRepository userRepository;
 
     @Override
