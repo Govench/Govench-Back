@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,12 @@ public class EventService {
     public List<EventResponseDTO> getEventByExp(String exp) {
         List<Event> event = eventRepository.findAllByEventExp(exp);
          return eventMapper.convertToListDTO(event);
+    }
+    @Transactional(readOnly = true)
+    public Event getEventById(int id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado "));
+        return event;
     }
 
     @Transactional

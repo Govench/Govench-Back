@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -22,10 +23,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+
     @Override
     public User getUserbyId(Integer userId) {
         return userRepository.findById(userId).orElse(null);
     }
+
 
     @Override
     public User createUser(UserRequestDTO userRequestDTO) {
@@ -34,16 +37,12 @@ public class UserServiceImpl implements UserService {
         } User user = userMapper.convertToEntity(userRequestDTO);
         return userRepository.save(user);
     }
-
-
-
     public User updateUser(Integer userId, UserRequestDTO userDTO) {
         User user1 = getUserbyId(userId);
 
         if (user1 == null) {
             throw new RuntimeException("Usuario no encontrado");
         }
-
         if(userDTO.getName() != null) user1.setName(userDTO.getName());
         if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
         if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
@@ -75,7 +74,6 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         return userMapper.convertToListDTO(users);
     }
-
     @Override
     public boolean authenticateUser(String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
