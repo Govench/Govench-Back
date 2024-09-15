@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -29,17 +30,15 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDTO getEventByName(String tittle) {
-        Event event = eventRepository.findAllByEventTittle(tittle)
-                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el titulo "+tittle));
-        return eventMapper.convertToDTO(event);
+    public List<EventResponseDTO> getEventByName(String tittle) {
+      List<Event> event = eventRepository.findAllByEventTittle(tittle);
+        return eventMapper.convertToListDTO(event);
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDTO getEventByExp(String exp) {
-        Event event = eventRepository.findAllByEventExp(exp)
-                .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el nivel de experiencia "+exp));
-        return eventMapper.convertToDTO(event);
+    public List<EventResponseDTO> getEventByExp(String exp) {
+        List<Event> event = eventRepository.findAllByEventExp(exp);
+         return eventMapper.convertToListDTO(event);
     }
 
     @Transactional

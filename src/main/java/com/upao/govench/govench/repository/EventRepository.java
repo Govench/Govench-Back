@@ -14,10 +14,10 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE e.tittle = :tittle")
-    Optional<Event> findAllByEventTittle(@Param("tittle") String Tittle);
+    List<Event> findAllByEventTittle(@Param("tittle") String Tittle);
 
     @Query("SELECT e FROM Event e WHERE e.exp = :exp")
-    Optional<Event> findAllByEventExp(@Param("exp") String Exp);
+    List<Event> findAllByEventExp(@Param("exp") String Exp);
 
     @Query("SELECT e FROM Event e JOIN UserEvent ue ON e.id = ue.event.id WHERE ue.user.id = :userId AND e.date >= :now")
     List<Event> findUpcomingEventsForUser(@Param("userId") Integer userId, @Param("now") LocalDate now);
