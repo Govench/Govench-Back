@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -43,10 +44,10 @@ public class NotificationServiceImpl implements NotificationService {
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
-    @Scheduled(cron = "10 0 0 * * ?")
+    @Scheduled(cron = "*/1 * * * * ?")
     @Override
     public void sendReminders() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
         List<User> users = userRepository.findAll();
 
         for (User user : users) {
@@ -58,14 +59,17 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public void scheduleEventReminders(User user, Event event) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime eventDateTime = LocalDateTime.of(event.getDate(), event.getStartTime());
+        LocalDate today = LocalDate.now(); // Solo la fecha actual
+        LocalDate eventDate = event.getDate(); // Suponiendo que event.getDate() es LocalDate
 
-        long daysUntilEvent = ChronoUnit.DAYS.between(now, eventDateTime);
+        long daysUntilEvent = ChronoUnit.DAYS.between(today, eventDate);
 
         if (daysUntilEvent == 3 || daysUntilEvent == 2 || daysUntilEvent == 1) {
             sendDailyReminder(user, event);
         } else if (daysUntilEvent == 0) { // El mismo día del evento
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime eventDateTime = LocalDateTime.of(event.getDate(), event.getStartTime());
+
             long hoursUntilEvent = ChronoUnit.HOURS.between(now, eventDateTime);
             if (hoursUntilEvent >= 2 && hoursUntilEvent <= 6) {
                 sendSameDayReminder(user, event, (int) hoursUntilEvent);
