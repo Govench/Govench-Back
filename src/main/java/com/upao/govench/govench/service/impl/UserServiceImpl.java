@@ -53,26 +53,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Integer userId, UserDTO userDTO) {
-        Optional<User> optionalUser = userRepository.findById(userId);
+        User user1 = getUserbyId(userId);
 
-        if (!optionalUser.isPresent()) {
+        if (user1 == null) {
             throw new RuntimeException("Usuario no encontrado");
         }
 
-        User user = optionalUser.get();
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
-
-        user.setPassword(userDTO.getPassword());
-
-        user.setProfileDesc(userDTO.getProfileDesc());
-        user.setInterest(userDTO.getInterest());
-        user.setSkills(userDTO.getSkills());
-        user.setSocialLinks(userDTO.getSocialLinks());
-        user.setFollowers(userDTO.getFollowers());
-        user.setFollowed(userDTO.getFollowed());
-
-        return userRepository.save(user);
+        if(userDTO.getName() != null) user1.setName(userDTO.getName());
+        if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
+        if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
+        if(userDTO.getBirthday() != null) user1.setBirthday(userDTO.getBirthday());
+        if(userDTO.getGender() != null) user1.setGender(userDTO.getGender());
+        if(userDTO.getProfileDesc() != null) user1.setProfileDesc(userDTO.getProfileDesc());
+        if(userDTO.getInterest() != null) user1.setInterest(userDTO.getInterest());
+        if(userDTO.getSkills() != null) user1.setSkills(userDTO.getSkills());
+        if(userDTO.getSocialLinks() != null) user1.setSocialLinks(userDTO.getSocialLinks());
+        if(userDTO.getFollowers() != null) user1.setFollowers(userDTO.getFollowers());
+        if(userDTO.getFollowed() != null) user1.setFollowed(userDTO.getFollowed());
+        return userRepository.save(user1);
     }
 
     @Override
