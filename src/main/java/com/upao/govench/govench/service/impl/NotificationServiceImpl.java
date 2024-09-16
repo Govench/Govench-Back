@@ -59,23 +59,34 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public void scheduleEventReminders(User user, Event event) {
-        LocalDate today = LocalDate.now(); // Solo la fecha actual
-        LocalDate eventDate = event.getDate(); // Suponiendo que event.getDate() es LocalDate
+        LocalDate today = LocalDate.now();
+        LocalDate eventDate = event.getDate();
 
         long daysUntilEvent = ChronoUnit.DAYS.between(today, eventDate);
 
-        if (daysUntilEvent == 3 || daysUntilEvent == 2 || daysUntilEvent == 1) {
+        if ((daysUntilEvent == 3 || daysUntilEvent == 2 || daysUntilEvent == 1) && !isReminderSentToday(event)) {
             sendDailyReminder(user, event);
-        } else if (daysUntilEvent == 0) { // El mismo día del evento
+            event.setLastReminderSentDate(today);
+            eventRepository.save(event);
+        } else if (daysUntilEvent == 0) {
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime eventDateTime = LocalDateTime.of(event.getDate(), event.getStartTime());
 
             long hoursUntilEvent = ChronoUnit.HOURS.between(now, eventDateTime);
-            if (hoursUntilEvent >= 2 && hoursUntilEvent <= 6) {
+            if (hoursUntilEvent >= 2 && hoursUntilEvent <= 6 && !event.isSameDayReminderSent()) {
                 sendSameDayReminder(user, event, (int) hoursUntilEvent);
-            } else if (hoursUntilEvent < 2) {
+                event.setSameDayReminderSent(true);
+                eventRepository.save(event);
+            } else if (hoursUntilEvent < 2 && !event.isFinalReminderSent()) {
                 sendFinalReminder(user, event);
+                event.setFinalReminderSent(true);
+                eventRepository.save(event);
             }
         }
+    }
+
+    private boolean isReminderSentToday(Event event) {
+        LocalDate lastReminderDate = event.getLastReminderSentDate();
+        return lastReminderDate != null && lastReminderDate.equals(LocalDate.now());
     }
 }
