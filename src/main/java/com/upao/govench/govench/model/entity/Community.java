@@ -20,9 +20,11 @@ public class Community {
     private String nombre;
     @Column(name="com_des_vc")
     private String descripcion;
+
     @ManyToOne
     @JoinColumn(name = "com_own_vc",nullable = false)
     private User owner;
+
     @ElementCollection
     @CollectionTable(name = "community_tags", joinColumns = @JoinColumn(name = "com_id_in"))
     @Column(name = "com_tag_vc")

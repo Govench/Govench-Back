@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +23,6 @@ public class UserResponseDTO {
     private List<String> interest;
     private List<String> skills;
     private List<String> socialLinks;
-    private List<String> followers;
-    private List<String> followed;
+    private List<User> followers;
+    private List<User> followings;
 }

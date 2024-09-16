@@ -3,11 +3,10 @@ package com.upao.govench.govench.api;
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.Order;
 import com.upao.govench.govench.model.entity.Event;
-import com.upao.govench.govench.service.impl.EventService;
+import com.upao.govench.govench.service.impl.EventServiceImpl;
 import com.upao.govench.govench.service.PaypalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,7 +17,7 @@ public class PaypalController {
     @Autowired
     public PaypalService paypalService;
     @Autowired
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
 
     @PostMapping("/create-order")
     public String  createOrder(@RequestParam double totalAmount) {
@@ -67,7 +66,7 @@ public class PaypalController {
     public String handleEventPayment(@PathVariable int eventId) {
 
         // Retrieve event by ID
-        Event event = eventService.getEventById(eventId);
+        Event event = eventServiceImpl.getEventById(eventId);
 
         String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment";
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";

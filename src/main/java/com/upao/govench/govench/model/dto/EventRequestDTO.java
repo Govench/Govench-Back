@@ -25,7 +25,7 @@ public class EventRequestDTO {
     private String description;
 
     @NotBlank(message = "La fecha no puede estar vacia")
-    //@Future(message = "La fecha debe ser una fecha futura")
+    @Future(message = "La fecha debe ser una fecha futura")
     private LocalDate date;
 
     @NotBlank(message = "La hora de inicio no puede estar vacía")
