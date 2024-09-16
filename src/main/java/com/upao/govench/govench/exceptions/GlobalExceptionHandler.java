@@ -15,7 +15,7 @@ public class GlobalExceptionHandler extends RuntimeException{
         // Retorna solo el mensaje de error con el status adecuado
         return new ResponseEntity<>(ex.getReason(), ex.getStatusCode());
     }
-    @ExceptionHandler(Exception.class)
+   @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
         // Retorna un mensaje genérico para otras excepciones
         return new ResponseEntity<>("Ocurrió un error inesperado.", HttpStatus.INTERNAL_SERVER_ERROR);

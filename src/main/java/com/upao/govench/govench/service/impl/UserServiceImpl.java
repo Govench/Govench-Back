@@ -4,12 +4,20 @@ import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
+import com.upao.govench.govench.repository.ProfileMongoRepository;
 import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.upao.govench.govench.model.entity.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +45,7 @@ public class UserServiceImpl implements UserService {
         } User user = userMapper.convertToEntity(userRequestDTO);
         return userRepository.save(user);
     }
+    @Override
     public User updateUser(Integer userId, UserRequestDTO userDTO) {
         User user1 = getUserbyId(userId);
 
@@ -81,6 +90,36 @@ public class UserServiceImpl implements UserService {
             User user = userOptional.get();
             return user.getPassword().equals(password);
         } return false;
+    }
+
+    @Override
+    public User associateProfileWithUser(int userId, String profileId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setProfileId(profileId);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    @Override
+    public User dessasociateProfileWithUser(int userId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+
+
+        if (user != null) {
+
+            String profileId = user.getProfileId();
+
+
+            if (profileId != null) {
+                user.setProfileId(null);
+                return userRepository.save(user);
+            }
+        }
+
+        return null;
     }
 }
 
