@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.dto;
 
+import com.upao.govench.govench.model.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -31,6 +33,4 @@ public class UserRequestDTO {
     private List<String> interest;
     private List<String> skills;
     private List<String> socialLinks;
-    private List<String> followers;
-    private List<String> followed;
 }
