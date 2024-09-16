@@ -11,5 +11,6 @@ import java.util.List;
 
 @Repository
 public interface UserEventRepository extends JpaRepository<UserEvent, IdCompuestoU_E> {
-    List<User> findByEvent(Event event);
+    List<UserEvent> findByEvent(Event event);
+    List<UserEvent> findByUser(User user);
 }

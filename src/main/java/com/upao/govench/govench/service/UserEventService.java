@@ -26,4 +26,7 @@ public interface UserEventService {
 
     public List<UserEvent> getAllUserEvents();
 
+    public List<UserEvent> getUserEventbyUser(User user);
+    public  List<UserEvent> getUserEventbyEvent(Event event);
+
 }

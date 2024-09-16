@@ -21,7 +21,7 @@ public class CommunityController {
     @Autowired
     private CommunityService CommunityService; // Inyección del servicio de Community
     @Autowired
-    private UserService UserService;
+    private UserService userService;
 
     @GetMapping
     public List<Community> getCommunitiesByUser(@PathVariable("encodedUserId") String encodedUserId) throws Exception {
@@ -52,6 +52,7 @@ public class CommunityController {
     public Community getCommunityById(@PathVariable("id") int id)  {
         return CommunityService.findById(id);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<String> updateCommunity(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("id") int id, @RequestBody Community community) throws Exception
     {
@@ -72,7 +73,7 @@ public class CommunityController {
     @PostMapping("/create")
     public ResponseEntity<String> createCommunity(@PathVariable("encodedUserId") String encodedUserId,@RequestBody Community community) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
-        User owner=UserService.getUserbyId(userId);
+        User owner=userService.getUserbyId(userId);
         CommunityService.save(community,owner);
         return new ResponseEntity<>("Comunidad creada con éxito", HttpStatus.CREATED);
 

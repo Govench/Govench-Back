@@ -3,10 +3,11 @@ package com.upao.govench.govench.service;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.User;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public interface UserService {
     List<UserResponseDTO> getAllUsers();
 

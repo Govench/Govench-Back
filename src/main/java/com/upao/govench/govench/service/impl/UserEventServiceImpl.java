@@ -1,4 +1,5 @@
 package com.upao.govench.govench.service.impl;
+import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.UserEvent;
@@ -29,6 +30,16 @@ public class UserEventServiceImpl implements UserEventService {
         {
             userEventRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<UserEvent> getUserEventbyUser(User user) {
+       return userEventRepository.findByUser(user);
+    }
+
+    @Override
+    public List<UserEvent> getUserEventbyEvent(Event event) {
+        return userEventRepository.findByEvent(event);
     }
 
     @Override

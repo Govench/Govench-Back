@@ -38,6 +38,7 @@ public class UserCommunityController {
         UserCommunity detail = userCommunityService.searchUserCommunityById(userCommunity.getId());
         return userCommunityService.addUserCommunity(userCommunity);
     }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{iduser}/{idcommunity}")
     public void deleteUserCommunity(@PathVariable int iduser,@PathVariable int idcommunity) {
