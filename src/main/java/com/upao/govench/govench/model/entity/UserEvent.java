@@ -31,4 +31,7 @@ public class UserEvent {
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
+    @Column(name = "use_eve_notif_act_bo")
+    private boolean notificationsEnabled = false;
+
 }

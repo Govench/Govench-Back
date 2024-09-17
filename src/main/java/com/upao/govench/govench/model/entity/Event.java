@@ -17,6 +17,7 @@ import java.time.LocalTime;
 public class Event {
 
     @Id
+    @Column(name= "eve_id_in")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -47,9 +48,16 @@ public class Event {
     private String exp;
 
     @ManyToOne
-    @JoinColumn(name = "loc_id_", nullable = true)
+    @JoinColumn(name = "loc_id_in", nullable = true)
     private Location location;
 
+    @Column(name = "eve_last_rem_da")
+    private LocalDate lastReminderSentDate;
 
-    //Aca se agregaria la Entidad user, pero como no lo tengo implementado aun no
+    @Column(name = "eve_same_day_rem_bo", nullable = false)
+    private boolean sameDayReminderSent = false;
+
+    @Column(name = "eve_fin_rem_bo", nullable = false)
+    private boolean finalReminderSent = false;
+
 }

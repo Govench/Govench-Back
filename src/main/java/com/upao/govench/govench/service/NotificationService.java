@@ -12,4 +12,5 @@ public interface NotificationService {
     void sendReminders();
 
     void scheduleEventReminders(User user, Event event);
+
 }
