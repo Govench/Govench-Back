@@ -12,5 +12,6 @@ public interface ProfileService {
     public Profile getProfile(String profileId);
     public User getUserbyId(int userId);
     public void deleteProfile(String profileId);
-
+    public  void validateImageSize(MultipartFile file) throws IOException;
+    byte[] resizeImage(MultipartFile file) throws IOException;
 }
