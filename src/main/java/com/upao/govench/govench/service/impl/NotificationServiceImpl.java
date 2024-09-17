@@ -2,7 +2,9 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.repository.EventRepository;
+import com.upao.govench.govench.repository.UserEventRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.NotificationService;
 import com.upao.govench.govench.service.EmailService;
@@ -22,6 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final EmailService emailService;
+    private final UserEventRepository userEventRepository;
 
     @Override
     public void sendDailyReminder(User user, Event event) {
@@ -48,11 +51,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendReminders() {
         LocalDate now = LocalDate.now();
-        List<User> users = userRepository.findAll();
+        List<UserEvent> usersWithNotifications = userEventRepository.findUsersWithNotificationsEnabled();
 
-        for (User user : users) {
-            List<Event> upcomingEvents = eventRepository.findUpcomingEventsForUser(user.getId(), now);
-            for (Event event : upcomingEvents) {
+        for (UserEvent userEvent : usersWithNotifications) {
+            User user = userEvent.getUser();
+            Event event = userEvent.getEvent();
+
+            if (event.getDate().isAfter(now) || event.getDate().isEqual(now)) {
                 scheduleEventReminders(user, event);
             }
         }
@@ -64,7 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         long daysUntilEvent = ChronoUnit.DAYS.between(today, eventDate);
 
-        if ((daysUntilEvent == 3 || daysUntilEvent == 2 || daysUntilEvent == 1) && !isReminderSentToday(event)) {
+        if ((daysUntilEvent == 3 || daysUntilEvent == 2 || daysUntilEvent == 1) && !today.equals(event.getLastReminderSentDate())) {
             sendDailyReminder(user, event);
             event.setLastReminderSentDate(today);
             eventRepository.save(event);
@@ -83,10 +88,5 @@ public class NotificationServiceImpl implements NotificationService {
                 eventRepository.save(event);
             }
         }
-    }
-
-    private boolean isReminderSentToday(Event event) {
-        LocalDate lastReminderDate = event.getLastReminderSentDate();
-        return lastReminderDate != null && lastReminderDate.equals(LocalDate.now());
     }
 }
