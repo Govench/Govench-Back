@@ -3,6 +3,7 @@ package com.upao.govench.govench.api;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.upao.govench.govench.model.entity.UserCommunity;
 import com.upao.govench.govench.model.entity.IdCompuestoU_C;
@@ -32,11 +33,20 @@ public class UserCommunityController {
         return userCommunityService.searchUserCommunityById(id);
     }
 
+
+
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping()
-    public UserCommunity createUserCommunity(@RequestBody UserCommunity userCommunity) {
-        UserCommunity detail = userCommunityService.searchUserCommunityById(userCommunity.getId());
-        return userCommunityService.addUserCommunity(userCommunity);
+    @PostMapping
+    public ResponseEntity<UserCommunity> createUserCommunity(@RequestBody UserCommunity userCommunity) {
+        UserCommunity existingCommunity = userCommunityService.searchUserCommunityById(userCommunity.getId());
+
+        if (existingCommunity != null) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        }
+
+        UserCommunity createdUserCommunity = userCommunityService.addUserCommunity(userCommunity);
+
+        return new ResponseEntity<>(createdUserCommunity, HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

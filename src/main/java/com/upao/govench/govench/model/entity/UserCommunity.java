@@ -32,4 +32,9 @@ public class UserCommunity {
 
     @Column(name = "ins_dat_da")
     private LocalDate date;
+
+    @PrePersist
+    public void prePersist() {
+        date = LocalDate.now();
+    }
 }
