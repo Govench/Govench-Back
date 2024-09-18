@@ -34,4 +34,9 @@ public class UserEvent {
     @Column(name = "use_eve_notif_act_bo")
     private boolean notificationsEnabled = false;
 
+    @PrePersist
+    public void prePersist() {
+        this.registrationDate = LocalDate.now();
+    }
+
 }

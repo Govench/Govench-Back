@@ -24,6 +24,9 @@ import java.util.List;
 @RequestMapping("/inscription")
 public class UserEventController{
     @Autowired
+    private EventServiceImpl eventService;
+    @Autowired
+
     private UserEventService userEventService;
     @Autowired
     private EventServiceImpl eventServiceImpl;
@@ -48,22 +51,45 @@ public class UserEventController{
         return userEventService.getUserEventbyEvent(event);
     }
 
-    @PostMapping
-    public ResponseEntity<String> addUserEvent(@RequestBody UserEvent userEvent) {
-        LocalTime systemTime = LocalTime.now();
-        LocalDate systemDate= LocalDate.now();
-        int id_event= userEvent.getEvent().getId();
-        Event event = eventServiceImpl.getEventById(id_event);
-        if(systemDate.isBefore(event.getDate()) ||
-                (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime())))
-        {
-             userEventService.addUserEvent(userEvent);
-            return new ResponseEntity<>("Se ha inscrito correctamente.", HttpStatus.CREATED);
+    @PostMapping("/{iduser}/{idevent}")
+    public ResponseEntity<String> createUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
+        // Consultar el usuario por su ID
+        User user = userService.getUserbyId(iduser);
+        if (user == null) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND); // Si el usuario no existe
         }
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "No se realizar la inscripción porque el evento ya no acepta mas incscripciones."
-        );
+
+        // Consultar el evento por su ID
+        Event event = eventService.getEventById(idevent);
+        if (event == null) {
+            return new ResponseEntity<>("Evento no encontrado", HttpStatus.NOT_FOUND); // Si el evento no existe
+        }
+
+        // Verificar si la relación ya existe
+        UserEvent existingEvent = userEventService.searchUserEventById(new IdCompuestoU_E(iduser, idevent));
+        if (existingEvent != null) {
+            return new ResponseEntity<>("Ya estás registrado en este evento", HttpStatus.CONFLICT); // Si la relación ya existe
+        }
+
+        // Verificar si el evento todavía permite inscripciones (según fecha y hora)
+        LocalTime systemTime = LocalTime.now();
+        LocalDate systemDate = LocalDate.now();
+
+        if (systemDate.isBefore(event.getDate()) ||
+                (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime()))) {
+
+            // Crear la nueva relación entre usuario y evento
+            UserEvent createdUserEvent = userEventService.addUserEvent(
+                    new UserEvent(new IdCompuestoU_E(iduser, idevent), user, event, LocalDate.now(), false)
+            );
+
+            return new ResponseEntity<>("Inscripción exitosa", HttpStatus.CREATED);
+
+        } else {
+            return new ResponseEntity<>("No se puede realizar la inscripción porque el evento ya no acepta más inscripciones.", HttpStatus.BAD_REQUEST);
+        }
     }
+
 
 
     @DeleteMapping("/{iduser}/{idevent}")
