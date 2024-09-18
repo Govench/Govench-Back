@@ -29,7 +29,7 @@ public class CommunityController {
         return communityService.findByOwner_Id(userId);
     }
 
-    // Obtener comunidades que no fueron creadas por el usuario
+
     @GetMapping("/others")
     public List<Community> getCommunitiesNotCreatedByUser(@PathVariable("encodedUserId") String encodedUserId) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
@@ -58,15 +58,15 @@ public class CommunityController {
     {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
 
-        // Obtener la comunidad por su ID
+
         Community existingCommunity = communityService.findById(id);
 
-        // Verificar que el usuario es el propietario de la comunidad
+
           if (existingCommunity.getOwner().getId() != userId) {
           throw new AccessDeniedException("No tienes permiso para modificar esta comunidad");
         }
         
-        // Si es el propietario, permite la actualización
+
         communityService.update(community, id);
         return new ResponseEntity<>("Comunidad editada con éxito", HttpStatus.ACCEPTED);
     }
