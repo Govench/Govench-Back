@@ -25,4 +25,5 @@ public interface UserService {
     User dessasociateProfileWithUser(int userId);
     void followUser(Integer userId, Integer followerId);
     void removeFollowUser(Integer userId, Integer followedUserId);
+
 }

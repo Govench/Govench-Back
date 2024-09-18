@@ -1,6 +1,7 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.CommunityService;
 import com.upao.govench.govench.service.EncryptionService;
@@ -23,29 +24,35 @@ public class CommunityController {
     @Autowired
     private UserService userService;
 
+
+
     @GetMapping
     public List<Community> getCommunitiesByUser(@PathVariable("encodedUserId") String encodedUserId) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
         return communityService.findByOwner_Id(userId);
     }
 
-    // Obtener comunidades que no fueron creadas por el usuario
+
     @GetMapping("/others")
     public List<Community> getCommunitiesNotCreatedByUser(@PathVariable("encodedUserId") String encodedUserId) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
         return communityService.findByOwner_IdNot(userId);
     }
     @DeleteMapping("/{id}")
-    public void deleteCommunity(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("id") int id) throws Exception {
+    public ResponseEntity<?> deleteCommunity(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("id") int id) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
 
         Community existingCommunity = communityService.findById(id);
-
+        if (existingCommunity == null) {
+            throw new NullPointerException("Esta comunidad no existe");
+        }
         // Verificar que el usuario es el propietario de la comunidad
        if (existingCommunity.getOwner().getId() != userId) {
            throw new AccessDeniedException("No tienes permiso para eliminar esta comunidad");
         }
         communityService.deleteById(id);
+
+        return new ResponseEntity<>("Comunidad Eliminada",  HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -58,15 +65,15 @@ public class CommunityController {
     {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
 
-        // Obtener la comunidad por su ID
+
         Community existingCommunity = communityService.findById(id);
 
-        // Verificar que el usuario es el propietario de la comunidad
+
           if (existingCommunity.getOwner().getId() != userId) {
           throw new AccessDeniedException("No tienes permiso para modificar esta comunidad");
         }
         
-        // Si es el propietario, permite la actualización
+
         communityService.update(community, id);
         return new ResponseEntity<>("Comunidad editada con éxito", HttpStatus.ACCEPTED);
     }
@@ -78,4 +85,5 @@ public class CommunityController {
         return new ResponseEntity<>("Comunidad creada con éxito", HttpStatus.CREATED);
 
     }
+
 }

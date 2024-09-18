@@ -1,43 +1,50 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.CommunityRepository;
+import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.service.CommunityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
     @Autowired
-    private CommunityRepository CommunityRepository;
+    private CommunityRepository communityRepository;
+    @Autowired
+    private PostRepository postRepository;
+
 
     @Override
     public List<Community> findByOwner_Id(int userId) {
-        return CommunityRepository.findByOwner_Id(userId);
+        return communityRepository.findByOwner_Id(userId);
     }
 
-    // Comunidades que no fueron creadas por el usuario
+    @Override
     public List<Community> findByOwner_IdNot(int userId) {
-        return CommunityRepository.findByOwner_IdNot(userId);
+        return communityRepository.findByOwner_IdNot(userId);
     }
 
     @Override
     public Community findById(int id) {
-        return CommunityRepository.findById(id).orElse(null);
+        return communityRepository.findById(id).orElse(null);
     }
 
     @Override
     public Community save(Community community, User owner) {
         community.setOwner(owner);
-        return CommunityRepository.save(community);
+        return communityRepository.save(community);
     }
 
     @Override
     public void deleteById(int id) {
-        CommunityRepository.deleteById(id);
+        communityRepository.deleteById(id);
     }
 
     @Override
@@ -46,7 +53,7 @@ public class CommunityServiceImpl implements CommunityService {
         if(community1 != null){
             if(community.getNombre() != null) community1.setNombre(community.getNombre());
             if(community.getDescripcion()!=null)community1.setDescripcion(community.getDescripcion());
-            return CommunityRepository.save(community1);
+            return communityRepository.save(community1);
         }
         return null;
     }
