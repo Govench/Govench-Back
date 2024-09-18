@@ -3,7 +3,7 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.UserService;
-import com.upao.govench.govench.service.impl.EventService;
+import com.upao.govench.govench.service.impl.EventServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class UserEventController{
     @Autowired
     private UserEventService userEventService;
     @Autowired
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
     @Autowired
     private UserService userService;
     @ResponseStatus(HttpStatus.OK)
@@ -44,7 +44,7 @@ public class UserEventController{
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/event/{idevent}")
     public List<UserEvent> getUserEventbyEvent(@PathVariable int idevent) {
-        Event event= eventService.getEventById(idevent);
+        Event event= eventServiceImpl.getEventById(idevent);
         return userEventService.getUserEventbyEvent(event);
     }
 
@@ -53,7 +53,7 @@ public class UserEventController{
         LocalTime systemTime = LocalTime.now();
         LocalDate systemDate= LocalDate.now();
         int id_event= userEvent.getEvent().getId();
-        Event event = eventService.getEventById(id_event);
+        Event event = eventServiceImpl.getEventById(id_event);
         if(systemDate.isBefore(event.getDate()) ||
                 (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime())))
         {
@@ -69,7 +69,7 @@ public class UserEventController{
     @DeleteMapping("/{iduser}/{idevent}")
     public ResponseEntity<String> deleteUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
         IdCompuestoU_E id = new IdCompuestoU_E(iduser, idevent);
-        Event event= eventService.getEventById(idevent);
+        Event event= eventServiceImpl.getEventById(idevent);
         LocalTime systemTime = LocalTime.now();
         LocalDate systemDate= LocalDate.now();
         if(systemDate.isBefore(event.getDate()) ||

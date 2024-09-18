@@ -1,15 +1,19 @@
 package com.upao.govench.govench.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
 @Table(name="User_profile")
 public class User {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="use_id_in")
@@ -42,12 +46,19 @@ public class User {
     @ElementCollection
     private List<String> socialLinks;
 
-    @ElementCollection
-    private List<String> followers;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "followings")
+    private List<User> followers;
 
     @ElementCollection
     private List<String> followed;
 
     @Column(name = "use_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "UserFollow",
+            joinColumns = @JoinColumn(name = "use_id_fwer_in"),
+            inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
+    private List<User> followings;
 }

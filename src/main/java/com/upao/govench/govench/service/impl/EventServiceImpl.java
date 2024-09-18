@@ -5,23 +5,20 @@ import com.upao.govench.govench.mapper.EventMapper;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
-import com.upao.govench.govench.model.entity.Location;
 import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.LocationRepository;
+import com.upao.govench.govench.service.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class EventService {
+public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
-    private final LocationRepository locationRepository;
     private final EventMapper eventMapper;
 
     @Transactional(readOnly = true)
@@ -41,6 +38,7 @@ public class EventService {
         List<Event> event = eventRepository.findAllByEventExp(exp);
          return eventMapper.convertToListDTO(event);
     }
+
     @Transactional(readOnly = true)
     public Event getEventById(int id) {
         Event event = eventRepository.findById(id)
@@ -59,15 +57,15 @@ public class EventService {
     public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el numero de ID"+id));
-        event.setTittle(eventRequestDTO.getTittle());
-        event.setDescription(eventRequestDTO.getDescription());
-        event.setDate(eventRequestDTO.getDate());
-        event.setStartTime(eventRequestDTO.getStartTime());
-        event.setEndTime(eventRequestDTO.getEndTime());
-        event.setState(eventRequestDTO.getState());
-        event.setType(eventRequestDTO.getType());
-        event.setCost(eventRequestDTO.getCost());
-        event.setLocation(eventRequestDTO.getLocation());
+        if(eventRequestDTO.getTittle()!= null)event.setTittle(eventRequestDTO.getTittle());
+        if(eventRequestDTO.getDescription()!= null)event.setDescription(eventRequestDTO.getDescription());
+        if(eventRequestDTO.getDate()!= null)event.setDate(eventRequestDTO.getDate());
+        if(eventRequestDTO.getStartTime()!= null)event.setStartTime(eventRequestDTO.getStartTime());
+        if(eventRequestDTO.getEndTime()!= null)event.setEndTime(eventRequestDTO.getEndTime());
+        if(eventRequestDTO.getState()!= null)event.setState(eventRequestDTO.getState());
+        if(eventRequestDTO.getType()!= null)event.setType(eventRequestDTO.getType());
+        if(eventRequestDTO.getCost()!= null)event.setCost(eventRequestDTO.getCost());
+        if(eventRequestDTO.getLocation()!= null)event.setLocation(eventRequestDTO.getLocation());
 
         event = eventRepository.save(event);
 

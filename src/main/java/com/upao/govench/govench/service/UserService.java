@@ -3,8 +3,10 @@ package com.upao.govench.govench.service;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,4 +23,6 @@ public interface UserService {
     boolean authenticateUser(String email, String password);
     User associateProfileWithUser(int userId, String profileId);
     User dessasociateProfileWithUser(int userId);
+    void followUser(Integer userId, Integer followerId);
+    void removeFollowUser(Integer userId, Integer followedUserId);
 }

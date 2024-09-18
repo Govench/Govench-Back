@@ -1,5 +1,6 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.model.dto.LoginRequestDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
@@ -128,5 +129,29 @@ public class UserController {
         userService.dessasociateProfileWithUser(userId);
         profileService.deleteProfile(profileId);
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{userId}/follow/{followedUserId}")
+    public ResponseEntity<String> followUser(@PathVariable Integer userId, @PathVariable Integer followedUserId) {
+        try {
+            userService.followUser(userId, followedUserId);
+            return new ResponseEntity<>("Usuario seguido correctamente", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al seguir al usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{userId}/unfollow/{removedUserId}")
+    public ResponseEntity<String> removeFollowUser(@PathVariable Integer userId, @PathVariable Integer removedUserId) {
+        try {
+            userService.removeFollowUser(userId, removedUserId);
+            return new ResponseEntity<>("Dejado de seguir Usuario correctamente", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al dejar de seguir al usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

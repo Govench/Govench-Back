@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service.impl;
 
+import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -45,6 +47,7 @@ public class UserServiceImpl implements UserService {
         } User user = userMapper.convertToEntity(userRequestDTO);
         return userRepository.save(user);
     }
+
     @Override
     public User updateUser(Integer userId, UserRequestDTO userDTO) {
         User user1 = getUserbyId(userId);
@@ -61,8 +64,6 @@ public class UserServiceImpl implements UserService {
         if(userDTO.getInterest() != null) user1.setInterest(userDTO.getInterest());
         if(userDTO.getSkills() != null) user1.setSkills(userDTO.getSkills());
         if(userDTO.getSocialLinks() != null) user1.setSocialLinks(userDTO.getSocialLinks());
-        if(userDTO.getFollowers() != null) user1.setFollowers(userDTO.getFollowers());
-        if(userDTO.getFollowed() != null) user1.setFollowed(userDTO.getFollowed());
         return userRepository.save(user1);
     }
 
@@ -90,6 +91,19 @@ public class UserServiceImpl implements UserService {
             User user = userOptional.get();
             return user.getPassword().equals(password);
         } return false;
+    }
+
+    @Override
+    public void followUser(Integer userId, Integer followedUserId){
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User userToFollow = userRepository.findById(followedUserId).orElseThrow(() -> new ResourceNotFoundException("Usuario a seguir no encontrado"));
+
+        user.getFollowings().add(userToFollow);
+        userToFollow.getFollowers().add(user);
+
+        userRepository.save(user);
+        userRepository.save(userToFollow);
     }
 
     @Override
@@ -121,5 +135,18 @@ public class UserServiceImpl implements UserService {
 
         return null;
     }
+    @Override
+    public void removeFollowUser(Integer userId, Integer followedUserId){
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User userToFollow = userRepository.findById(followedUserId).orElseThrow(() -> new ResourceNotFoundException("Usuario a dejar de seguir no encontrado"));
+
+        user.getFollowings().remove(userToFollow);
+        userToFollow.getFollowers().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(userToFollow);
+    }
 }
+
 
