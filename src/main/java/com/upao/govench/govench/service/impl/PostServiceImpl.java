@@ -10,7 +10,7 @@ import com.upao.govench.govench.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public class PostServiceImpl implements PostService {
             Community community = communityOptional.get();
             post.setAutor(author);
             post.setComunidad(community);
-            post.setCreated(new Date());
+            post.setCreated(LocalDate.now());
             postRepository.save(post);
         } else {
             throw new RuntimeException("La comunidad no fue encontrada.");
@@ -60,9 +60,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post actualizaPost(int id, Post post) {
         Post postActual = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post no encontrado con el numero de id" + id));
-        postActual.setBody(post.getBody());
-        postRepository.save(postActual);
-       return postActual;
+
+        if(post.getBody()!=null)postActual.setBody(post.getBody());
+
+        return postRepository.save(postActual);
     }
 }
 

@@ -2,13 +2,13 @@ package com.upao.govench.govench.model.entity;
 
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -18,24 +18,36 @@ import java.util.Date;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id_in", nullable = false)
+    @Column(name = "pos_id_in", nullable = false)
     private int id;
 
-    @Column(name = "post_body_vc", nullable = false)
+    @Column(name = "pos_bod_vc", nullable = false)
     private String body;
 
 
     @ManyToOne
-    @JoinColumn(name = "post_autor_vc", nullable = false)
+    @JoinColumn(name = "pos_aut_vc", nullable = false)
     private User autor;
 
 
     @ManyToOne
-    @JoinColumn(name = "post_comunidad_id", nullable = false)
+    @JoinColumn(name = "pos_com_id", nullable = false)
     private Community comunidad;
 
-    @Column(name = "post_created_dt", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date created;
+    @Column(name = "post_crd_dt", nullable = false)
+    private LocalDate created;
+
+    @Column(name = "post_upd_dt", nullable = true)
+    private LocalDateTime updated;
+
+    @PrePersist
+    public void prePersist() {
+        this.created = LocalDate.now();
+    }
+    @PreUpdate
+    public void preUpdate()
+    {
+        this.updated = LocalDateTime.now();
+    }
 }
 

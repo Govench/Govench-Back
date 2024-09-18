@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
-    @Scheduled(cron = "*/1 * * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     @Override
     public void sendReminders() {
         LocalDate now = LocalDate.now();

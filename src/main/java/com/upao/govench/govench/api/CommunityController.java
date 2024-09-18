@@ -39,16 +39,20 @@ public class CommunityController {
         return communityService.findByOwner_IdNot(userId);
     }
     @DeleteMapping("/{id}")
-    public void deleteCommunity(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("id") int id) throws Exception {
+    public ResponseEntity<?> deleteCommunity(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("id") int id) throws Exception {
         int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
 
         Community existingCommunity = communityService.findById(id);
-
+        if (existingCommunity == null) {
+            throw new NullPointerException("Esta comunidad no existe");
+        }
         // Verificar que el usuario es el propietario de la comunidad
        if (existingCommunity.getOwner().getId() != userId) {
            throw new AccessDeniedException("No tienes permiso para eliminar esta comunidad");
         }
         communityService.deleteById(id);
+
+        return new ResponseEntity<>("Comunidad Eliminada",  HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

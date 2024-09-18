@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +57,7 @@ public class PostController {
         }
         post.setAutor(author);
         post.setComunidad(community);
-        post.setCreated(new Date());
+        post.setCreated(LocalDate.now());
 
         postService.save(post);
         return new ResponseEntity<>("Post creado con éxito", HttpStatus.CREATED);
@@ -71,7 +73,8 @@ public class PostController {
                         post.getBody(),
                         post.getAutor().getName(),
                         post.getComunidad().getNombre(),
-                        post.getCreated()
+                        post.getCreated(),
+                        post.getUpdated()
                 )
         ).collect(Collectors.toList());
 
@@ -109,21 +112,22 @@ public class PostController {
     }
 
         @PutMapping("/{encodedUserId}/{postId}")
-        public ResponseEntity<?> updatePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId) throws Exception {
+        public ResponseEntity<?> updatePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId,@RequestBody Post updatedPost) throws Exception {
             try {
                 int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
-                Post updatedPost = postService.findById(postId);
+                Post Post1 = postService.findById(postId);
                  System.out.println("User ID desencriptado: " + userId);
 
+                if (Post1 == null) {
+                    return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
+                }
+
+                if (Post1.getAutor().getId() != userId) {
+                    throw new AccessDeniedException("No tienes permiso para modificar este post");
+                }
+
                 Post updatedExistingPost = postService.actualizaPost(postId, updatedPost);
-
-            if (updatedExistingPost == null) {
-                return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
-            }
-
-            if (updatedExistingPost.getAutor().getId() != userId) {
-                throw new AccessDeniedException("No tienes permiso para modificar este post");
-            }
+                updatedExistingPost.setUpdated(LocalDateTime.now());
 
             return new ResponseEntity<>("El post ha sido actualizado", HttpStatus.ACCEPTED);
         } catch (NumberFormatException e) {
