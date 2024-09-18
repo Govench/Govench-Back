@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class Community {
     @Column(name = "com_tag_vc")
     private List<String> tags;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> post;
 }

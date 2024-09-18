@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service.impl;
 
+import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
@@ -54,6 +55,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post save(Post post) {
         return postRepository.save(post);
+    }
+
+    @Override
+    public Post actualizaPost(int id, Post post) {
+        Post postActual = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post no encontrado con el numero de id" + id));
+        postActual.setBody(post.getBody());
+        postRepository.save(postActual);
+       return postActual;
     }
 }
 

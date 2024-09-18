@@ -1,6 +1,7 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.CommunityService;
 import com.upao.govench.govench.service.EncryptionService;
@@ -22,6 +23,8 @@ public class CommunityController {
     private CommunityService communityService; // Inyección del servicio de Community
     @Autowired
     private UserService userService;
+
+
 
     @GetMapping
     public List<Community> getCommunitiesByUser(@PathVariable("encodedUserId") String encodedUserId) throws Exception {
@@ -78,4 +81,5 @@ public class CommunityController {
         return new ResponseEntity<>("Comunidad creada con éxito", HttpStatus.CREATED);
 
     }
+
 }
