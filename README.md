@@ -90,7 +90,7 @@ Para entender mejor la estructura y diseño de la aplicación "BookHub", revisa 
 
 ### Diagrama de Base de Datos
 
-![Diagrama de Base de Datos](img/Diagrama%20Base%20de%20Datos%20-%20BookHub.jpeg)
+![Diagrama de Base de Datos](img/Diagrama%20Base%20de%20datos.jpeg)
 
 Este diagrama ilustra el esquema de la base de datos utilizada por la aplicación, mostrando las tablas, columnas, y relaciones entre las entidades.
 
