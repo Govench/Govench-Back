@@ -29,7 +29,7 @@ Govench es una plataforma web vibrante y accesible que transforma la manera en q
 | **En Pruebas**    | Contiene las tareas que han pasado la revisión de código y necesitan pruebas exhaustivas (unitarias, de integración y de aceptación) para garantizar su calidad. |
 | **Hecho**         | Las tareas completamente desarrolladas, revisadas y probadas se mueven aquí, indicando que están listas y finalizadas.                               |
 
-Mira cómo va avanzando nuestro trabajo visitando el siguiente enlace: [Tablero de Trello](https://trello.com/b/5sNtLdze).
+Mira cómo va avanzando nuestro trabajo visitando el siguiente enlace: [Jira](https://upao-team-rdkenqgm.atlassian.net/jira/software/projects/GOV/boards/67/backlog?epics=visible).
 
 
 ### Funcionalidades de la Aplicación Govench
