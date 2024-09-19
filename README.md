@@ -1,9 +1,12 @@
 
-## Introducción
+# Introducción
+**Govench** es una aplicación web diseñada para promover y facilitar tanto la gestion registro de eventos. Con Govench, los usuarios pueden crear su cuenta, iniciar sesión, realizar y pagos. 
 
-**BookHub** es una aplicación web diseñada para facilitar la compra de libros electrónicos y proporcionar una experiencia de usuario completa en la gestión de bibliotecas digitales personales. Con BookHub, los usuarios pueden crear una cuenta, iniciar sesión, y realizar pagos de manera segura a través de PayPal para adquirir sus libros favoritos. La aplicación permite a los administradores realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre libros, categorías y autores, gestionando de manera eficiente el catálogo de libros. Los usuarios pueden también organizar sus libros adquiridos en colecciones personalizadas.
+La aplicación permitirá crear, compartir y participar en eventos y comunidades relacionados al tema tegnológico. A su vez podremos visualizar dinámicamente los eventos registrados o creados y recibir notificaciones.
 
-El propósito de BookHub es ofrecer una plataforma integrada que combine la facilidad de compra de libros electrónicos, la gestión del catálogo por parte de administradores, y la personalización de bibliotecas digitales por parte de los usuarios, todo en un entorno seguro y amigable.
+
+Govench es una plataforma web vibrante y accesible que transforma la manera en que interactúas con el mundo de la tecnología. Te ofrece la capacidad de crear y gestionar eventos, mantener un calendario personalizado, y participar en comunidades apasionadas por la innovación. Con Govench, cada usuario puede visualizar eventos, recibir notificaciones en tiempo real, y obtener certificados a través de pagos seguros. Nuestro objetivo es proporcionar un espacio en el que tus intereses tecnológicos sean celebrados, facilitando el aprendizaje y la colaboración en una experiencia en línea enriquecedora y conectada.
+
 
 ### Colaboradores del Proyecto
 
