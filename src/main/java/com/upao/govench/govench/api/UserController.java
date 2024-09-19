@@ -1,10 +1,10 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
-import com.upao.govench.govench.model.dto.LoginRequestDTO;
-import com.upao.govench.govench.model.dto.UserRequestDTO;
-import com.upao.govench.govench.model.dto.UserResponseDTO;
+import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.Profile;
+import com.upao.govench.govench.model.entity.Rating;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -154,4 +156,37 @@ public class UserController {
             return new ResponseEntity<>("Error al dejar de seguir al usuario", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/{userId}/rate/{ratedUserId}")
+    public ResponseEntity<String> rateUser(
+            @PathVariable Integer userId,
+            @PathVariable Integer ratedUserId,
+            @RequestBody Rating rating
+    ) {
+        try {
+            userService.rateUser(userId, ratedUserId, rating.getRatingValue(), rating.getComment());
+
+            return new ResponseEntity<>("Usuario calificado correctamente", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al calificar usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{userId}/ratings")
+    public ResponseEntity <List <RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
+        try {
+
+           List<Rating> ratings = userService.getUserRatings(userId);
+
+           List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> new RatingRequestDTO
+
+          (rating.getRaterUser().getName(), rating.getRatingValue(), rating.getComment())).collect(Collectors.toList());
+
+            return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
+        } catch (Exception e)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

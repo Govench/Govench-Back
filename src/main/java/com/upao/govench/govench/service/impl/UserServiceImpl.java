@@ -2,10 +2,12 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.UserMapper;
+import com.upao.govench.govench.model.entity.Rating;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.repository.ProfileMongoRepository;
+import com.upao.govench.govench.repository.RatingRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
@@ -33,6 +35,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RatingRepository ratingRepository;
 
     @Override
     public User getUserbyId(Integer userId) {
@@ -147,6 +151,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         userRepository.save(userToFollow);
     }
+
+
+     @Override
+    public void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment) {
+        User rater = userRepository.findById(raterUserId).orElseThrow(() -> new RuntimeException("Usuario que califica no encontrado"));
+        User rated = userRepository.findById(ratedUserId).orElseThrow(() -> new RuntimeException("Usuario a calificar no encontrado"));
+
+        Rating rating = new Rating();
+        rating.setRaterUser(rater);
+        rating.setRatedUser(rated);
+        rating.setRatingValue(ratingValue);
+        rating.setComment(comment);
+
+        ratingRepository.save(rating);
+    }
+
+    @Override
+    public List<Rating> getUserRatings(Integer userId) {
+        return ratingRepository.findByRatedUserId(userId);
+    }
+
 }
 
 

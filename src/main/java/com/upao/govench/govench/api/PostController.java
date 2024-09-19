@@ -65,8 +65,8 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<PostDTO>> obtenerTodosLosPosts() {
-        List<Post> posts = postService.getAllPosts();
 
+        List<Post> posts = postService.getAllPosts();
 
         List<PostDTO> postDTOs = posts.stream().map(post -> new PostDTO(
                         post.getId(),

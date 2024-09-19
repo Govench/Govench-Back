@@ -62,4 +62,13 @@ public class User {
             joinColumns = @JoinColumn(name = "use_id_fwer_in"),
             inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
     private List<User> followings;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "ratedUser")
+    private List<Rating> receivedRatings;
+    @JsonIgnore
+    @OneToMany(mappedBy = "raterUser")
+    private List<Rating> givenRatings;
+
+
 }
