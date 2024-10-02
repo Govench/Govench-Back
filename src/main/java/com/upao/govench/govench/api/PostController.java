@@ -1,10 +1,12 @@
 package com.upao.govench.govench.api;
 
+
 import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.dto.PostDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
@@ -13,6 +15,7 @@ import com.upao.govench.govench.service.EncryptionService;
 import com.upao.govench.govench.service.PostService;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.PostServiceImpl;
+import lombok.AllArgsConstructor;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForBigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +31,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
+@AllArgsConstructor
 public class PostController {
+
 
     @Autowired
     private PostService postService;
@@ -43,25 +48,27 @@ public class PostController {
     private EncryptionService encryptionService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPost(@RequestBody Post post) {
+    public ResponseEntity<String> createPost(@RequestBody PostRequestDTO postRequestDTO) {
 
-        int userId = post.getAutor().getId();
+        int userId = postRequestDTO.getAutor().getId();
         User author = userService.getUserbyId(userId);
 
         if (author == null) {
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         }
         
+        bugfix/ConvirtiendoaDtoCommunity
         int communityId = post.getComunidad().getId();
         Community community = communityMapper.convertToEntity(communityService.findById(communityId));
+
         if (community == null) {
             return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND);
         }
-        post.setAutor(author);
-        post.setComunidad(community);
-        post.setCreated(LocalDate.now());
+        postRequestDTO.setAutor(author);
+        postRequestDTO.setComunidad(community);
+        postRequestDTO.setCreated(LocalDate.now());
 
-        postService.save(post);
+        postServiceImpl.publicarPost(communityId,postRequestDTO,author);
         return new ResponseEntity<>("Post creado con éxito", HttpStatus.CREATED);
     }
 
@@ -81,6 +88,7 @@ public class PostController {
         ).collect(Collectors.toList());
 
         return new ResponseEntity<>(postDTOs, HttpStatus.OK);
+
     }
 
 
@@ -89,7 +97,7 @@ public class PostController {
         try {
             int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
 
-            Post existingPost = postService.findById(postId);
+            PostResponseDTO existingPost = postServiceImpl.getPostById(postId);
 
             if (existingPost == null) {
                 return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
@@ -99,7 +107,7 @@ public class PostController {
                 throw new AccessDeniedException("No tienes permiso para eliminar este post");
             }
 
-            postService.deleteById(postId);
+            postServiceImpl.deleteById(postId);
 
             return new ResponseEntity<>("Post eliminado con éxito", HttpStatus.OK);
         }
@@ -114,10 +122,11 @@ public class PostController {
     }
 
         @PutMapping("/{encodedUserId}/{postId}")
-        public ResponseEntity<?> updatePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId,@RequestBody Post updatedPost) throws Exception {
+        public ResponseEntity<?> updatePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId,
+                                            @RequestBody PostRequestDTO postRequestDTO) throws Exception {
             try {
                 int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
-                Post Post1 = postService.findById(postId);
+                PostResponseDTO Post1 = postServiceImpl.getPostById(postId);
                  System.out.println("User ID desencriptado: " + userId);
 
                 if (Post1 == null) {
@@ -128,8 +137,8 @@ public class PostController {
                     throw new AccessDeniedException("No tienes permiso para modificar este post");
                 }
 
-                Post updatedExistingPost = postService.actualizaPost(postId, updatedPost);
-                updatedExistingPost.setUpdated(LocalDateTime.now());
+                PostResponseDTO updatedPost = postServiceImpl.actualizaPost(postId, postRequestDTO);
+                updatedPost.setUpdated(LocalDateTime.now());
 
             return new ResponseEntity<>("El post ha sido actualizado", HttpStatus.ACCEPTED);
         } catch (NumberFormatException e) {
@@ -138,9 +147,6 @@ public class PostController {
             return new ResponseEntity<>("Error al actualizar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }
 
 

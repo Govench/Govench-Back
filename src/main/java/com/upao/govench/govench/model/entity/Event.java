@@ -29,6 +29,7 @@ public class Event {
 
     @Column(name = "eve_dat_da", nullable = false)
     private LocalDate date;
+
     @Column(name = "eve_start_time", nullable = false)
     private LocalTime startTime;
 
