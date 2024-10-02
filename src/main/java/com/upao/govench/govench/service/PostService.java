@@ -1,15 +1,17 @@
 package com.upao.govench.govench.service;
 
+import com.upao.govench.govench.model.dto.PostRequestDTO;
+import com.upao.govench.govench.model.dto.PostResponseDTO;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import java.util.List;
 
 public interface PostService {
-    void publicarPost(int communityId, Post post, User author);
-    List<Post> getAllPosts();
-    Post findById(int id);
+
+    void publicarPost(int communityId, PostRequestDTO postRequestDTO, User author);
+    List<PostResponseDTO> getAllPosts();
     void deleteById(int id);
-    Post save(Post post);
-    Post actualizaPost(int id, Post post);
+    PostResponseDTO getPostById(int id);
+    PostResponseDTO actualizaPost(int id, PostRequestDTO postRequestDTO);
 
 }
