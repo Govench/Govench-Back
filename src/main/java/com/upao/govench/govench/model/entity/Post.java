@@ -1,7 +1,5 @@
 package com.upao.govench.govench.model.entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,11 +22,9 @@ public class Post {
     @Column(name = "pos_bod_vc", nullable = false)
     private String body;
 
-
     @ManyToOne
     @JoinColumn(name = "pos_aut_vc", nullable = false)
     private User autor;
-
 
     @ManyToOne
     @JoinColumn(name = "pos_com_id", nullable = false)

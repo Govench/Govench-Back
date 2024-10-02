@@ -1,31 +1,35 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
+import com.upao.govench.govench.mapper.PostMapper;
+import com.upao.govench.govench.model.dto.PostRequestDTO;
+import com.upao.govench.govench.model.dto.PostResponseDTO;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class PostServiceImpl implements PostService {
 
-    @Autowired
     private PostRepository postRepository;
-
-    @Autowired
     private CommunityRepository communityRepository;
+    private PostMapper postMapper;
 
-    @Override
-    public void publicarPost(int communityId, Post post, User author) {
+    @Transactional
+    public void publicarPost(int communityId, PostRequestDTO postRequestDTO, User author) {
         Optional<Community> communityOptional = communityRepository.findById(communityId);
+        Post post = postMapper.convertToEntity(postRequestDTO);
         if (communityOptional.isPresent()) {
             Community community = communityOptional.get();
             post.setAutor(author);
@@ -37,33 +41,33 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<PostResponseDTO> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return postMapper.convertToListDTO(posts);
     }
 
-    @Override
-    public Post findById(int id) {
-        return postRepository.findById(id).orElse(null);
-    }
-
-    @Override
+    @Transactional
     public void deleteById(int id) {
         postRepository.deleteById(id);
     }
 
     @Override
-    public Post save(Post post) {
-        return postRepository.save(post);
+    public PostResponseDTO getPostById(int id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Post no encontrado con el id" + id));
+        return postMapper.convertToDTO(post);
     }
 
-    @Override
-    public Post actualizaPost(int id, Post post) {
-        Post postActual = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post no encontrado con el numero de id" + id));
+    @Transactional
+    public PostResponseDTO actualizaPost(int id, PostRequestDTO postRequestDTO) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post no encontrado con el numero de id" + id));
+        if(postRequestDTO.getBody()!=null)post.setBody(postRequestDTO.getBody());
 
-        if(post.getBody()!=null)postActual.setBody(post.getBody());
+        post = postRepository.save(post);
 
-        return postRepository.save(postActual);
+        return postMapper.convertToDTO(post);
     }
 }
 
