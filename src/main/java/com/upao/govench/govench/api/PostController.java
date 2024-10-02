@@ -1,5 +1,7 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.mapper.CommunityMapper;
+import com.upao.govench.govench.model.dto.CommunityResponseDTO;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.dto.PostDTO;
@@ -35,7 +37,8 @@ public class PostController {
     private UserService userService;
     @Autowired
     private CommunityService communityService;
-
+    @Autowired
+    private CommunityMapper   communityMapper ;
     @Autowired
     private EncryptionService encryptionService;
 
@@ -50,8 +53,7 @@ public class PostController {
         }
         
         int communityId = post.getComunidad().getId();
-        Community community = communityService.findById(communityId);
-
+        Community community = communityMapper.convertToEntity(communityService.findById(communityId));
         if (community == null) {
             return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND);
         }
@@ -72,7 +74,7 @@ public class PostController {
                         post.getId(),
                         post.getBody(),
                         post.getAutor().getName(),
-                        post.getComunidad().getNombre(),
+                        post.getComunidad().getName(),
                         post.getCreated(),
                         post.getUpdated()
                 )
