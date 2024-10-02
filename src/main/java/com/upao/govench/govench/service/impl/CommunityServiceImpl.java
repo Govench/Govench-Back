@@ -1,11 +1,18 @@
 package com.upao.govench.govench.service.impl;
 
+import com.upao.govench.govench.mapper.CommunityMapper;
+import com.upao.govench.govench.mapper.UserMapper;
+import com.upao.govench.govench.model.dto.CommunityRequestDTO;
+import com.upao.govench.govench.model.dto.CommunityResponseDTO;
+import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.repository.PostRepository;
+import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.CommunityService;
+import com.upao.govench.govench.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,27 +26,48 @@ public class CommunityServiceImpl implements CommunityService {
     private CommunityRepository communityRepository;
     @Autowired
     private PostRepository postRepository;
-
-
+    @Autowired
+    private CommunityMapper communityMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private UserRepository userRepository;
     @Override
-    public List<Community> findByOwner_Id(int userId) {
-        return communityRepository.findByOwner_Id(userId);
+    public List<CommunityResponseDTO> findByOwner_Id(int userId) {
+         User usuario = userRepository.findById(userId).orElse(null);
+       if(usuario != null) {
+           return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_Id(userId));
+       }
+        else
+            return null;
     }
 
     @Override
-    public List<Community> findByOwner_IdNot(int userId) {
-        return communityRepository.findByOwner_IdNot(userId);
+    public List<CommunityResponseDTO> findByOwner_IdNot(int userId) {
+        User usuario = userRepository.findById(userId).orElse(null);
+        if(usuario != null) {
+            return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_IdNot(userId));
+
+        }
+        else {
+            return null;
+        }
+    }
+
+    public CommunityResponseDTO findById(int id) {
+        Community community = communityRepository.findById(id).orElse(null);
+        if (community == null) {
+            throw new NullPointerException("La comunidad con ID " + id + " no existe");
+        }
+        return communityMapper.converToResponseDTO(community);
     }
 
     @Override
-    public Community findById(int id) {
-        return communityRepository.findById(id).orElse(null);
-    }
+    public CommunityResponseDTO save(CommunityRequestDTO community, User owner) {
 
-    @Override
-    public Community save(Community community, User owner) {
-        community.setOwner(owner);
-        return communityRepository.save(community);
+        Community comunityentity = communityMapper.convertToEntity(community);
+        comunityentity.setOwner(owner);
+        return  communityMapper.converToResponseDTO(communityRepository.save(comunityentity));
     }
 
     @Override
@@ -48,13 +76,19 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community update(Community community, int id) {
-       Community community1 =findById(id);
+    public CommunityResponseDTO update(CommunityRequestDTO community, int id) {
+        Community community1 = communityRepository.findById(id).orElse(null);
         if(community1 != null){
-            if(community.getNombre() != null) community1.setNombre(community.getNombre());
+            if(community.getName() != null) community1.setName(community.getName());
             if(community.getDescripcion()!=null)community1.setDescripcion(community.getDescripcion());
-            return communityRepository.save(community1);
+            if(community.getTags()!=null)community1.setTags(community.getTags()); //probar si sobrescribe o agrega
+            return communityMapper.converToResponseDTO(communityRepository.save(community1));
         }
         return null;
+    }
+
+    @Override
+    public Community EntityfindById(int idcommunity) {
+        return communityRepository.findById(idcommunity).orElse(null);
     }
 }

@@ -1,5 +1,9 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.exceptions.UserCommunityAlreadyExistsException;
+import com.upao.govench.govench.mapper.CommunityMapper;
+import com.upao.govench.govench.model.dto.CommunityResponseDTO;
+import com.upao.govench.govench.model.dto.UserCommunityResponseDTO;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.CommunityService;
@@ -31,6 +35,8 @@ public class UserCommunityController {
     private UserService userService;
     @Autowired
     private CommunityService communityService;
+    @Autowired
+    private CommunityMapper communityMapper;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
@@ -47,23 +53,22 @@ public class UserCommunityController {
 
 
     @PostMapping("/{iduser}/{idcommunity}")
-    public ResponseEntity<UserCommunity> createUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
+    public ResponseEntity<?> createUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
         // Consultar el usuario por su ID
         User user = userService.getUserbyId(iduser);
         if (user == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // Si el usuario no existe
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND); // Mensaje más claro
         }
 
         // Consultar la comunidad por su ID
-        Community community = communityService.findById(idcommunity);
+        Community community = communityService.EntityfindById(idcommunity);
         if (community == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // Si la comunidad no existe
+            return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND); // Mensaje más claro
         }
 
         // Verificar si la relación ya existe
-        UserCommunity existingCommunity = userCommunityService.searchUserCommunityById(new IdCompuestoU_C(iduser, idcommunity));
-        if (existingCommunity != null) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT); // Si la relación ya existe
+        if (userCommunityService.searchUserCommunityById(new IdCompuestoU_C(iduser, idcommunity)) != null) {
+            throw new UserCommunityAlreadyExistsException("La relación ya existe entre el usuario y la comunidad."); // Lanzar excepción
         }
 
         // Crear la nueva relación entre usuario y comunidad
@@ -73,8 +78,6 @@ public class UserCommunityController {
 
         return new ResponseEntity<>(createdUserCommunity, HttpStatus.CREATED);
     }
-
-
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{iduser}/{idcommunity}")

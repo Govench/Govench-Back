@@ -1,5 +1,11 @@
 package com.upao.govench.govench.api;
 
+
+import com.upao.govench.govench.mapper.CommunityMapper;
+import com.upao.govench.govench.model.dto.CommunityResponseDTO;
+import com.upao.govench.govench.model.dto.EventRequestDTO;
+import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.PostDTO;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
@@ -28,10 +34,18 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PostController {
 
-    private final PostService postServiceImpl;
-    private final UserService userService;
-    private final CommunityService communityService;
-    private final EncryptionService encryptionService;
+
+    @Autowired
+    private PostService postService;
+
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CommunityService communityService;
+    @Autowired
+    private CommunityMapper   communityMapper ;
+    @Autowired
+    private EncryptionService encryptionService;
 
     @PostMapping("/create")
     public ResponseEntity<String> createPost(@RequestBody PostRequestDTO postRequestDTO) {
@@ -43,8 +57,9 @@ public class PostController {
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         }
         
-        int communityId = postRequestDTO.getComunidad().getId();
-        Community community = communityService.findById(communityId);
+        bugfix/ConvirtiendoaDtoCommunity
+        int communityId = post.getComunidad().getId();
+        Community community = communityMapper.convertToEntity(communityService.findById(communityId));
 
         if (community == null) {
             return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND);
@@ -58,9 +73,22 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponseDTO>> obtenerTodosLosPosts() {
-        List<PostResponseDTO> posts = postServiceImpl.getAllPosts();
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+    public ResponseEntity<List<PostDTO>> obtenerTodosLosPosts() {
+
+        List<Post> posts = postService.getAllPosts();
+
+        List<PostDTO> postDTOs = posts.stream().map(post -> new PostDTO(
+                        post.getId(),
+                        post.getBody(),
+                        post.getAutor().getName(),
+                        post.getComunidad().getName(),
+                        post.getCreated(),
+                        post.getUpdated()
+                )
+        ).collect(Collectors.toList());
+
+        return new ResponseEntity<>(postDTOs, HttpStatus.OK);
+
     }
 
 
@@ -119,9 +147,6 @@ public class PostController {
             return new ResponseEntity<>("Error al actualizar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }
 
 
