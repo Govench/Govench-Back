@@ -16,7 +16,7 @@ public class PostResponseDTO {
 
     private int id;
     private String body;
-    private User autor;
+    private AutorResponseDTO autor;
     private LocalDate created;
     private LocalDateTime updated;
 

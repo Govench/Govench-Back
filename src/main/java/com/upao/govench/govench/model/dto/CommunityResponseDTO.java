@@ -12,7 +12,7 @@ public class CommunityResponseDTO {
     private String descripcion;
     private OwnerResponseDTO owner;
     private List<String> tags;
-    //private List<Post> post;
+    private List<PostResponseDTO> post;
 }
 
 
