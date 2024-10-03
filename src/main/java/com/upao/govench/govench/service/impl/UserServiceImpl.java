@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -193,15 +194,13 @@ public class UserServiceImpl implements UserService {
         if(!userAsist) {
             throw new RuntimeException("Usuario no asistio al evento");
         }
+
         RatingEvent ratingEvent = ratingEventMapper.convertToEntity(ratingEventRequestDTO);
+        ratingEvent.setUserId(userId);
+        ratingEvent.setEventId(eventId);
+        ratingEvent.setFechaPuntuacion(LocalDate.now());
         ratingEventRepository.save(ratingEvent);
         return ratingEventMapper.convertToDTO(ratingEvent);
-    }
-
-    @Override
-    public List<RatingEventResponseDTO> getRatingEvents(int eventId) {
-        List<RatingEvent> ratingEvents = ratingEventRepository.findAllById(Collections.singleton(eventId));
-        return ratingEventMapper.convertToListDTO(ratingEvents);
     }
 
 }

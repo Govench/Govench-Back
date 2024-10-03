@@ -12,10 +12,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingEventResponseDTO {
+    private int id;
     private int valorPuntuacion;
     private LocalDate fechaPuntuacion;
-    private User user;
-    private Event event;
-
-
+    private int userId;
+    private int eventId;
 }

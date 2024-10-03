@@ -33,5 +33,4 @@ public interface UserService {
     List<Rating> getUserRatings(Integer userId);
 
     RatingEventResponseDTO createRatingEvent(int  userId, int eventId, RatingEventRequestDTO ratingEventRequestDTO);
-    List<RatingEventResponseDTO> getRatingEvents(int evenId);
 }

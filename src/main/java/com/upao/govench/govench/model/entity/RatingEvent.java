@@ -25,12 +25,11 @@ public class RatingEvent {
     @Column(name = "rat_fech_va", nullable = false)
     private LocalDate fechaPuntuacion;
 
-    @ManyToOne
-    @JoinColumn(name = "rat_use_id", nullable = false)
-    private User usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "rat_eve_id", nullable = false)
-    private Event evento;
+    @Column(name = "use_id_in", nullable = false)
+    private int userId;
+
+    @Column(name = "eve_id_in", nullable = false)
+    private int eventId;
 
 }

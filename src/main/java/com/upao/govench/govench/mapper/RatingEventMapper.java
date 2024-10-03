@@ -2,13 +2,13 @@ package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.RatingEventRequestDTO;
 import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
-import com.upao.govench.govench.model.dto.RatingRequestDTO;
 import com.upao.govench.govench.model.entity.RatingEvent;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -29,5 +29,4 @@ public class RatingEventMapper {
              .map(this::convertToDTO)
              .toList();
     }
-
 }

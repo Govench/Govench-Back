@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,9 +19,9 @@ import java.time.LocalTime;
 public class Event {
 
     @Id
-    @Column(name= "eve_id_in")
+    @Column(name = "eve_id_in")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
 
     @Column(name = "eve_tit_vc", nullable = false)
     private String tittle;

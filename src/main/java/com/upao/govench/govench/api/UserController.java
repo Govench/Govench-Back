@@ -8,6 +8,7 @@ import com.upao.govench.govench.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -193,21 +194,10 @@ public class UserController {
                                             @RequestBody RatingEventRequestDTO ratingEventRequestDTO) {
 
         try{
-            userService.createRatingEvent(eventId, userId, ratingEventRequestDTO);
+            userService.createRatingEvent(userId, eventId, ratingEventRequestDTO);
             return new ResponseEntity<>("Evento calificado correctamente", HttpStatus.OK);
         }catch (Exception e) {
             return new ResponseEntity<>("Error al calificar evento", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/ratings/{eventId}")
-    public ResponseEntity<?> getEventRating(@PathVariable Integer eventId) {
-        try {
-            List<RatingEventResponseDTO> ratingEvents = userService.getRatingEvents(eventId);
-
-            return new ResponseEntity<>(ratingEvents, HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("No se encontro al evento",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
