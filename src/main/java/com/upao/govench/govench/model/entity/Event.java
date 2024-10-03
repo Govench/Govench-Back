@@ -29,6 +29,7 @@ public class Event {
 
     @Column(name = "eve_dat_da", nullable = false)
     private LocalDate date;
+
     @Column(name = "eve_start_time", nullable = false)
     private LocalTime startTime;
 
@@ -48,16 +49,16 @@ public class Event {
     private String exp;
 
     @ManyToOne
-    @JoinColumn(name = "loc_id_in", nullable = true)
+    @JoinColumn(name = "loc_id_in", nullable = true )
     private Location location;
 
     @Column(name = "eve_last_rem_da")
     private LocalDate lastReminderSentDate;
 
-    @Column(name = "eve_same_day_rem_bo", nullable = false)
+    @Column(name = "eve_same_day_rem_bo", nullable = true)
     private boolean sameDayReminderSent = false;
 
-    @Column(name = "eve_fin_rem_bo", nullable = false)
+    @Column(name = "eve_fin_rem_bo", nullable = true)
     private boolean finalReminderSent = false;
 
 }

@@ -28,4 +28,6 @@ public class EventMapper {
                 .map(this::convertToDTO)
                 .toList();
     }
+
+
 }

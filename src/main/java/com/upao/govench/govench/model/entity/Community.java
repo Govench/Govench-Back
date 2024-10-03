@@ -19,7 +19,7 @@ public class Community {
     @Column(name = "com_id_in", nullable = false)
     private int id;
     @Column(name = "com_nom_vc", nullable = false)
-    private String nombre;
+    private String name;
     @Column(name = "com_des_vc")
     private String descripcion;
 

@@ -210,5 +210,4 @@ public class UserController {
             return new ResponseEntity<>("No se encontro al evento",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
