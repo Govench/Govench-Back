@@ -50,9 +50,6 @@ public class User {
     @ManyToMany(mappedBy = "followings")
     private List<User> followers;
 
-    @ElementCollection
-    private List<String> followed;
-
     @Column(name = "use_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
 
@@ -66,6 +63,7 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "ratedUser")
     private List<Rating> receivedRatings;
+
     @JsonIgnore
     @OneToMany(mappedBy = "raterUser")
     private List<Rating> givenRatings;
