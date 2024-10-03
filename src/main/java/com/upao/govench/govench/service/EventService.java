@@ -15,4 +15,6 @@ public interface EventService {
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO);
     public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO);
     public void deleteEvent(Integer id);
+
+
 }

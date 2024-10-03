@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service;
 
+import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
 import com.upao.govench.govench.model.entity.UserEvent;
@@ -28,5 +29,7 @@ public interface UserEventService {
 
     public List<UserEvent> getUserEventbyUser(User user);
     public  List<UserEvent> getUserEventbyEvent(Event event);
+
+    List<EventResponseDTO> getEventHistory(Integer userId);
 
 }
