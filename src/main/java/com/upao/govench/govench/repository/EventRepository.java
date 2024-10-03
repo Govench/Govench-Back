@@ -22,4 +22,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query("SELECT e FROM Event e JOIN UserEvent ue ON e.id = ue.event.id WHERE ue.user.id = :userId AND e.date >= :now")
     List<Event> findUpcomingEventsForUser(@Param("userId") Integer userId, @Param("now") LocalDate now);
 
+
+
 }

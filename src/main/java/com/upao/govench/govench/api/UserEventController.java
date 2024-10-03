@@ -1,9 +1,11 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
+import com.upao.govench.govench.service.impl.UserEventServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -110,6 +112,17 @@ public class UserEventController{
                     HttpStatus.BAD_REQUEST, "No se puede cancelar la inscripción porque el evento ya ha comenzado."
             );
         }
+    }
+
+
+    // Este endpoint devuelve el historial de eventos de un usuario por su ID
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId(@PathVariable Integer userId) {
+        List<EventResponseDTO> eventHistory = userEventService.getEventHistory(userId);
+        if (eventHistory.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(eventHistory, HttpStatus.OK);
     }
 
 }

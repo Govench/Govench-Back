@@ -66,7 +66,7 @@ public class PostController {
     }
 
 
-    @DeleteMapping("/{encodedUserId}/{postId}")
+        @DeleteMapping("/{encodedUserId}/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId) throws Exception {
         try {
             int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));

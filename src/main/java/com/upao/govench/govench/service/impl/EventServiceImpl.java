@@ -76,4 +76,5 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(Integer id) {
         eventRepository.deleteById(id);
     }
+
 }
