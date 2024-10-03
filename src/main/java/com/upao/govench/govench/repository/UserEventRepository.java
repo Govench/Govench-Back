@@ -19,6 +19,8 @@ public interface UserEventRepository extends JpaRepository<UserEvent, IdCompuest
     @Query("SELECT ue FROM UserEvent ue WHERE ue.notificationsEnabled = true")
     List<UserEvent> findUsersWithNotificationsEnabled();
 
+    boolean existsByUserAndEvent(User user, Event event);
+
     @Query("SELECT ue FROM UserEvent ue WHERE ue.user.id = :userId")
     List<UserEvent> findAllByUserId(@Param("userId") Integer userId);
 }

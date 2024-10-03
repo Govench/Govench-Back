@@ -1,19 +1,18 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
+import com.upao.govench.govench.mapper.RatingEventMapper;
 import com.upao.govench.govench.mapper.UserMapper;
-import com.upao.govench.govench.model.entity.Rating;
-import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.dto.RatingEventRequestDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
-import com.upao.govench.govench.repository.ProfileMongoRepository;
-import com.upao.govench.govench.repository.RatingRepository;
-import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.repository.*;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.upao.govench.govench.model.entity.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +37,17 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RatingRepository ratingRepository;
+
+    @Autowired
+    private RatingEventMapper ratingEventMapper;
+    @Autowired
+    private final RatingEventRepository ratingEventRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private UserEventRepository userEventRepository;
 
     @Override
     public User getUserbyId(Integer userId) {
@@ -169,7 +180,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Rating> getUserRatings(Integer userId) {
+
         return ratingRepository.findByRatedUserId(userId);
+    }
+
+    @Override
+    public RatingEventResponseDTO createRatingEvent(int userId, int eventId, RatingEventRequestDTO ratingEventRequestDTO) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuario que califica no encontrado"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Evento a calificar no encontrado"));
+
+        boolean userAsist = userEventRepository.existsByUserAndEvent(user, event);
+        if(!userAsist) {
+            throw new RuntimeException("Usuario no asistio al evento");
+        }
+        RatingEvent ratingEvent = ratingEventMapper.convertToEntity(ratingEventRequestDTO);
+        ratingEventRepository.save(ratingEvent);
+        return ratingEventMapper.convertToDTO(ratingEvent);
+    }
+
+    @Override
+    public List<RatingEventResponseDTO> getRatingEvents(int eventId) {
+        List<RatingEvent> ratingEvents = ratingEventRepository.findAllById(Collections.singleton(eventId));
+        return ratingEventMapper.convertToListDTO(ratingEvents);
     }
 
 }

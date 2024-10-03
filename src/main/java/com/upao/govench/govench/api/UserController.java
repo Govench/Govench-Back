@@ -2,10 +2,7 @@ package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.model.dto.*;
-import com.upao.govench.govench.model.entity.Post;
-import com.upao.govench.govench.model.entity.Profile;
-import com.upao.govench.govench.model.entity.Rating;
-import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,7 @@ public class UserController {
     private LoginRequestDTO loginRequestDTO;
     @Autowired
     private ProfileService profileService;
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
@@ -189,6 +187,27 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{eventId}/ratingEvent/{userId}")
+    public ResponseEntity<String> rateEvent(@PathVariable Integer eventId,
+                                            @PathVariable Integer userId,
+                                            @RequestBody RatingEventRequestDTO ratingEventRequestDTO) {
 
+        try{
+            userService.createRatingEvent(eventId, userId, ratingEventRequestDTO);
+            return new ResponseEntity<>("Evento calificado correctamente", HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("Error al calificar evento", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    @GetMapping("/ratings/{eventId}")
+    public ResponseEntity<?> getEventRating(@PathVariable Integer eventId) {
+        try {
+            List<RatingEventResponseDTO> ratingEvents = userService.getRatingEvents(eventId);
+
+            return new ResponseEntity<>(ratingEvents, HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("No se encontro al evento",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

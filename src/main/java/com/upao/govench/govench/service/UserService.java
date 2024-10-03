@@ -1,5 +1,7 @@
 package com.upao.govench.govench.service;
 
+import com.upao.govench.govench.model.dto.RatingEventRequestDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.dto.UserResponseDTO;
 import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.Rating;
@@ -30,6 +32,6 @@ public interface UserService {
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
 
-
-
+    RatingEventResponseDTO createRatingEvent(int  userId, int eventId, RatingEventRequestDTO ratingEventRequestDTO);
+    List<RatingEventResponseDTO> getRatingEvents(int evenId);
 }
