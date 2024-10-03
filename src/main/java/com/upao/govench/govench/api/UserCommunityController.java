@@ -79,11 +79,19 @@ public class UserCommunityController {
         return new ResponseEntity<>(createdUserCommunity, HttpStatus.CREATED);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+
     @DeleteMapping("/{iduser}/{idcommunity}")
-    public void deleteUserCommunity(@PathVariable int iduser,@PathVariable int idcommunity) {
-        IdCompuestoU_C id =new IdCompuestoU_C(iduser, idcommunity);
-        userCommunityService.removeUserCommunityById(id);
+    public ResponseEntity<?> deleteUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
+        IdCompuestoU_C id = new IdCompuestoU_C(iduser, idcommunity);
+
+        // Verificar si la relación existe antes de intentar eliminarla
+        if (userCommunityService.searchUserCommunityById(id) != null) {
+            userCommunityService.removeUserCommunityById(id);
+            return new ResponseEntity<>("Se ha desasociado de la comunidad", HttpStatus.OK);
+        } else {
+            // Devolver un mensaje indicando que la relación no existe
+            return new ResponseEntity<>("La relación ya no existe", HttpStatus.NOT_FOUND);
+        }
     }
 }
 
