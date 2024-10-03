@@ -25,7 +25,7 @@ public class UserCommunity {
     @JoinColumn(name = "use_id_in")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @MapsId("com_id_in")
     @JoinColumn(name = "com_id_in")
     private Community community;

@@ -35,4 +35,8 @@ public class Community {
     @JsonIgnore
     @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> post;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserCommunity> userCommunities;
 }

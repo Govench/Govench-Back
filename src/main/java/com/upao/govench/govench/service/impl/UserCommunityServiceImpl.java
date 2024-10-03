@@ -8,13 +8,16 @@ import com.upao.govench.govench.service.UserCommunityService;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserCommunityServiceImpl implements  UserCommunityService {
     @Autowired
     private UserCommunityRepository UserCommunityRepository;
+
 
     @Override
     public UserCommunity addUserCommunity(UserCommunity userCommunity) {
@@ -32,11 +35,12 @@ public class UserCommunityServiceImpl implements  UserCommunityService {
        return UserCommunityRepository.findById(id).orElse(null);
     }
 
-    @Override
     public void removeUserCommunityById(IdCompuestoU_C id) {
-        if (UserCommunityRepository.existsById(id))
-        {
-            UserCommunityRepository.deleteById(id);
+        try {
+            UserCommunityRepository.deleteById(id);  // Si el ID no existe, lanzará una excepción
+        } catch (EmptyResultDataAccessException e) {
+            // Manejar el caso en que no existe la relación
+            throw new EntityNotFoundException("La relación con el ID especificado no existe");
         }
     }
 
