@@ -1,0 +1,11 @@
+package com.upao.govench.govench.exceptions;
+
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException() {
+
+    }
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
