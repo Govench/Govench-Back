@@ -18,7 +18,6 @@ import java.time.LocalDate;
 public class RatingEventRequestDTO {
 
     @NotNull(message = "La puntuacion no puede estar vacia")
-    @Pattern(regexp = "[0-5]+", message = "La puntucion solo puede ser entre 0 y 5")
+    @Pattern(regexp = "^[1-5]$", message = "La puntucion solo puede ser entre 0 y 5")
     private int valorPuntuacion;
-
 }

@@ -2,6 +2,8 @@ package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.service.EventService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 @AllArgsConstructor
-public class EventController {
+public class EventController{
 
     private final EventServiceImpl eventServiceImpl;
 
@@ -61,5 +63,11 @@ public class EventController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/{eventId}/ratings")
+    public ResponseEntity<List<RatingEventResponseDTO>> getRatingEvents(@PathVariable int eventId) {
+        List<RatingEventResponseDTO> ratingEvents = eventServiceImpl.getRatingEvents(eventId);
+
+        return new ResponseEntity<>(ratingEvents, HttpStatus.OK);
+    }
 }
 

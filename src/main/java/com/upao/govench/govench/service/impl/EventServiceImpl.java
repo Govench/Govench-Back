@@ -2,17 +2,23 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.EventMapper;
+import com.upao.govench.govench.mapper.RatingEventMapper;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.RatingEvent;
 import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.LocationRepository;
+import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.service.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -20,6 +26,8 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final RatingEventRepository ratingEventRepository;
+    private final RatingEventMapper ratingEventMapper;
 
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
@@ -77,4 +85,9 @@ public class EventServiceImpl implements EventService {
         eventRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<RatingEventResponseDTO> getRatingEvents(int eventId) {
+        List<RatingEvent> ratingEvents = ratingEventRepository.findByEventId(eventId);
+        return ratingEventMapper.convertToListDTO(ratingEvents);
+    }
 }

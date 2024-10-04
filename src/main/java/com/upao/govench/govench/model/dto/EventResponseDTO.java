@@ -24,7 +24,5 @@ public class EventResponseDTO {
     private BigDecimal cost;
     private LocationResponseDTO location;
     private String exp;
-
-
-
+    private RatingEventResponseDTO rating;
 }

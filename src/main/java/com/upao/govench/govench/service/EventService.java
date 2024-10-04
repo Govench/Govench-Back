@@ -2,6 +2,7 @@ package com.upao.govench.govench.service;
 
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 
 import java.util.List;
@@ -15,6 +16,6 @@ public interface EventService {
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO);
     public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO);
     public void deleteEvent(Integer id);
-
+    public List<RatingEventResponseDTO> getRatingEvents(int eventId);
 
 }
