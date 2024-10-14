@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.dto;
 
+import com.upao.govench.govench.model.entity.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommunityRequestDTO {
+
+    private User owner;
+
     @NotNull(message = "El nombre no puede ser vacio")
     @Size(max = 100, message = "El nombre no puede exceder los 100 caracteres")
     private String name;

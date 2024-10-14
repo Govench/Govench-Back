@@ -8,14 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/utility") //Esta clase me sirve para encryptar un id
+@RequestMapping("/utility")
 public class UtilityController {
 
-    @Autowired
-    private EncryptionService encryptionService;
-
-    @GetMapping("/encrypt/{userId}") //Este metodo recibe un id y me devuelve encryptado
-    public String getEncodedUserId(@PathVariable("userId") int userId) throws Exception {
-        return encryptionService.encrypt(Integer.toString(userId));
-    }
 }

@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OwnerResponseDTO {
+public class OwnerRequestDTO {
     public int id;
-    public String name;
-    public String email;
-    public String profileDesc;
 }
-
