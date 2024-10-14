@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>2.15.0</version> <!-- Asegúrate de usar una versión compatible -->
+            <version>2.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -148,6 +148,11 @@
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
             <version>0.4.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>2.2.0</version>
         </dependency>
     </dependencies>
 
