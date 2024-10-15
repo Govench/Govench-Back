@@ -16,11 +16,11 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(name = "rater_user_id", nullable = false)
-    private User raterUser; // Usuario que está realizando la calificación
+    private Participant raterUser; // Usuario que está realizando la calificación
 
     @ManyToOne
     @JoinColumn(name = "rated_user_id", nullable = false)
-    private User ratedUser; // Usuario que está siendo calificado
+    private Participant ratedUser; // Usuario que está siendo calificado
 
     @Column(name = "rating_value", nullable = false)
     private Integer ratingValue; // Escala de 1 a 5, por ejemplo.

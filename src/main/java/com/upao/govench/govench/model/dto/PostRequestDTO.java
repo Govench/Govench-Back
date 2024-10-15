@@ -1,7 +1,7 @@
 package com.upao.govench.govench.model.dto;
 
 import com.upao.govench.govench.model.entity.Community;
-import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.Participant;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class PostRequestDTO {
     private String body;
 
     @NotBlank(message = "La id del autor no puede estar vacia")
-    private User autor;
+    private Participant autor;
 
     @NotBlank(message = "La id de la comunidad no puede estar vacia")
     private Community comunidad;

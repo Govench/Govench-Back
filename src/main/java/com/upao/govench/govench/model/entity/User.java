@@ -1,26 +1,17 @@
 package com.upao.govench.govench.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-@Entity
 @Data
-@Table(name="User_profile")
+@Entity
+@Table(name = "govenchUser")
 public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="use_id_in")
-    private Integer id;
-
-    @Column(name="use_nam_vc", nullable = false, length=100)
-    private String name;
+    private Integer user_id;
 
     @Column(name="use_ema_vc", nullable = false, length=100)
     private String email;
@@ -28,44 +19,16 @@ public class User {
     @Column(name="use_pas_vc", nullable = false)
     private String password;
 
-    @Column(name="use_birth_date_dt", nullable = false)
-    private Date birthday;
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Participant participant;
 
-    @Column(name="use_gen_bi", nullable = false)
-    private String gender;
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Organizer organizer;
 
-    @Column(name="use_des_vc", nullable = false)
-    private String profileDesc;
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Admin admin;
 
-    @ElementCollection
-    private List<String> interest;
-
-    @ElementCollection
-    private List<String> skills;
-
-    @ElementCollection
-    private List<String> socialLinks;
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "followings")
-    private List<User> followers;
-
-    @Column(name = "use_profile_id", nullable = true)
-    private String profileId; // Referencia al ID del perfil en MongoDB
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "UserFollow",
-            joinColumns = @JoinColumn(name = "use_id_fwer_in"),
-            inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
-    private List<User> followings;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "ratedUser")
-    private List<Rating> receivedRatings;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "raterUser")
-    private List<Rating> givenRatings;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rol_id_in" , referencedColumnName = "role_id")
+    private Role role;
 }

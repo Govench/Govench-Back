@@ -1,7 +1,7 @@
 package com.upao.govench.govench.model.dto;
 
 import com.upao.govench.govench.model.entity.Community;
-import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.Participant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

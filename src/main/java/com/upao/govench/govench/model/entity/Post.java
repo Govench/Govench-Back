@@ -24,7 +24,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "pos_aut_vc", nullable = false)
-    private User autor;
+    private Participant autor;
 
     @ManyToOne
     @JoinColumn(name = "pos_com_id", nullable = false)

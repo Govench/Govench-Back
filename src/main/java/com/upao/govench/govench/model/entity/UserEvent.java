@@ -21,7 +21,7 @@ public class UserEvent {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @MapsId("use_id_in")
     @JoinColumn(name = "use_id_in")
-    private User user;
+    private Participant user;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @MapsId("eve_id_in")
