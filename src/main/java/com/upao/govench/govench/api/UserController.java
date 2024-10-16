@@ -5,6 +5,7 @@ import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,27 +19,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    private LoginRequestDTO loginRequestDTO;
     @Autowired
     private ProfileService profileService;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            userService.createUser(userRequestDTO);
-            return new ResponseEntity<>("Cuenta creada con éxito", HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    @PostMapping("/register/participant")
+    public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
+        UserProfileDTO userProfileDTO = userService.registerParticipant(userRegistrationDTO);
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
     }
 
+    @PostMapping("/register/organizer")
+    public ResponseEntity<UserProfileDTO> registerOrganizer(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
+        UserProfileDTO userProfileDTO = userService.registerOrganizer(userRegistrationDTO);
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
+    }
+
+//Metodos pre security//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {

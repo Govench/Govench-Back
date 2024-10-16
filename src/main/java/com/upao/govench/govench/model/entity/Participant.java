@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -13,22 +15,22 @@ public class Participant{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "use_id_in")
+    @Column(name = "par_id_in")
     private Integer id;
 
-    @Column(name = "use_nam_vc", nullable = false, length = 100)
+    @Column(name = "par_nam_vc", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "use_las_nam_vc", nullable = false, length = 100)
+    @Column(name = "par_las_nam_vc", nullable = false, length = 100)
     private String lastname;
 
-    @Column(name="use_birth_date_dt", nullable = false)
+    @Column(name="par_birth_date_dt", nullable = false)
     private Date birthday;
 
-    @Column(name="use_gen_bi", nullable = false)
+    @Column(name="par_gen_bi", nullable = false)
     private String gender;
 
-    @Column(name="use_des_vc", nullable = false)
+    @Column(name="par_des_vc")
     private String profileDesc;
 
     @ElementCollection
@@ -39,6 +41,10 @@ public class Participant{
 
     @ElementCollection
     private List<String> socialLinks;
+
+    @JsonIgnore
+    @Column(name="par_cre_dt")
+    private LocalDateTime created;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "followings")

@@ -3,39 +3,45 @@ package com.upao.govench.govench.service.impl;
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.RatingEventMapper;
 import com.upao.govench.govench.mapper.UserMapper;
-import com.upao.govench.govench.model.dto.RatingEventRequestDTO;
-import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
-import com.upao.govench.govench.model.dto.UserResponseDTO;
-import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.repository.*;
-import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
+
 import java.time.LocalDate;
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
-
+    //
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ParticipantRepository participantRepository;
+    @Autowired
+    private OrganizerRepository organizerRepository;
+    @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
+    private  RoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private UserRepository userRepository;
-
+    //
     @Autowired
     private RatingRepository ratingRepository;
 
@@ -50,6 +56,125 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserEventRepository userEventRepository;
 
+    //Metodos seguridad //
+
+    @Override
+    public UserProfileDTO registerParticipant(UserRegistrationDTO userRegistrationDTO) {
+        Role role = roleRepository.findById(2).orElse(null);
+        return UserRegistrationWithRole(userRegistrationDTO,role);
+    }
+
+    @Override
+    public UserProfileDTO registerOrganizer(UserRegistrationDTO userRegistrationDTO) {
+        Role role = roleRepository.findById(3).orElse(null);
+        return UserRegistrationWithRole(userRegistrationDTO,role);
+    }
+
+
+    @Override
+    public UserProfileDTO uptadteUserProfile(Integer id, UserProfileDTO userProfileDTO) {
+        User user = userRepository.findById(id).orElseThrow( ( )-> new ResourceNotFoundException("Usuario no encontrado"));
+
+        boolean existParticipant = participantRepository.existsByNameAndLastnameAndUserIdNot(userProfileDTO.getName(),userProfileDTO.getLastname(),id);
+        boolean existOrganizer = organizerRepository.existsByNameAndLastnameAndUserIdNot(userProfileDTO.getName(),userProfileDTO.getLastname(),id);
+
+        if (existParticipant || existOrganizer) {
+            throw new IllegalArgumentException("Ya existe un usuario con el mismo nombre y apellido");
+        }
+
+        if(user.getParticipant()!=null)
+        {
+            if(userProfileDTO.getName()!=null)user.getParticipant().setName(userProfileDTO.getName());
+            if(userProfileDTO.getLastname()!=null)user.getParticipant().setLastname(userProfileDTO.getLastname());
+            if(userProfileDTO.getProfileDesc()!=null) user.getParticipant().setProfileDesc(userProfileDTO.getProfileDesc());
+            if(userProfileDTO.getInterest()!=null) user.getParticipant().setInterest(userProfileDTO.getInterest());
+            if(userProfileDTO.getSkills()!=null) user.getParticipant().setSkills(userProfileDTO.getSkills());
+            if(userProfileDTO.getSocialLinks()!=null)user.getParticipant().setSocialLinks(userProfileDTO.getSocialLinks());
+
+        }
+
+        if(user.getOrganizer()!=null)
+        {
+            if(userProfileDTO.getName()!=null)user.getOrganizer().setName(userProfileDTO.getName());
+            if(userProfileDTO.getLastname()!=null)user.getOrganizer().setLastname(userProfileDTO.getLastname());
+            if(userProfileDTO.getProfileDesc()!=null) user.getOrganizer().setProfileDesc(userProfileDTO.getProfileDesc());
+            if(userProfileDTO.getInterest()!=null) user.getOrganizer().setInterest(userProfileDTO.getInterest());
+            if(userProfileDTO.getSkills()!=null) user.getOrganizer().setSkills(userProfileDTO.getSkills());
+            if(userProfileDTO.getSocialLinks()!=null)user.getOrganizer().setSocialLinks(userProfileDTO.getSocialLinks());
+
+        }
+
+        User updatedUser = userRepository.save(user);
+        return userMapper.toUserProfileDTO(updatedUser);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserProfileDTO getUserProfilebyId(Integer id) {
+        User user = userRepository.findById(id).orElseThrow( () -> new ResourceNotFoundException("Usuario no encontrado"));
+        return userMapper.toUserProfileDTO(user);
+    }
+
+    private UserProfileDTO UserRegistrationWithRole(UserRegistrationDTO userRegistrationDTO,Role role)
+    {
+        boolean existByEmail = userRepository.existsByEmail(userRegistrationDTO.getEmail());
+        boolean existOrganizer = organizerRepository.existsByNameAndLastname(userRegistrationDTO.getName(),userRegistrationDTO.getLastname());
+        boolean existParticipant = participantRepository.existsByNameAndLastname(userRegistrationDTO.getName(),userRegistrationDTO.getLastname());
+
+        if(existByEmail)
+        {
+            throw new IllegalArgumentException("Email ya esta registrado");
+        }
+        if(existOrganizer || existParticipant)
+        {
+            throw new IllegalArgumentException("El usuario ya esta registrado");
+        }
+
+       userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        User user = userMapper.toUserEntity(userRegistrationDTO);
+        user.setRole(role);
+
+        if(Objects.equals(role.getName(), "PARTICIPANT"))
+        {   Participant participant = new Participant();
+            participant.setName(userRegistrationDTO.getName());
+            participant.setLastname(userRegistrationDTO.getLastname());
+            participant.setBirthday(userRegistrationDTO.getBirthday());
+            participant.setGender(userRegistrationDTO.getGender());
+            participant.setProfileDesc(userRegistrationDTO.getProfileDesc());
+            participant.setInterest(userRegistrationDTO.getInterest());
+            participant.setSkills(userRegistrationDTO.getSkills());
+            participant.setSocialLinks(userRegistrationDTO.getSocialLinks());
+            participant.setCreated(LocalDateTime.now());
+            participant.setUser(user);
+            user.setParticipant(participant);
+
+        }
+        else if (Objects.equals(role.getName(), "ORGANIZER")) {
+            Organizer organizer = new Organizer();
+            organizer.setName(userRegistrationDTO.getName());
+            organizer.setLastname(userRegistrationDTO.getLastname());
+            organizer.setBirthday(userRegistrationDTO.getBirthday());
+            organizer.setGender(userRegistrationDTO.getGender());
+            organizer.setProfileDesc(userRegistrationDTO.getProfileDesc());
+            organizer.setInterest(userRegistrationDTO.getInterest());
+            organizer.setSkills(userRegistrationDTO.getSkills());
+            organizer.setSocialLinks(userRegistrationDTO.getSocialLinks());
+            organizer.setCreated(LocalDateTime.now());
+            organizer.setEventosCreados(0);
+            organizer.setUser(user);
+            user.setOrganizer(organizer);
+        }
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toUserProfileDTO(savedUser);
+    }
+
+
+
+
+
+    ///Metodos pre seguridad///
     @Override
     public User getUserbyId(Integer userId) {
         return userRepository.findById(userId).orElse(null);

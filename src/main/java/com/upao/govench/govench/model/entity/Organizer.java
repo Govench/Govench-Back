@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class Organizer{
     @Column(name="or_gen_bi", nullable = false)
     private String gender;
 
-    @Column(name="or_des_vc", nullable = false)
+    @Column(name="or_des_vc")
     private String profileDesc;
 
     @ElementCollection
@@ -39,6 +40,12 @@ public class Organizer{
 
     @ElementCollection
     private List<String> socialLinks;
+
+    @Column(name = "or_can_eve_in")
+    private int eventosCreados;
+    @JsonIgnore
+    @Column(name="or_cre_dt")
+    private LocalDateTime created;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "followings")
