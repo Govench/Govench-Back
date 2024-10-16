@@ -24,8 +24,8 @@ public class Community {
     private String descripcion;
 
     @ManyToOne
-    @JoinColumn(name = "com_own_vc", nullable = false)
-    private Participant owner;
+    @JoinColumn(name = "com_own_vc", nullable = false, referencedColumnName = "user_id")
+    private User owner;
 
     @ElementCollection
     @CollectionTable(name = "community_tags", joinColumns = @JoinColumn(name = "com_id_in"))

@@ -23,8 +23,8 @@ public class Post {
     private String body;
 
     @ManyToOne
-    @JoinColumn(name = "pos_aut_vc", nullable = false)
-    private Participant autor;
+    @JoinColumn(name = "pos_aut_vc", nullable = false,referencedColumnName = "user_id")
+    private User autor;
 
     @ManyToOne
     @JoinColumn(name = "pos_com_id", nullable = false)

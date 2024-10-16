@@ -103,7 +103,7 @@ public class UserController {
     @GetMapping("/profile/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable int userId) {
         User user = userService.getUserbyId(userId);
-        String profileId=user.getProfileId();
+        String profileId=user.getParticipant().getProfileId();
         Profile profile = profileService.getProfile(profileId);
         if (profile != null && profile.getImage() != null) {
             return ResponseEntity.ok()
@@ -119,7 +119,7 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         }
-        String profileId = user.getProfileId();
+        String profileId = user.getParticipant().getProfileId();
         if (profileId == null) {
             return new ResponseEntity<>("Usuario no tiene una foto de perfil asociada", HttpStatus.NOT_FOUND);
         }
@@ -172,18 +172,29 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/ratings")
-    public ResponseEntity <List <RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
+    public ResponseEntity<List<RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
         try {
+            // Obtener las calificaciones
+            List<Rating> ratings = userService.getUserRatings(userId);
 
-           List<Rating> ratings = userService.getUserRatings(userId);
+            // Mapear a DTO
+            List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> {
+                String raterName = "";
 
-           List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> new RatingRequestDTO
+                // Verificar quién otorgó la calificación (organizador o participante)
+                if (rating.getRaterOrganizer() != null) {
+                    // Si es un organizador que califica
+                    raterName = rating.getRaterOrganizer().getName(); // Asegúrate de que 'getName()' esté implementado en Organizer
+                } else if (rating.getRaterParticipant() != null) {
+                    // Si es un participante que califica
+                    raterName = rating.getRaterParticipant().getName(); // Asegúrate de que 'getName()' esté implementado en Participant
+                }
 
-          (rating.getRaterUser().getName(), rating.getRatingValue(), rating.getComment())).collect(Collectors.toList());
+                return new RatingRequestDTO(raterName, rating.getRatingValue(), rating.getComment());
+            }).collect(Collectors.toList());
 
             return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -9,8 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name="Participant")
-public class Participant {
+public class Participant{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +20,7 @@ public class Participant {
     private String name;
 
     @Column(name = "use_las_nam_vc", nullable = false, length = 100)
-    private String last_name;
+    private String lastname;
 
     @Column(name="use_birth_date_dt", nullable = false)
     private Date birthday;
@@ -55,13 +54,14 @@ public class Participant {
             inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
     private List<Participant> followings;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "ratedUser")
-    private List<Rating> receivedRatings;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "raterUser")
-    private List<Rating> givenRatings;
+    @OneToMany(mappedBy = "raterParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> givenRatingsToOrganizers;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "ratedParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> receivedRatingsFromOrganizers;
 
     @OneToOne
     @JoinColumn(name = "par_use_id_in" ,referencedColumnName = "user_id")

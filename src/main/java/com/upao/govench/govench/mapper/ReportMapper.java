@@ -2,6 +2,7 @@ package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.model.entity.Participant;
+import com.upao.govench.govench.model.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ReportMapper {
 
-    public ReportResponseDTO toReportResponseDTO(Participant user, int totalEvents, int newFollowers, int connectionsMade,
+    public ReportResponseDTO toReportResponseDTO(User user, int totalEvents, int newFollowers, int connectionsMade,
                                                  int eventsAttended, int totalCommunities, int totalUsersInCommunities,
                                                  int totalPostsInCommunities) {
         ReportResponseDTO responseDTO = new ReportResponseDTO();

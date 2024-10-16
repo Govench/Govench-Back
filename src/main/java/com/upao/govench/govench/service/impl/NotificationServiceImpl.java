@@ -29,21 +29,21 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendDailyReminder(User user, Event event) {
         String subject = "Recordatorio Diario para el Evento " + event.getTittle();
-        String message = "\n\nHola " + user.getName() + ", no olvides que tienes un evento próximo en " + event.getDate() + ".";
+        String message = "\n\nHola " + user.getParticipant().getName() + ", no olvides que tienes un evento próximo en " + event.getDate() + ".";
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
     @Override
     public void sendSameDayReminder(User user, Event event, int hoursBeforeEvent) {
         String subject = "Recordatorio del Evento Hoy!";
-        String message = "Hola " + user.getName() + ", el evento '" + event.getTittle() + "' comenzará en " + hoursBeforeEvent + " horas.";
+        String message = "Hola " + user.getParticipant().getName() + ", el evento '" + event.getTittle() + "' comenzará en " + hoursBeforeEvent + " horas.";
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
     @Override
     public void sendFinalReminder(User user, Event event) {
         String subject = "¡Último recordatorio! El evento está por comenzar";
-        String message = "Hola " + user.getName() + ", el evento '" + event.getTittle() + "' comenzará en unos minutos.";
+        String message = "Hola " + user.getParticipant().getName() + ", el evento '" + event.getTittle() + "' comenzará en unos minutos.";
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 

@@ -1,6 +1,6 @@
 package com.upao.govench.govench.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,13 +14,27 @@ public class Rating {
     @Column(name = "rating_id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "rater_user_id", nullable = false)
-    private Participant raterUser; // Usuario que está realizando la calificación
 
+
+    // Relación con el organizador que otorga la calificación
     @ManyToOne
-    @JoinColumn(name = "rated_user_id", nullable = false)
-    private Participant ratedUser; // Usuario que está siendo calificado
+    @JoinColumn(name = "rater_organizer_id")
+    private Organizer raterOrganizer;
+
+    // Relación con el participante que otorga la calificación
+    @ManyToOne
+    @JoinColumn(name = "rater_participant_id")
+    private Participant raterParticipant;
+
+    // Relación con el organizador que recibe la calificación
+    @ManyToOne
+    @JoinColumn(name = "rated_organizer_id")
+    private Organizer ratedOrganizer;
+
+    // Relación con el participante que recibe la calificación
+    @ManyToOne
+    @JoinColumn(name = "rated_participant_id")
+    private Participant ratedParticipant;
 
     @Column(name = "rating_value", nullable = false)
     private Integer ratingValue; // Escala de 1 a 5, por ejemplo.
