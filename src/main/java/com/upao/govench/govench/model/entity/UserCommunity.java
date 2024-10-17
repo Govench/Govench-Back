@@ -22,7 +22,7 @@ public class UserCommunity {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @MapsId("use_id_in")
-    @JoinColumn(name = "use_id_in")
+    @JoinColumn(name = "use_id_in",referencedColumnName = "user_id")
     private User user;
 
     @ManyToOne(cascade = CascadeType.REMOVE)

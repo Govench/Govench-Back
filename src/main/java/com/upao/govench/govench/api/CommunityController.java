@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RequestMapping("/community")
 @RestController
+@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER','PARTICIPANT')")
 public class CommunityController {
     @Autowired
     private EncryptionService encryptionService; // Inyección del servicio de encriptación
@@ -56,7 +58,7 @@ public class CommunityController {
         {
             throw new NullPointerException("El usuario no existe");
         }
-       if (owneractual.getId() != ownerdto.getId()) {
+       if (owneractual.getOrganizer().getId() != ownerdto.getId()) {
            throw new AccessDeniedException("No tienes permiso para eliminar esta comunidad");
         }
         communityService.deleteById(id);
@@ -81,12 +83,12 @@ public class CommunityController {
         User owner = community.getOwner();
 
         // Verificar si el usuario existe
-        if (owner == null || owner.getId() == null) {
+        if (owner == null || owner.getOrganizer().getId() == null) {
             throw new EntityNotFoundException("El usuario no existe");
         }
 
         // Verificar si el usuario es el dueño de la comunidad
-        if (existingCommunity.getOwner().getId() != owner.getId()) {
+        if (existingCommunity.getOwner().getId() != owner.getOrganizer().getId()) {
             throw new AccessDeniedException("No tienes permiso para modificar esta comunidad");
         }
 

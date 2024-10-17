@@ -1,5 +1,6 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.model.entity.Participant;
 import lombok.AllArgsConstructor;
 import com.upao.govench.govench.service.UserEventService;
 import com.upao.govench.govench.model.dto.ReminderRequestDTO;

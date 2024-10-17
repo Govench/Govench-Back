@@ -36,7 +36,7 @@ public class CommunityServiceImpl implements CommunityService {
     public List<CommunityResponseDTO> findByOwner_Id(int userId) {
          User usuario = userRepository.findById(userId).orElse(null);
        if(usuario != null) {
-           return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_Id(userId));
+           return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_id(userId));
        }
         else
             return null;
@@ -46,7 +46,7 @@ public class CommunityServiceImpl implements CommunityService {
     public List<CommunityResponseDTO> findByOwner_IdNot(int userId) {
         User usuario = userRepository.findById(userId).orElse(null);
         if(usuario != null) {
-            return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_IdNot(userId));
+            return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_idNot(userId));
 
         }
         else {

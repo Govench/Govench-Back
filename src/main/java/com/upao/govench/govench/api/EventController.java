@@ -44,25 +44,6 @@ public class EventController{
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<EventResponseDTO> createEvent(@RequestBody EventRequestDTO eventRequestDTO) {
-        EventResponseDTO createdEvent = eventServiceImpl.createEvent(eventRequestDTO);
-        return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<EventResponseDTO> updateEvent(@PathVariable Integer id,
-                                                        @RequestBody EventRequestDTO eventRequestDTO) {
-        EventResponseDTO updatedEvent = eventServiceImpl.updateEvent(id, eventRequestDTO);
-        return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Integer id) {
-        eventServiceImpl.deleteEvent(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @GetMapping("/{eventId}/ratings")
     public ResponseEntity<List<RatingEventResponseDTO>> getRatingEvents(@PathVariable int eventId) {
         List<RatingEventResponseDTO> ratingEvents = eventServiceImpl.getRatingEvents(eventId);

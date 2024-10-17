@@ -1,6 +1,7 @@
 package com.upao.govench.govench.model.dto;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.Participant;
 import com.upao.govench.govench.model.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

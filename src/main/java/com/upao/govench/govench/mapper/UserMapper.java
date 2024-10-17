@@ -1,20 +1,78 @@
 package com.upao.govench.govench.mapper;
 
-import com.upao.govench.govench.model.dto.OwnerResponseDTO;
-import com.upao.govench.govench.model.dto.UserRequestDTO;
-import com.upao.govench.govench.model.dto.UserResponseDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.User;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserMapper {
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
+
+
+    public User toUserEntity(UserRegistrationDTO registrationDTO) {
+        return modelMapper.map(registrationDTO, User.class);
+    }
+
+    public UserProfileDTO toUserProfileDTO(User user) {
+        UserProfileDTO userProfileDTO =  modelMapper.map(user, UserProfileDTO.class);
+        if(user.getParticipant()!=null)
+        {
+            userProfileDTO.setName(user.getParticipant().getName());
+            userProfileDTO.setLastname(user.getParticipant().getLastname());
+            userProfileDTO.setProfileDesc(user.getParticipant().getProfileDesc());
+            userProfileDTO.setInterest(user.getParticipant().getInterest());
+            userProfileDTO.setSkills(user.getParticipant().getSkills());
+            userProfileDTO.setSocialLinks(user.getParticipant().getSocialLinks());
+        }
+        if(user.getOrganizer()!=null)
+        {
+            userProfileDTO.setName(user.getOrganizer().getName());
+            userProfileDTO.setLastname(user.getOrganizer().getLastname());
+            userProfileDTO.setProfileDesc(user.getOrganizer().getProfileDesc());
+            userProfileDTO.setInterest(user.getOrganizer().getInterest());
+            userProfileDTO.setSkills(user.getOrganizer().getSkills());
+            userProfileDTO.setSocialLinks(user.getOrganizer().getSocialLinks());
+            userProfileDTO.setEventosCreados(user.getOrganizer().getEventosCreados());
+        }
+        if(user.getAdmin()!=null)
+        {
+
+        }
+        return userProfileDTO;
+
+    }
+
+
+    public User toUserEntity(LoginDTO loginDTO)
+    {
+        return modelMapper.map(loginDTO, User.class);
+    }
+
+    public AuthResponseDTO toAuthResponseDTO(User user , String token) {
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
+        authResponseDTO.setToken(token);
+
+        String name = (user.getParticipant() != null) ? user.getParticipant().getName() :
+                (user.getOrganizer() != null) ? user.getOrganizer().getName():"ADMIN";
+        String lastname = (user.getParticipant() != null ) ? user.getParticipant().getLastname() :
+                (user.getOrganizer() != null) ? user.getOrganizer().getLastname():"USER";
+
+        authResponseDTO.setName(name);
+        authResponseDTO.setLastname(lastname);
+
+        authResponseDTO.setRole(user.getRole().getName());
+
+        return authResponseDTO;
+    }
+
+
+//metodos pre security//
     public User convertToEntity(UserRequestDTO userRequestDTO) {
         return modelMapper.map(userRequestDTO, User.class);
     }

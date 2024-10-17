@@ -5,6 +5,7 @@ import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,27 +19,35 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    private LoginRequestDTO loginRequestDTO;
     @Autowired
     private ProfileService profileService;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            userService.createUser(userRequestDTO);
-            return new ResponseEntity<>("Cuenta creada con éxito", HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    @PostMapping("/register/participant")
+    public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
+        UserProfileDTO userProfileDTO = userService.registerParticipant(userRegistrationDTO);
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
     }
 
+    @PostMapping("/register/organizer")
+    public ResponseEntity<UserProfileDTO> registerOrganizer(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
+        UserProfileDTO userProfileDTO = userService.registerOrganizer(userRegistrationDTO);
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
+        AuthResponseDTO authResponseDTO = userService.login(loginDTO);
+        return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
+    }
+
+
+
+//-------Metodos pre security----------//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
@@ -49,15 +58,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            userService.updateUser(id, userRequestDTO);
-            return new ResponseEntity<>("Usuario actualizado con éxito", HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
@@ -71,19 +71,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
-        try {
-            boolean isAuthenticated = userService.authenticateUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-            if (isAuthenticated) {
-                return new ResponseEntity<>("Inicio de sesión exitoso", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Correo electrónico o contraseña incorrectos", HttpStatus.UNAUTHORIZED);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error en el sistema", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @PostMapping("/profile/{userId}/upload")
     public String uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {
@@ -103,7 +90,7 @@ public class UserController {
     @GetMapping("/profile/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable int userId) {
         User user = userService.getUserbyId(userId);
-        String profileId=user.getProfileId();
+        String profileId=user.getParticipant().getProfileId();
         Profile profile = profileService.getProfile(profileId);
         if (profile != null && profile.getImage() != null) {
             return ResponseEntity.ok()
@@ -119,7 +106,7 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         }
-        String profileId = user.getProfileId();
+        String profileId = user.getParticipant().getProfileId();
         if (profileId == null) {
             return new ResponseEntity<>("Usuario no tiene una foto de perfil asociada", HttpStatus.NOT_FOUND);
         }
@@ -131,6 +118,7 @@ public class UserController {
         profileService.deleteProfile(profileId);
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
     }
+
 
     @PostMapping("/{userId}/follow/{followedUserId}")
     public ResponseEntity<String> followUser(@PathVariable Integer userId, @PathVariable Integer followedUserId) {
@@ -172,18 +160,29 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/ratings")
-    public ResponseEntity <List <RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
+    public ResponseEntity<List<RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
         try {
+            // Obtener las calificaciones
+            List<Rating> ratings = userService.getUserRatings(userId);
 
-           List<Rating> ratings = userService.getUserRatings(userId);
+            // Mapear a DTO
+            List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> {
+                String raterName = "";
 
-           List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> new RatingRequestDTO
+                // Verificar quién otorgó la calificación (organizador o participante)
+                if (rating.getRaterOrganizer() != null) {
+                    // Si es un organizador que califica
+                    raterName = rating.getRaterOrganizer().getName(); // Asegúrate de que 'getName()' esté implementado en Organizer
+                } else if (rating.getRaterParticipant() != null) {
+                    // Si es un participante que califica
+                    raterName = rating.getRaterParticipant().getName(); // Asegúrate de que 'getName()' esté implementado en Participant
+                }
 
-          (rating.getRaterUser().getName(), rating.getRatingValue(), rating.getComment())).collect(Collectors.toList());
+                return new RatingRequestDTO(raterName, rating.getRatingValue(), rating.getComment());
+            }).collect(Collectors.toList());
 
             return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
