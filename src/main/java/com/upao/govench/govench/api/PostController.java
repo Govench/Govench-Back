@@ -30,10 +30,6 @@ public class PostController {
     private final UserService userService;
     @Autowired
     private final CommunityService communityService;
-    @Autowired
-    private final EncryptionService encryptionService;
-    @Autowired
-    private final CommunityMapper communityMapper;
 
     @PostMapping("/create")
     public ResponseEntity<String> createPost(@RequestBody PostRequestDTO postRequestDTO) {
@@ -65,11 +61,10 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-
-        @DeleteMapping("/{encodedUserId}/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId) throws Exception {
+        @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost( @RequestBody OwnerRequestDTO ownerdto, @PathVariable("postId") int postId) throws Exception {
         try {
-            int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
+            User owner = userService.getUserbyId(ownerdto.getId());
 
             PostResponseDTO existingPost = postServiceImpl.getPostById(postId);
 
@@ -77,7 +72,7 @@ public class PostController {
                 return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
             }
 
-            if (existingPost.getAutor().getId() != userId) {
+            if (existingPost.getAutor().getId() != owner.getId()) {
                 throw new AccessDeniedException("No tienes permiso para eliminar este post");
             }
 
@@ -86,28 +81,23 @@ public class PostController {
             return new ResponseEntity<>("Post eliminado con éxito", HttpStatus.OK);
         }
 
-        catch (NumberFormatException e) {
-            return new ResponseEntity<>("Error al desencriptar el ID de usuario", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
         catch (Exception e) {
             return new ResponseEntity<>("Error al eliminar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/{encodedUserId}/{postId}")
-    public ResponseEntity<?> updatePost(@PathVariable("encodedUserId") String encodedUserId, @PathVariable("postId") int postId,
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost( @PathVariable("postId") int postId,
                                         @RequestBody PostRequestDTO postRequestDTO) throws Exception {
         try {
-            int userId = Integer.parseInt(encryptionService.decrypt(encodedUserId));
+            User owner = userService.getUserbyId(postRequestDTO.getAutor().getId());
             PostResponseDTO Post1 = postServiceImpl.getPostById(postId);
-            System.out.println("User ID desencriptado: " + userId);
 
             if (Post1 == null) {
                 return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
             }
 
-            if (Post1.getAutor().getId() != userId) {
+            if (Post1.getAutor().getId() != owner.getId()) {
                 throw new AccessDeniedException("No tienes permiso para modificar este post");
             }
 
@@ -115,14 +105,9 @@ public class PostController {
             updatedPost.setUpdated(LocalDateTime.now());
 
             return new ResponseEntity<>("El post ha sido actualizado", HttpStatus.ACCEPTED);
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Error al desencriptar el ID de usuario", HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (Exception e) {
+        }  catch (Exception e) {
             return new ResponseEntity<>("Error al actualizar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }
 
