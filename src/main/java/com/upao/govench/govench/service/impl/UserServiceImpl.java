@@ -293,8 +293,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public User associateProfileWithUser(int userId, String profileId) {
         User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
+        if(user ==null)
+        {
+            throw new NullPointerException("Usuario no encontrado");
+        }
+        if (user.getParticipant() != null) {
             user.getParticipant().setProfileId(profileId);
+            return userRepository.save(user);
+        }
+        if (user.getOrganizer() != null) {
+            user.getOrganizer().setProfileId(profileId);
             return userRepository.save(user);
         }
         return null;
@@ -304,9 +312,13 @@ public class UserServiceImpl implements UserService {
     public User dessasociateProfileWithUser(int userId) {
 
         User user = userRepository.findById(userId).orElse(null);
+        if(user ==null)
+        {
+            throw new NullPointerException("Usuario no encontrado");
+        }
 
 
-        if (user != null) {
+        if (user.getParticipant() != null) {
 
             String profileId = user.getParticipant().getProfileId();
 
@@ -316,6 +328,18 @@ public class UserServiceImpl implements UserService {
                 return userRepository.save(user);
             }
         }
+
+        if (user.getOrganizer() != null) {
+
+            String profileId = user.getOrganizer().getProfileId();
+
+
+            if (profileId != null) {
+                user.getOrganizer().setProfileId(null);
+                return userRepository.save(user);
+            }
+        }
+
 
         return null;
     }

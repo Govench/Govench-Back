@@ -1,16 +1,14 @@
 package com.upao.govench.govench.config;
 
 import com.paypal.orders.Token;
-import com.upao.govench.govench.security.JWTConfigurer;
-import com.upao.govench.govench.security.JWTFilter;
-import com.upao.govench.govench.security.JwtAuthenticationEntryPoint;
-import com.upao.govench.govench.security.TokenProvider;
+import com.upao.govench.govench.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -35,7 +33,7 @@ public class WebSecurityConfig {
     private final TokenProvider tokenProvider;
     private final JWTFilter jwtRequestFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -52,7 +50,8 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/auth/login")).permitAll()
                         //.requestMatchers(antMatcher("/auth/register/organizer")).permitAll() // Solo el admin puede registrar organizadores , asi fue mencionado en el video.
                         .requestMatchers(antMatcher("/auth/register/participant")).permitAll()
-                        .requestMatchers(antMatcher("/events/*")).permitAll() //para ver los eventos
+                        .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
+                        .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/mail/**")).permitAll()  // Palomino aca pones el enpoint para el envio del correo de recuperacion.(creo xd)
                         .requestMatchers("/api/v1/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
                         // TODO: Cualquier otra solicitud requiere autenticación (JWT u otra autenticación configurada)
@@ -83,7 +82,8 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-
-
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
 
 }
