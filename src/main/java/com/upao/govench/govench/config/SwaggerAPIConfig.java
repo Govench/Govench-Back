@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerAPIConfig {
-    @Value("${Govench.openapi.dev-url}")
-    private String devurl="http://localhost:8080/api/v1";
+    @Value("${Govench.openapi.dev-url}/swagger-ui")
+    private String devurl="http://localhost:8080/api/v1/swagger-ui";
 
     @Bean
     public OpenAPI myOpenAPI() {

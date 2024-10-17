@@ -6,10 +6,15 @@ import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.*;
+import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.UserService;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserEventRepository userEventRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     //Metodos seguridad //
 
@@ -170,6 +179,23 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserProfileDTO(savedUser);
     }
 
+    @Override
+    public AuthResponseDTO login(LoginDTO loginDTO) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(),loginDTO.getPassword())
+
+        );
+
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
+
+        //Aca se va generar el token
+
+        String token = "tokentemporal";
+
+        AuthResponseDTO responseDTO = userMapper.toAuthResponseDTO(user,token);
+        return responseDTO;
+    }
 
 
 

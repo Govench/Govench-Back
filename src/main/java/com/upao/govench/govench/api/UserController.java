@@ -72,19 +72,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
-        try {
-            boolean isAuthenticated = userService.authenticateUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-            if (isAuthenticated) {
-                return new ResponseEntity<>("Inicio de sesión exitoso", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Correo electrónico o contraseña incorrectos", HttpStatus.UNAUTHORIZED);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error en el sistema", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @PostMapping("/profile/{userId}/upload")
     public String uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {

@@ -23,6 +23,9 @@ public interface UserService {
 
     UserProfileDTO getUserProfilebyId(Integer id);
 
+    //Autenticar el login
+    AuthResponseDTO login(LoginDTO loginDTO);
+
 
     //Metodos pre security//
     List<UserResponseDTO> getAllUsers();

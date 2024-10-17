@@ -49,7 +49,30 @@ public class UserMapper {
     }
 
 
+    public User toUserEntity(LoginDTO loginDTO)
+    {
+        return modelMapper.map(loginDTO, User.class);
+    }
 
+    public AuthResponseDTO toAuthResponseDTO(User user , String token) {
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
+        authResponseDTO.setToken(token);
+
+        String name = (user.getParticipant() != null) ? user.getParticipant().getName() :
+                (user.getOrganizer() != null) ? user.getOrganizer().getName():"ADMIN";
+        String lastname = (user.getParticipant() != null ) ? user.getParticipant().getLastname() :
+                (user.getOrganizer() != null) ? user.getOrganizer().getLastname():"USER";
+
+        authResponseDTO.setName(name);
+        authResponseDTO.setLastname(lastname);
+
+        authResponseDTO.setRole(user.getRole().getName());
+
+        return authResponseDTO;
+    }
+
+
+//metodos pre security//
     public User convertToEntity(UserRequestDTO userRequestDTO) {
         return modelMapper.map(userRequestDTO, User.class);
     }
