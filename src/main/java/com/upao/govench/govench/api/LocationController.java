@@ -6,13 +6,15 @@ import com.upao.govench.govench.service.impl.LocationServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/locations")
+@RequestMapping("/admin/locations")
 @AllArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class LocationController {
 
     private final LocationServiceImpl locationServiceImpl;

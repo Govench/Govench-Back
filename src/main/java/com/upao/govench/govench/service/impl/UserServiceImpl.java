@@ -6,6 +6,7 @@ import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.*;
+import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.UserService;
 import jakarta.persistence.Transient;
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
+    @Autowired
+    private TokenProvider tokenProvider;
     //Metodos seguridad //
 
     @Override
@@ -191,16 +193,14 @@ public class UserServiceImpl implements UserService {
 
         //Aca se va generar el token
 
-        String token = "tokentemporal";
+        String token = tokenProvider.createAccessToken(authentication);
 
         AuthResponseDTO responseDTO = userMapper.toAuthResponseDTO(user,token);
         return responseDTO;
     }
 
 
-
-
-    ///Metodos pre seguridad///
+    ///--------Metodos pre seguridad----------///
     @Override
     public User getUserbyId(Integer userId) {
         return userRepository.findById(userId).orElse(null);

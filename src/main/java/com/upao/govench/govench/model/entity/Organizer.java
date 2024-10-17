@@ -43,9 +43,14 @@ public class Organizer{
 
     @Column(name = "or_can_eve_in")
     private int eventosCreados;
+
     @JsonIgnore
     @Column(name="or_cre_dt")
     private LocalDateTime created;
+
+    @JsonIgnore
+    @Column(name="or_up_dt")
+    private LocalDateTime updated;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "followings")

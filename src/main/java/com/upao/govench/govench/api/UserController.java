@@ -39,7 +39,15 @@ public class UserController {
         return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
     }
 
-//Metodos pre security//
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
+        AuthResponseDTO authResponseDTO = userService.login(loginDTO);
+        return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
+    }
+
+
+
+//-------Metodos pre security----------//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
@@ -50,15 +58,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            userService.updateUser(id, userRequestDTO);
-            return new ResponseEntity<>("Usuario actualizado con éxito", HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
@@ -119,6 +118,7 @@ public class UserController {
         profileService.deleteProfile(profileId);
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
     }
+
 
     @PostMapping("/{userId}/follow/{followedUserId}")
     public ResponseEntity<String> followUser(@PathVariable Integer userId, @PathVariable Integer followedUserId) {
