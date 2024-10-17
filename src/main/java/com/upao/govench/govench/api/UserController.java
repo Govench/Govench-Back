@@ -3,12 +3,21 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
+import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.security.TokenProvider;
+import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
+import org.hibernate.mapping.TableOwner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.TokenService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +35,10 @@ public class UserController {
 
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TokenProvider tokenProvider;
 
     @PostMapping("/register/participant")
     public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
@@ -46,8 +59,120 @@ public class UserController {
     }
 
 
+    @PostMapping("/upload/profile/{userId}")
+    public ResponseEntity<String> uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {
+        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+        User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
+        if(user.getRole().getName().equals("ROLE_ADMIN"))
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("El admin no puede tener foto de perfil");
+        }
+        if (authenticatedUserId == null || authenticatedUserId != userId) {
+            return new ResponseEntity<>("Acceso denegado: Solo el dueño del perfil puede subir una imagen.", HttpStatus.FORBIDDEN);
+        }
 
-//-------Metodos pre security----------//
+        try {
+            Profile profile = profileService.saveProfileWithImage(file);
+
+            userService.associateProfileWithUser(userId, profile.getId());
+
+            return new ResponseEntity<>("La imagen se ha asociado al perfil correctamente", HttpStatus.OK);
+
+        } catch (IOException e) {
+            return new ResponseEntity<>("Falla en la subida de la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials(); // Obtén el token del objeto de autenticación
+
+            // Extraer el email del token
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+
+            // Buscar el usuario usando el email
+            User user = userRepository.findByEmail(email).orElse(null); // Debes implementar este método en tu UserService
+            return user != null ? user.getId() : null;
+        }
+        return null; // Si no hay autenticación, devuelve null
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable int userId) {
+        Profile profile=null;
+        User user = userService.getUserbyId(userId);
+
+        if(user.getParticipant()!=null) {
+            String profileId=user.getParticipant().getProfileId();
+            profile = profileService.getProfile(profileId);
+        }
+        if(user.getOrganizer()!=null) {
+            String profileId=user.getOrganizer().getProfileId();
+            profile = profileService.getProfile(profileId);
+        }
+
+        if (profile != null && profile.getImage() != null) {
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG) // o el tipo de imagen adecuado
+                    .body(profile.getImage());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/profile/{userId}")
+    public ResponseEntity<String> deleteProfileImage(@PathVariable int userId) {
+
+        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+
+        if (authenticatedUserId == null || authenticatedUserId != userId) {
+            return new ResponseEntity<>("Acceso denegado: Solo el dueño del perfil puede eliminar la imagen.", HttpStatus.FORBIDDEN);
+        }
+
+        User user = userService.getUserbyId(userId);
+        String profileId=null;
+
+        if (user == null) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+        if(user.getAdmin()!=null)
+        {
+            return new ResponseEntity<>("Usuario admin no puede tener foto de perfil", HttpStatus.BAD_REQUEST);
+        }
+        if(user.getParticipant()!=null)
+        {
+            profileId = user.getParticipant().getProfileId();
+
+        }
+
+        if(user.getOrganizer()!=null)
+        {
+            profileId = user.getOrganizer().getProfileId();
+
+        }
+
+        if (profileId == null) {
+            return new ResponseEntity<>("Usuario no tiene una foto de perfil asociada", HttpStatus.NOT_FOUND);
+        }
+
+        Profile profile = profileService.getProfile(profileId);
+
+        if (profile == null || profile.getImage() == null) {
+            return new ResponseEntity<>("Foto de perfil no encontrada", HttpStatus.NOT_FOUND);
+        }
+
+        userService.dessasociateProfileWithUser(userId);
+        profileService.deleteProfile(profileId);
+        return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
+    }
+
+
+
+    //-------Metodos pre security----------//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
@@ -72,52 +197,6 @@ public class UserController {
     }
 
 
-    @PostMapping("/profile/{userId}/upload")
-    public String uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {
-        try {
-
-            Profile profile = profileService.saveProfileWithImage(file);
-
-            userService.associateProfileWithUser(userId, profile.getId());
-
-            return "La imagen se ha asociado al perfil correctamente";
-
-        } catch (IOException e) {
-            return "Falla en la subida de la imagen";
-        }
-    }
-
-    @GetMapping("/profile/{userId}")
-    public ResponseEntity<byte[]> getProfileImage(@PathVariable int userId) {
-        User user = userService.getUserbyId(userId);
-        String profileId=user.getParticipant().getProfileId();
-        Profile profile = profileService.getProfile(profileId);
-        if (profile != null && profile.getImage() != null) {
-            return ResponseEntity.ok()
-                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG) // o el tipo de imagen adecuado
-                    .body(profile.getImage());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    @DeleteMapping("profile/{userId}")
-    public ResponseEntity<String> deleteProfileImage(@PathVariable int userId) {
-        User user = userService.getUserbyId(userId);
-        if (user == null) {
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        }
-        String profileId = user.getParticipant().getProfileId();
-        if (profileId == null) {
-            return new ResponseEntity<>("Usuario no tiene una foto de perfil asociada", HttpStatus.NOT_FOUND);
-        }
-        Profile profile = profileService.getProfile(profileId);
-        if (profile == null || profile.getImage() == null) {
-            return new ResponseEntity<>("Foto de perfil no encontrada", HttpStatus.NOT_FOUND);
-        }
-        userService.dessasociateProfileWithUser(userId);
-        profileService.deleteProfile(profileId);
-        return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
-    }
 
 
     @PostMapping("/{userId}/follow/{followedUserId}")
