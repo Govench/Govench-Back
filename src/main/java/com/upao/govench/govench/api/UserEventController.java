@@ -31,7 +31,6 @@ public class UserEventController{
     @Autowired
     private EventServiceImpl eventService;
     @Autowired
-
     private UserEventService userEventService;
     @Autowired
     private EventServiceImpl eventServiceImpl;

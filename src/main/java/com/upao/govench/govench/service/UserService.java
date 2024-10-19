@@ -25,7 +25,7 @@ public interface UserService {
 
     //Autenticar el login
     AuthResponseDTO login(LoginDTO loginDTO);
-
+     Integer getAuthenticatedUserIdFromJWT();
 
     //Metodos pre security//
     List<UserResponseDTO> getAllUsers();

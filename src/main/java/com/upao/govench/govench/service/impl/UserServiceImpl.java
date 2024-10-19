@@ -9,13 +9,18 @@ import com.upao.govench.govench.repository.*;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +35,8 @@ import java.util.Optional;
 
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
+
     //
     @Autowired
     private UserRepository userRepository;
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RatingEventMapper ratingEventMapper;
     @Autowired
-    private final RatingEventRepository ratingEventRepository;
+    private RatingEventRepository ratingEventRepository;
 
     @Autowired
     private EventRepository eventRepository;
@@ -67,12 +72,15 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenProvider tokenProvider;
+
+
     //Metodos seguridad //
 
     @Override
     public UserProfileDTO registerParticipant(UserRegistrationDTO userRegistrationDTO) {
         Role role = roleRepository.findById(2).orElse(null);
         return UserRegistrationWithRole(userRegistrationDTO,role);
+
     }
 
     @Override
@@ -199,6 +207,23 @@ public class UserServiceImpl implements UserService {
         return responseDTO;
     }
 
+    public Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials(); // Obtén el token del objeto de autenticación
+
+            // Extraer el email del token
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+
+            // Buscar el usuario usando el email
+            User user = userRepository.findByEmail(email).orElse(null); // Debes implementar este método en tu UserService
+            return user != null ? user.getId() : null;
+        }
+        return null; // Si no hay autenticación, devuelve null
+    }
 
     ///--------Metodos pre seguridad----------///
     @Override

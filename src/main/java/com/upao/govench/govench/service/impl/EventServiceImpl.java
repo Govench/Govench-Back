@@ -2,6 +2,7 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.EventMapper;
+import com.upao.govench.govench.mapper.LocationMapper;
 import com.upao.govench.govench.mapper.RatingEventMapper;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
@@ -28,6 +29,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
+    private final LocationMapper locationMapper;
 
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {

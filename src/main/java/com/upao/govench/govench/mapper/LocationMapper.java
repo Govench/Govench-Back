@@ -18,6 +18,9 @@ public class LocationMapper {
     public Location convertToEntity(LocationRequestDTO locationRequestDTO) {
         return modelMapper.map(locationRequestDTO, Location.class);
     }
+    public Location convertToEntity(LocationResponseDTO locationRequestDTO) {
+        return modelMapper.map(locationRequestDTO, Location.class);
+    }
 
     public LocationResponseDTO convertToDTO(Location location) {
         return modelMapper.map(location, LocationResponseDTO.class);
