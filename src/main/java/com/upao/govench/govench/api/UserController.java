@@ -10,6 +10,7 @@ import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.mapping.TableOwner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,18 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class UserController {
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private ProfileService profileService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TokenProvider tokenProvider;
+    private final UserService userService;
+
+    private final ProfileService profileService;
+
+    private  final UserRepository userRepository;
+
+    private final TokenProvider tokenProvider;
 
     @PostMapping("/register/participant")
     public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
@@ -58,7 +59,6 @@ public class UserController {
         return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
     }
 
-
     @PostMapping("/upload/profile/{userId}")
     public ResponseEntity<String> uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {
         Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
@@ -73,9 +73,7 @@ public class UserController {
 
         try {
             Profile profile = profileService.saveProfileWithImage(file);
-
             userService.associateProfileWithUser(userId, profile.getId());
-
             return new ResponseEntity<>("La imagen se ha asociado al perfil correctamente", HttpStatus.OK);
 
         } catch (IOException e) {
@@ -92,7 +90,6 @@ public class UserController {
             // Extraer el email del token
             Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
             String email = claims.getSubject();
-
 
             // Buscar el usuario usando el email
             User user = userRepository.findByEmail(email).orElse(null); // Debes implementar este método en tu UserService
@@ -146,15 +143,11 @@ public class UserController {
         if(user.getParticipant()!=null)
         {
             profileId = user.getParticipant().getProfileId();
-
         }
-
         if(user.getOrganizer()!=null)
         {
             profileId = user.getOrganizer().getProfileId();
-
         }
-
         if (profileId == null) {
             return new ResponseEntity<>("Usuario no tiene una foto de perfil asociada", HttpStatus.NOT_FOUND);
         }
@@ -170,8 +163,6 @@ public class UserController {
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
     }
 
-
-
     //-------Metodos pre security----------//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
@@ -182,7 +173,6 @@ public class UserController {
             return new ResponseEntity<>("Error al obtener la lista de usuarios", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
@@ -195,9 +185,6 @@ public class UserController {
             return new ResponseEntity<>("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 
     @PostMapping("/{userId}/follow/{followedUserId}")
     public ResponseEntity<String> followUser(@PathVariable Integer userId, @PathVariable Integer followedUserId) {
@@ -270,7 +257,6 @@ public class UserController {
     public ResponseEntity<String> rateEvent(@PathVariable Integer eventId,
                                             @PathVariable Integer userId,
                                             @RequestBody RatingEventRequestDTO ratingEventRequestDTO) {
-
         try{
             userService.createRatingEvent(userId, eventId, ratingEventRequestDTO);
             return new ResponseEntity<>("Evento calificado correctamente", HttpStatus.OK);
