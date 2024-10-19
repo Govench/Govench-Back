@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUserEntity(userRegistrationDTO);
         user.setRole(role);
 
-        if(Objects.equals(role.getName(), "PARTICIPANT"))
+        if(Objects.equals(role.getName(), "ROLE_PARTICIPANT"))
         {   Participant participant = new Participant();
             participant.setName(userRegistrationDTO.getName());
             participant.setLastname(userRegistrationDTO.getLastname());
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
             user.setParticipant(participant);
 
         }
-        else if (Objects.equals(role.getName(), "ORGANIZER")) {
+        else if (Objects.equals(role.getName(), "ROLE_ORGANIZER")) {
             Organizer organizer = new Organizer();
             organizer.setName(userRegistrationDTO.getName());
             organizer.setLastname(userRegistrationDTO.getLastname());
