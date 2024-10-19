@@ -6,6 +6,7 @@ import com.upao.govench.govench.model.entity.PasswordResetToken;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.PasswordResetTokenRepository;
 import com.upao.govench.govench.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,9 @@ public class PasswordResetService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public String initiatePasswordReset(String email) {
         if (userRepository.existsByEmail(email)) {
@@ -51,9 +55,10 @@ public class PasswordResetService {
 
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken passwordResetToken = tokenRepository.findByToken(token);
-        if (passwordResetToken != null && passwordResetToken.getExpiryDate().isAfter(LocalDateTime.now())) {
+        if (passwordResetToken != null) {
             User user = passwordResetToken.getUser();
-            user.setPassword(newPassword); // Make sure to hash the password before saving
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            user.setPassword(encodedPassword);
             userRepository.save(user);
             tokenRepository.delete(passwordResetToken);
         } else {

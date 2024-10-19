@@ -19,9 +19,6 @@ public class EmailController {
     @Autowired
     private PasswordResetService passwordResetService;
 
-    @Autowired
-    private EmailService emailService;
-
     @PostMapping("/forgot-password/{email}")
     public ResponseEntity<String> forgotPassword(@PathVariable("email") String email) {
         System.out.println(email);
