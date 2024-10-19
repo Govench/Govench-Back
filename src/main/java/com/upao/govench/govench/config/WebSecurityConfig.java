@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/auth/register/participant")).permitAll()
                         .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
                         .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
+                        .requestMatchers(antMatcher("/admin/payments/payment/**")).permitAll()
                         .requestMatchers(antMatcher("/mail/**")).permitAll()  // Palomino aca pones el enpoint para el envio del correo de recuperacion.(creo xd)
                         .requestMatchers(antMatcher("/community/**/posts")).permitAll()
 
