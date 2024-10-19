@@ -1,6 +1,8 @@
 package com.upao.govench.govench.service;
 
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.UserProfileDTO;
+import com.upao.govench.govench.model.dto.UserRegistrationDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
 import com.upao.govench.govench.model.entity.UserEvent;
@@ -20,6 +22,8 @@ import com.upao.govench.govench.service.UserService;
 public interface UserEventService {
 
     public UserEvent addUserEvent(UserEvent userEvent);
+
+    /*metodos pre security*/
 
     public UserEvent searchUserEventById(IdCompuestoU_E id);
 
