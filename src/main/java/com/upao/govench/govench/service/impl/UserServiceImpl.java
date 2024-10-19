@@ -144,7 +144,6 @@ public class UserServiceImpl implements UserService {
        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
         User user = userMapper.toUserEntity(userRegistrationDTO);
         user.setRole(role);
-
         if(Objects.equals(role.getName(), "ROLE_PARTICIPANT"))
         {   Participant participant = new Participant();
             participant.setName(userRegistrationDTO.getName());
@@ -158,7 +157,6 @@ public class UserServiceImpl implements UserService {
             participant.setCreated(LocalDateTime.now());
             participant.setUser(user);
             user.setParticipant(participant);
-
         }
         else if (Objects.equals(role.getName(), "ROLE_ORGANIZER")) {
             Organizer organizer = new Organizer();
@@ -175,9 +173,7 @@ public class UserServiceImpl implements UserService {
             organizer.setUser(user);
             user.setOrganizer(organizer);
         }
-
         User savedUser = userRepository.save(user);
-
         return userMapper.toUserProfileDTO(savedUser);
     }
 
@@ -199,56 +195,10 @@ public class UserServiceImpl implements UserService {
         return responseDTO;
     }
 
-
     ///--------Metodos pre seguridad----------///
     @Override
     public User getUserbyId(Integer userId) {
         return userRepository.findById(userId).orElse(null);
-    }
-
-
-    @Override
-    public User createUser(UserRequestDTO userRequestDTO) {
-        if (userRepository.findByEmail(userRequestDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("El correo ya está en uso");
-        } User user = userMapper.convertToEntity(userRequestDTO);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User updateUser(Integer userId, UserRequestDTO userDTO) {
-        User user1 = getUserbyId(userId);
-
-        if (user1 == null) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        if(userDTO.getName() != null) user1.getParticipant().setName(userDTO.getName());
-        if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
-        if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
-        if(userDTO.getBirthday() != null) user1.getParticipant().setBirthday(userDTO.getBirthday());
-        if(userDTO.getGender() != null) user1.getParticipant().setGender(userDTO.getGender());
-        if(userDTO.getProfileDesc() != null) user1.getParticipant().setProfileDesc(userDTO.getProfileDesc());
-        if(userDTO.getInterest() != null) user1.getParticipant().setInterest(userDTO.getInterest());
-        if(userDTO.getSkills() != null) user1.getParticipant().setSkills(userDTO.getSkills());
-        if(userDTO.getSocialLinks() != null) user1.getParticipant().setSocialLinks(userDTO.getSocialLinks());
-        return userRepository.save(user1);
-    }
-    public User updateOrganizer(Integer userId, UserRequestDTO userDTO) {
-        User user1 = getUserbyId(userId);
-
-        if (user1 == null) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        if(userDTO.getName() != null) user1.getOrganizer().setName(userDTO.getName());
-        if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
-        if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
-        if(userDTO.getBirthday() != null) user1.getOrganizer().setBirthday(userDTO.getBirthday());
-        if(userDTO.getGender() != null) user1.getOrganizer().setGender(userDTO.getGender());
-        if(userDTO.getProfileDesc() != null) user1.getOrganizer().setProfileDesc(userDTO.getProfileDesc());
-        if(userDTO.getInterest() != null) user1.getOrganizer().setInterest(userDTO.getInterest());
-        if(userDTO.getSkills() != null) user1.getOrganizer().setSkills(userDTO.getSkills());
-        if(userDTO.getSocialLinks() != null) user1.getOrganizer().setSocialLinks(userDTO.getSocialLinks());
-        return userRepository.save(user1);
     }
 
     @Override
@@ -258,23 +208,11 @@ public class UserServiceImpl implements UserService {
         } userRepository.deleteById(userId);
     }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return userMapper.convertToListDTO(users);
-    }
-    @Override
-    public boolean authenticateUser(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getPassword().equals(password);
-        } return false;
     }
 
     @Override
@@ -389,6 +327,7 @@ public class UserServiceImpl implements UserService {
          // Guardar la calificación
          ratingRepository.save(rating);
      }
+
     @Override
     public List<Rating> getUserRatings(Integer userId) {
 

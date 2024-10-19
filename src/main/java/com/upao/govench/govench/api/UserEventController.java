@@ -28,7 +28,6 @@ public class UserEventController{
     @Autowired
     private EventServiceImpl eventService;
     @Autowired
-
     private UserEventService userEventService;
     @Autowired
     private EventServiceImpl eventServiceImpl;
@@ -92,8 +91,6 @@ public class UserEventController{
         }
     }
 
-
-
     @DeleteMapping("/{iduser}/{idevent}")
     public ResponseEntity<String> deleteUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
         IdCompuestoU_E id = new IdCompuestoU_E(iduser, idevent);
@@ -114,7 +111,6 @@ public class UserEventController{
         }
     }
 
-
     // Este endpoint devuelve el historial de eventos de un usuario por su ID
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId(@PathVariable Integer userId) {
@@ -124,5 +120,4 @@ public class UserEventController{
         }
         return new ResponseEntity<>(eventHistory, HttpStatus.OK);
     }
-
 }

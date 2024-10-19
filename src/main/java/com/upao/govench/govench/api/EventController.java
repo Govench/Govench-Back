@@ -26,7 +26,6 @@ public class EventController{
     }
 
     @GetMapping("/tittle/{tittle}")
-
     public ResponseEntity<?> getEventByTittle(@PathVariable String tittle) {
 
             List<EventResponseDTO> event = eventServiceImpl.getEventByName(tittle);
@@ -51,4 +50,3 @@ public class EventController{
         return new ResponseEntity<>(ratingEvents, HttpStatus.OK);
     }
 }
-
