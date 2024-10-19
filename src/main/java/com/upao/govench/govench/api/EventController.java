@@ -3,6 +3,7 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.service.EventService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,6 @@ public class EventController{
         }else {
             return new ResponseEntity<>(event, HttpStatus.OK);
         }
-
     }
 
     @GetMapping("/exp/{exp}")
@@ -44,7 +44,7 @@ public class EventController{
     }
 
     @GetMapping("/{eventId}/ratings")
-    public ResponseEntity<List<RatingEventResponseDTO>> getRatingEvents(@PathVariable int eventId) {
+    public ResponseEntity<List<RatingEventResponseDTO>> getRatingEvents(@PathVariable Event eventId) {
         List<RatingEventResponseDTO> ratingEvents = eventServiceImpl.getRatingEvents(eventId);
 
         return new ResponseEntity<>(ratingEvents, HttpStatus.OK);

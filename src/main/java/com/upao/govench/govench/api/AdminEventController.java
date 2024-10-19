@@ -4,6 +4,7 @@ import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
 public class AdminEventController {
+
     private final EventServiceImpl eventServiceImpl;
 
     @PostMapping

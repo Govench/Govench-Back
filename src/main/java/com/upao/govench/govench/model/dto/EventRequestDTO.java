@@ -52,5 +52,4 @@ public class EventRequestDTO {
     @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
     private Integer maxCapacity;
 
-
 }

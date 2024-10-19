@@ -360,18 +360,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RatingEventResponseDTO createRatingEvent(int userId, int eventId, RatingEventRequestDTO ratingEventRequestDTO) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuario que califica no encontrado"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Evento a calificar no encontrado"));
+    public RatingEventResponseDTO createRatingEvent(User user, Event event, RatingEventRequestDTO ratingEventRequestDTO) {
 
         boolean userAsist = userEventRepository.existsByUserAndEvent(user, event);
         if(!userAsist) {
             throw new RuntimeException("Usuario no asistio al evento");
         }
 
+        System.out.print(ratingEventRequestDTO);
+
         RatingEvent ratingEvent = ratingEventMapper.convertToEntity(ratingEventRequestDTO);
-        ratingEvent.setUserId(userId);
-        ratingEvent.setEventId(eventId);
+        ratingEvent.setUserId(user);
+        ratingEvent.setEventId(event);
         ratingEvent.setFechaPuntuacion(LocalDate.now());
         ratingEventRepository.save(ratingEvent);
         return ratingEventMapper.convertToDTO(ratingEvent);

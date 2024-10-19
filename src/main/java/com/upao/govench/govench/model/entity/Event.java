@@ -70,4 +70,5 @@ public class Event {
     @Column(name = "eve_reg_count_in", nullable = false)
     private int registeredCount = 0;
 
+
 }

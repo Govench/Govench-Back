@@ -59,8 +59,9 @@ public class UserEventController{
         return userEventService.getUserEventbyEvent(event);
     }
 
-    @PostMapping("/{iduser}/{idevent}")
-    public ResponseEntity<String> createUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
+    @PostMapping("/{idevent}")
+    public ResponseEntity<String> createUserEvent(@PathVariable int idevent) {
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
         // Consultar el usuario por su ID
         User user = userService.getUserbyId(iduser);
         if (user == null) {
