@@ -1,7 +1,9 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.service.CommunityService;
@@ -13,15 +15,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.security.TokenProvider;
+
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Map;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("")
 @AllArgsConstructor
 public class PostController {
     @Autowired
@@ -31,83 +42,166 @@ public class PostController {
     @Autowired
     private final CommunityService communityService;
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createPost(@RequestBody PostRequestDTO postRequestDTO) {
+    @PostMapping("/community/{communityId}/posts/create")
+    public ResponseEntity<Map<String, String>> createPost(@PathVariable("communityId") int communityId,
+                                                          @RequestBody PostRequestDTO postRequestDTO) {
 
-        int userId = postRequestDTO.getAutor().getId();
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        if (userId == null) {
+            return new ResponseEntity<>(Map.of("message", "Acceso denegado: Usuario no autenticado"), HttpStatus.FORBIDDEN);
+        }
+
         User author = userService.getUserbyId(userId);
 
         if (author == null) {
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Map.of("message", "Usuario no encontrado"), HttpStatus.NOT_FOUND);
         }
-
-        int communityId = postRequestDTO.getComunidad().getId();
 
         Community community = communityService.EntityfindById(communityId);
         if (community == null) {
-            return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Map.of("message", "Comunidad no encontrada"), HttpStatus.NOT_FOUND);
         }
+
         postRequestDTO.setAutor(author);
         postRequestDTO.setComunidad(community);
         postRequestDTO.setCreated(LocalDate.now());
 
-        postServiceImpl.publicarPost(communityId,postRequestDTO,author);
-        return new ResponseEntity<>("Post creado con éxito", HttpStatus.CREATED);
+        postServiceImpl.publicarPost(communityId, postRequestDTO, author);
+
+        Map<String, String> response = Map.of("body", postRequestDTO.getBody());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<PostResponseDTO>> obtenerTodosLosPosts() {
-        List<PostResponseDTO> posts = postServiceImpl.getAllPosts();
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+    @Autowired
+    private TokenProvider tokenProvider;
+    @Autowired
+    private UserRepository userRepository;
+
+    private Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials();
+
+
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+
+            User user = userRepository.findByEmail(email).orElse(null);
+            return user != null ? user.getId() : null;
+        }
+        return null;
     }
 
-        @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost( @RequestBody OwnerRequestDTO ownerdto, @PathVariable("postId") int postId) throws Exception {
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> obtenerPostPorId(@PathVariable("postId") int postId) {
         try {
-            User owner = userService.getUserbyId(ownerdto.getId());
+            PostResponseDTO post = postServiceImpl.getPostById(postId);
+            return new ResponseEntity<>(post, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-            PostResponseDTO existingPost = postServiceImpl.getPostById(postId);
+    @GetMapping("/community/{communityId}/posts")
+    public ResponseEntity<List<PostResponseDTO>> obtenerPostsPorComunidadId(@PathVariable("communityId") int communityId) {
+        try {
+            List<PostResponseDTO> posts = postServiceImpl.getPostsByCommunityId(communityId);
+            if (posts.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @DeleteMapping("/community/{communityId}/posts/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable("communityId") int communityId,
+                                             @PathVariable("postId") int postId) {
+        try {
+            // Obtener el ID del usuario autenticado desde el JWT
+            Integer userId = getAuthenticatedUserIdFromJWT();
+
+            // Verificar que el usuario esté autenticado
+            if (userId == null) {
+                return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
+            }
+
+            // Obtener el post existente usando la entidad completa
+            Post existingPost = postServiceImpl.getPostEntityById(postId);
 
             if (existingPost == null) {
                 return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
             }
 
-            if (existingPost.getAutor().getId() != owner.getId()) {
-                throw new AccessDeniedException("No tienes permiso para eliminar este post");
+            // Verificar que el post pertenezca a la comunidad especificada
+            if (existingPost.getComunidad().getId() != communityId) {
+                return new ResponseEntity<>("El post no pertenece a esta comunidad", HttpStatus.BAD_REQUEST);
             }
 
+            // Verificar que el autor sea el mismo que el usuario autenticado
+            if (existingPost.getAutor().getId() != userId) {
+                return new ResponseEntity<>("No tienes permiso para eliminar este post", HttpStatus.FORBIDDEN);
+            }
+
+            // Eliminar el post
             postServiceImpl.deleteById(postId);
 
             return new ResponseEntity<>("Post eliminado con éxito", HttpStatus.OK);
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>("Error al eliminar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/{postId}")
-    public ResponseEntity<?> updatePost( @PathVariable("postId") int postId,
-                                        @RequestBody PostRequestDTO postRequestDTO) throws Exception {
-        try {
-            User owner = userService.getUserbyId(postRequestDTO.getAutor().getId());
-            PostResponseDTO Post1 = postServiceImpl.getPostById(postId);
 
-            if (Post1 == null) {
+    @PutMapping("/community/{communityId}/posts/{postId}")
+    public ResponseEntity<String> updatePost(@PathVariable("communityId") int communityId,
+                                             @PathVariable("postId") int postId,
+                                             @RequestBody PostRequestDTO postRequestDTO) {
+        try {
+            // Obtener el ID del usuario autenticado desde el JWT
+            Integer userId = getAuthenticatedUserIdFromJWT();
+
+            // Verificar que el usuario esté autenticado
+            if (userId == null) {
+                return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
+            }
+
+            // Obtener el post existente usando la entidad completa
+            Post existingPost = postServiceImpl.getPostEntityById(postId);
+
+            if (existingPost == null) {
                 return new ResponseEntity<>("Post no encontrado", HttpStatus.NOT_FOUND);
             }
 
-            if (Post1.getAutor().getId() != owner.getId()) {
-                throw new AccessDeniedException("No tienes permiso para modificar este post");
+            // Verificar que el post pertenezca a la comunidad especificada
+            if (existingPost.getComunidad().getId() != communityId) {
+                return new ResponseEntity<>("El post no pertenece a esta comunidad", HttpStatus.BAD_REQUEST);
             }
 
-            PostResponseDTO updatedPost = postServiceImpl.actualizaPost(postId, postRequestDTO);
-            updatedPost.setUpdated(LocalDateTime.now());
+            // Verificar que el autor sea el mismo que el usuario autenticado
+            if (existingPost.getAutor().getId() != userId) {
+                return new ResponseEntity<>("No tienes permiso para modificar este post", HttpStatus.FORBIDDEN);
+            }
+
+            // Actualizar el cuerpo del post
+            existingPost.setBody(postRequestDTO.getBody());
+            existingPost.setUpdated(LocalDateTime.now());
+
+            // Guardar los cambios
+            postServiceImpl.save(existingPost);
 
             return new ResponseEntity<>("El post ha sido actualizado", HttpStatus.ACCEPTED);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>("Error al actualizar el post", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
 

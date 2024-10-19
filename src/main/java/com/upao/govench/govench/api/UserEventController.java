@@ -3,6 +3,7 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import com.upao.govench.govench.service.impl.UserEventServiceImpl;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
@@ -24,6 +26,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/inscription")
+@PreAuthorize("hasAnyRole('PARTICIPANT', 'ORGANIZER')")
 public class UserEventController{
     @Autowired
     private EventServiceImpl eventService;
@@ -33,6 +36,10 @@ public class UserEventController{
     private EventServiceImpl eventServiceImpl;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EventRepository eventRepository;
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<UserEvent> getAllUserEvents() {
@@ -93,24 +100,41 @@ public class UserEventController{
 
     @DeleteMapping("/{iduser}/{idevent}")
     public ResponseEntity<String> deleteUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
-        IdCompuestoU_E id = new IdCompuestoU_E(iduser, idevent);
-        Event event= eventServiceImpl.getEventById(idevent);
-        LocalTime systemTime = LocalTime.now();
-        LocalDate systemDate= LocalDate.now();
-        if(systemDate.isBefore(event.getDate()) ||
-                (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime())))
-        {
-            userEventService.removeUserEventById(id);
-            return new ResponseEntity<>("Se ha eliminado la inscripción correctamente.", HttpStatus.OK);
+        // Verificar si el usuario existe
+        User user = userService.getUserbyId(iduser);
+        if (user == null) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         }
-        else
-        {
+
+        // Verificar si el evento existe
+        Event event = eventServiceImpl.getEventById(idevent);
+        if (event == null) {
+            return new ResponseEntity<>("Evento no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        IdCompuestoU_E id = new IdCompuestoU_E(iduser, idevent);
+        LocalTime systemTime = LocalTime.now();
+        LocalDate systemDate = LocalDate.now();
+
+        // Verificar si el evento aún no ha comenzado
+        if (systemDate.isBefore(event.getDate()) ||
+                (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime()))) {
+
+            // Eliminar la inscripción del usuario al evento
+            userEventService.removeUserEventById(id);
+
+            // Restar uno al contador de inscritos del evento y guardar los cambios
+            event.setRegisteredCount(event.getRegisteredCount() - 1);
+            eventRepository.save(event);
+
+            return new ResponseEntity<>("Se ha eliminado la inscripción correctamente.", HttpStatus.OK);
+        } else {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "No se puede cancelar la inscripción porque el evento ya ha comenzado."
             );
         }
     }
-
+  
     // Este endpoint devuelve el historial de eventos de un usuario por su ID
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId(@PathVariable Integer userId) {

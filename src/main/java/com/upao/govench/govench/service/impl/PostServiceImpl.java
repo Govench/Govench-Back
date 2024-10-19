@@ -69,5 +69,21 @@ public class PostServiceImpl implements PostService {
 
         return postMapper.convertToDTO(post);
     }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDTO> getPostsByCommunityId(int communityId) {
+        List<Post> posts = postRepository.findPostsByCommunityId(communityId);
+        return postMapper.convertToListDTO(posts);
+    }
+
+    public Post getPostEntityById(int id) {
+        return postRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void save(Post post) {
+        postRepository.save(post);
+    }
+
 }
 
