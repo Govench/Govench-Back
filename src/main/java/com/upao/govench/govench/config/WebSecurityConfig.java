@@ -54,6 +54,8 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/admin/payments/payment/**")).permitAll()
                         .requestMatchers(antMatcher("/mail/**")).permitAll()  // Palomino aca pones el enpoint para el envio del correo de recuperacion.(creo xd)
+                        .requestMatchers(antMatcher("/community/**/posts")).permitAll()
+
                         .requestMatchers("/api/v1/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
                         // TODO: Cualquier otra solicitud requiere autenticación (JWT u otra autenticación configurada)
                         .anyRequest().authenticated()

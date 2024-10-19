@@ -96,6 +96,7 @@ public class CommunityController {
         CommunityResponseDTO updatedCommunity = communityService.update(community, id);
         return new ResponseEntity<>(updatedCommunity, HttpStatus.ACCEPTED);
     }
+
     @PostMapping("/create")
     public ResponseEntity<?> createCommunity(@RequestBody CommunityRequestDTO community) throws Exception {
         User owner= community.getOwner();
