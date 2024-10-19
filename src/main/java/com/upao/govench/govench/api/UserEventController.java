@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 @RestController
@@ -98,8 +99,9 @@ public class UserEventController{
         }
     }
 
-    @DeleteMapping("/{iduser}/{idevent}")
-    public ResponseEntity<String> deleteUserEvent(@PathVariable int iduser, @PathVariable int idevent) {
+    @DeleteMapping("/{idevent}")
+    public ResponseEntity<String> deleteUserEvent(@PathVariable int idevent) {
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
         // Verificar si el usuario existe
         User user = userService.getUserbyId(iduser);
         if (user == null) {
@@ -113,16 +115,17 @@ public class UserEventController{
         }
 
         IdCompuestoU_E id = new IdCompuestoU_E(iduser, idevent);
-        LocalTime systemTime = LocalTime.now();
-        LocalDate systemDate = LocalDate.now();
+        // Verificar si la relación existe
+        UserEvent existingEvent = userEventService.searchUserEventById(new IdCompuestoU_E(iduser, idevent));
+        if (existingEvent == null) {
+            return new ResponseEntity<>("No estas registrado en este evento", HttpStatus.CONFLICT);
+        }
 
+        LocalDateTime localDateTime = LocalDateTime.of(event.getDate(), event.getStartTime());
         // Verificar si el evento aún no ha comenzado
-        if (systemDate.isBefore(event.getDate()) ||
-                (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime()))) {
-
+        if (localDateTime.isAfter(LocalDateTime.now())) {
             // Eliminar la inscripción del usuario al evento
             userEventService.removeUserEventById(id);
-
             // Restar uno al contador de inscritos del evento y guardar los cambios
             event.setRegisteredCount(event.getRegisteredCount() - 1);
             eventRepository.save(event);

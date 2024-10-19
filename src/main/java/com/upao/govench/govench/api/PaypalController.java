@@ -153,11 +153,6 @@ public class PaypalController {
             throw new IllegalArgumentException("Ya estas registrado ");
                }
 
-        // Verificar si el evento todavía permite inscripciones (según fecha y hora)
-        LocalDateTime localDateTime = LocalDateTime.of(event.getDate(), event.getEndTime());
-        System.out.println("evento : "+localDateTime.toString());
-        System.out.println("HORA ACTUAL : "+LocalDateTime.now().toString());
-
             // Crear la nueva relación entre usuario y evento
             UserEvent createdUserEvent = userEventService.addUserEvent(
                     new UserEvent(new IdCompuestoU_E(iduser, idevent), user, event, LocalDate.now(), false)
