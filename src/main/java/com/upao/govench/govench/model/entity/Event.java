@@ -63,4 +63,11 @@ public class Event {
     @Column(name = "eve_fin_rem_bo", nullable = true)
     private boolean finalReminderSent = false;
 
+    // Nuevos atributos
+    @Column(name = "eve_max_cap_in", nullable = false)
+    private int maxCapacity;
+
+    @Column(name = "eve_reg_count_in", nullable = false)
+    private int registeredCount = 0;
+
 }

@@ -32,3 +32,7 @@ public class User {
     @JoinColumn(name = "rol_id_in" , referencedColumnName = "rol_id")
     private Role role;
 }
+
+
+
+
