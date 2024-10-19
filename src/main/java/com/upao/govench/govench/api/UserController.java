@@ -238,6 +238,7 @@ public class UserController {
         }
     }
 
+
     @GetMapping("/{userId}/ratings")
     public ResponseEntity<List<RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
         try {

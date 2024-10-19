@@ -113,5 +113,4 @@ public class UserEventServiceImpl implements UserEventService {
                 .map(userEvent -> eventMapper.convertToDTO(userEvent.getEvent())) // Usamos el método existente
                 .toList();
     }
-
 }
