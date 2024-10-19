@@ -43,7 +43,7 @@ public class PasswordResetService {
                 //Para restablecimiento de contraseña, pero presionando el enlace
                 //String resetLink = "http://localhost:8080/reset-password?token=" + token;
                 //String emailBody = titleEmail + messageEmail + "\n\n" + resetLink;
-                emailService.sendEmail(user.getEmail(), "Password Reset Request \uD83D\uDD12", resetLink);
+                emailService.sendEmail(user.getEmail(), "Solicitud de cambio de contraseña \uD83D\uDD12", resetLink);
                 return "Token enviado exitosamente";
             } catch (Exception e) {
                 e.printStackTrace();
