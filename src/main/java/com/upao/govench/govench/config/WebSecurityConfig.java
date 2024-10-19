@@ -53,6 +53,10 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
                         .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
+                        .requestMatchers(antMatcher("/admin/payments/payment/**")).permitAll()
+                        .requestMatchers(antMatcher("/mail/**")).permitAll() 
+                        .requestMatchers(antMatcher("/community/**/posts")).permitAll()
+
                         .requestMatchers("/api/v1/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
                         // TODO: Cualquier otra solicitud requiere autenticación (JWT u otra autenticación configurada)
                         .anyRequest().authenticated()

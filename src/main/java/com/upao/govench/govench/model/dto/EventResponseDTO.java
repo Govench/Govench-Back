@@ -25,4 +25,6 @@ public class EventResponseDTO {
     private LocationResponseDTO location;
     private String exp;
     private RatingEventResponseDTO rating;
+    private Integer maxCapacity;
+    private int registeredCount;
 }

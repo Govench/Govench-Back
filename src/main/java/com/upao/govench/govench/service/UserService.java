@@ -16,32 +16,25 @@ import java.util.Optional;
 public interface UserService {
 
     UserProfileDTO registerParticipant(UserRegistrationDTO userRegistrationDTO);
-
     UserProfileDTO registerOrganizer(UserRegistrationDTO userRegistrationDTO);
-
     UserProfileDTO uptadteUserProfile(Integer id, UserProfileDTO userProfileDTO);
-
     UserProfileDTO getUserProfilebyId(Integer id);
 
     //Autenticar el login
     AuthResponseDTO login(LoginDTO loginDTO);
 
+     Integer getAuthenticatedUserIdFromJWT();
 
     //Metodos pre security//
     List<UserResponseDTO> getAllUsers();
-    User createUser(UserRequestDTO userRequestDTO);
-    User updateUser(Integer userId, UserRequestDTO userDTO);
     User getUserbyId(Integer userId);
-    Optional<User> findByEmail(String email);
     void deleteUser(Integer userId);
-    boolean authenticateUser(String email, String password);
     User associateProfileWithUser(int userId, String profileId);
     User dessasociateProfileWithUser(int userId);
 
-
+    //METODOS POR ARREGLAR
     void followUser(Integer userId, Integer followerId);
     void removeFollowUser(Integer userId, Integer followedUserId);
-
 
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);

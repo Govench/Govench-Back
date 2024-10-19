@@ -2,7 +2,10 @@ package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.LocationResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.Location;
+import com.upao.govench.govench.service.LocationService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -14,9 +17,16 @@ import java.util.List;
 public class EventMapper {
 
     private final ModelMapper modelMapper;
+    private final LocationService locationService;
+    private final LocationMapper locationMapper;
 
     public Event convertToEntity(EventRequestDTO eventRequestDTO) {
-        return modelMapper.map(eventRequestDTO, Event.class);
+        Event event = modelMapper.map(eventRequestDTO, Event.class);
+
+        LocationResponseDTO location = locationService.getLocationById(eventRequestDTO.getLocation().getId());
+        System.out.print(location);
+        event.setLocation(locationMapper.convertToEntity(location));
+        return event;
     }
 
     public EventResponseDTO convertToDTO(Event event) {

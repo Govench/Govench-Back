@@ -9,13 +9,18 @@ import com.upao.govench.govench.repository.*;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +35,8 @@ import java.util.Optional;
 
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
+
     //
     @Autowired
     private UserRepository userRepository;
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RatingEventMapper ratingEventMapper;
     @Autowired
-    private final RatingEventRepository ratingEventRepository;
+    private RatingEventRepository ratingEventRepository;
 
     @Autowired
     private EventRepository eventRepository;
@@ -67,12 +72,15 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenProvider tokenProvider;
+
+
     //Metodos seguridad //
 
     @Override
     public UserProfileDTO registerParticipant(UserRegistrationDTO userRegistrationDTO) {
         Role role = roleRepository.findById(2).orElse(null);
         return UserRegistrationWithRole(userRegistrationDTO,role);
+
     }
 
     @Override
@@ -144,7 +152,6 @@ public class UserServiceImpl implements UserService {
        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
         User user = userMapper.toUserEntity(userRegistrationDTO);
         user.setRole(role);
-
         if(Objects.equals(role.getName(), "ROLE_PARTICIPANT"))
         {   Participant participant = new Participant();
             participant.setName(userRegistrationDTO.getName());
@@ -158,7 +165,6 @@ public class UserServiceImpl implements UserService {
             participant.setCreated(LocalDateTime.now());
             participant.setUser(user);
             user.setParticipant(participant);
-
         }
         else if (Objects.equals(role.getName(), "ROLE_ORGANIZER")) {
             Organizer organizer = new Organizer();
@@ -175,9 +181,7 @@ public class UserServiceImpl implements UserService {
             organizer.setUser(user);
             user.setOrganizer(organizer);
         }
-
         User savedUser = userRepository.save(user);
-
         return userMapper.toUserProfileDTO(savedUser);
     }
 
@@ -199,56 +203,28 @@ public class UserServiceImpl implements UserService {
         return responseDTO;
     }
 
+    public Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials(); // Obtén el token del objeto de autenticación
+
+            // Extraer el email del token
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+
+            // Buscar el usuario usando el email
+            User user = userRepository.findByEmail(email).orElse(null); // Debes implementar este método en tu UserService
+            return user != null ? user.getId() : null;
+        }
+        return null; // Si no hay autenticación, devuelve null
+    }
 
     ///--------Metodos pre seguridad----------///
     @Override
     public User getUserbyId(Integer userId) {
         return userRepository.findById(userId).orElse(null);
-    }
-
-
-    @Override
-    public User createUser(UserRequestDTO userRequestDTO) {
-        if (userRepository.findByEmail(userRequestDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("El correo ya está en uso");
-        } User user = userMapper.convertToEntity(userRequestDTO);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User updateUser(Integer userId, UserRequestDTO userDTO) {
-        User user1 = getUserbyId(userId);
-
-        if (user1 == null) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        if(userDTO.getName() != null) user1.getParticipant().setName(userDTO.getName());
-        if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
-        if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
-        if(userDTO.getBirthday() != null) user1.getParticipant().setBirthday(userDTO.getBirthday());
-        if(userDTO.getGender() != null) user1.getParticipant().setGender(userDTO.getGender());
-        if(userDTO.getProfileDesc() != null) user1.getParticipant().setProfileDesc(userDTO.getProfileDesc());
-        if(userDTO.getInterest() != null) user1.getParticipant().setInterest(userDTO.getInterest());
-        if(userDTO.getSkills() != null) user1.getParticipant().setSkills(userDTO.getSkills());
-        if(userDTO.getSocialLinks() != null) user1.getParticipant().setSocialLinks(userDTO.getSocialLinks());
-        return userRepository.save(user1);
-    }
-    public User updateOrganizer(Integer userId, UserRequestDTO userDTO) {
-        User user1 = getUserbyId(userId);
-
-        if (user1 == null) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        if(userDTO.getName() != null) user1.getOrganizer().setName(userDTO.getName());
-        if(userDTO.getEmail() != null) user1.setEmail(userDTO.getEmail());
-        if(userDTO.getPassword() != null) user1.setPassword(userDTO.getPassword());
-        if(userDTO.getBirthday() != null) user1.getOrganizer().setBirthday(userDTO.getBirthday());
-        if(userDTO.getGender() != null) user1.getOrganizer().setGender(userDTO.getGender());
-        if(userDTO.getProfileDesc() != null) user1.getOrganizer().setProfileDesc(userDTO.getProfileDesc());
-        if(userDTO.getInterest() != null) user1.getOrganizer().setInterest(userDTO.getInterest());
-        if(userDTO.getSkills() != null) user1.getOrganizer().setSkills(userDTO.getSkills());
-        if(userDTO.getSocialLinks() != null) user1.getOrganizer().setSocialLinks(userDTO.getSocialLinks());
-        return userRepository.save(user1);
     }
 
     @Override
@@ -258,23 +234,11 @@ public class UserServiceImpl implements UserService {
         } userRepository.deleteById(userId);
     }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return userMapper.convertToListDTO(users);
-    }
-    @Override
-    public boolean authenticateUser(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getPassword().equals(password);
-        } return false;
     }
 
     @Override
@@ -340,7 +304,6 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-
         return null;
     }
     @Override
@@ -389,6 +352,7 @@ public class UserServiceImpl implements UserService {
          // Guardar la calificación
          ratingRepository.save(rating);
      }
+
     @Override
     public List<Rating> getUserRatings(Integer userId) {
 
