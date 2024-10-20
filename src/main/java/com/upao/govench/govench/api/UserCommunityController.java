@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import com.upao.govench.govench.model.entity.UserCommunity;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
+
 
 @RequestMapping("/admin/usercommunity")
 public class UserCommunityController {
@@ -52,23 +54,36 @@ public class UserCommunityController {
 
 
 
-    @PostMapping("/{iduser}/{idcommunity}")
-    public ResponseEntity<?> createUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
+    @PostMapping("/{idcommunity}")
+    @PreAuthorize("hasAnyRole('PARTICIPANT', 'ORGANIZER')")
+    public ResponseEntity<?> createUserCommunity(@PathVariable int idcommunity) {
+        // Obtener el ID del usuario autenticado desde el token JWT
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
+        if (iduser == null) {
+            return new ResponseEntity<>("Usuario no autenticado", HttpStatus.UNAUTHORIZED);
+        }
+
         // Consultar el usuario por su ID
         User user = userService.getUserbyId(iduser);
         if (user == null) {
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND); // Mensaje más claro
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar si el rol del usuario es "ROLE_PARTICIPANT" o "ROLE_ORGANIZER"
+        String userRole = user.getRole().getName();
+        if ( user.getOrganizer() == null && user.getParticipant() == null ) {
+            return new ResponseEntity<>("Solo los participantes y organizadores pueden unirse a una comunidad", HttpStatus.FORBIDDEN);
         }
 
         // Consultar la comunidad por su ID
         Community community = communityService.EntityfindById(idcommunity);
         if (community == null) {
-            return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND); // Mensaje más claro
+            return new ResponseEntity<>("Comunidad no encontrada", HttpStatus.NOT_FOUND);
         }
 
         // Verificar si la relación ya existe
         if (userCommunityService.searchUserCommunityById(new IdCompuestoU_C(iduser, idcommunity)) != null) {
-            throw new UserCommunityAlreadyExistsException("La relación ya existe entre el usuario y la comunidad."); // Lanzar excepción
+            return new ResponseEntity<>("Ya estás registrado en esta comunidad", HttpStatus.CONFLICT);
         }
 
         // Crear la nueva relación entre usuario y comunidad
@@ -76,7 +91,7 @@ public class UserCommunityController {
                 new UserCommunity(new IdCompuestoU_C(iduser, idcommunity), user, community, LocalDate.now())
         );
 
-        return new ResponseEntity<>(createdUserCommunity, HttpStatus.CREATED);
+        return new ResponseEntity<>("Inscripción en la comunidad exitosa", HttpStatus.CREATED);
     }
 
 
