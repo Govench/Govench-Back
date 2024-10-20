@@ -1,6 +1,8 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.ParticipantDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.EventRepository;
@@ -40,6 +42,9 @@ public class UserEventController{
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
@@ -102,6 +107,7 @@ public class UserEventController{
 
     @DeleteMapping("/{idevent}")
     public ResponseEntity<String> deleteUserEvent(@PathVariable int idevent) {
+
         Integer iduser = userService.getAuthenticatedUserIdFromJWT();
         // Verificar si el usuario existe
         User user = userService.getUserbyId(iduser);
@@ -180,7 +186,7 @@ public class UserEventController{
         }
 
         // Obtener la lista de participantes inscritos en el evento
-        List<User> participants = userEventService.getParticipantsByEvent(idevent);
+        List<ParticipantDTO> participants = userMapper.getParticipantsByEvent(userEventService.getParticipantsByEvent(idevent));
         return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 

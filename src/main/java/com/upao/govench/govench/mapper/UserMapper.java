@@ -2,6 +2,7 @@ package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.UserEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -71,8 +72,39 @@ public class UserMapper {
         return authResponseDTO;
     }
 
+    public ParticipantDTO convertToParticipantDTO(User user) {
+        ParticipantDTO participant = modelMapper.map(user, ParticipantDTO.class);
 
-//metodos pre security//
+        if (user.getParticipant() != null) {
+            participant.setName(user.getParticipant().getName());
+            participant.setLastname(user.getParticipant().getLastname());
+            participant.setProfileDesc(user.getParticipant().getProfileDesc());
+            participant.setBirthday(user.getParticipant().getBirthday());
+            participant.setGender(user.getParticipant().getGender());
+        }
+        if (user.getOrganizer() != null) {
+            participant.setName(user.getOrganizer().getName());
+            participant.setLastname(user.getOrganizer().getLastname());
+            participant.setProfileDesc(user.getOrganizer().getProfileDesc());
+            participant.setBirthday(user.getOrganizer().getBirthday());
+            participant.setGender(user.getOrganizer().getGender());
+        }
+
+        // Devuelve el objeto participant con los datos configurados
+        return participant;
+    }
+
+
+
+    public List<ParticipantDTO> getParticipantsByEvent(List<User> participants) {
+        return participants.stream()
+                .map(this::convertToParticipantDTO) // Mapear cada User a ParticipantDTO
+                .toList();
+    }
+
+
+
+    //metodos pre security//
     public User convertToEntity(UserRequestDTO userRequestDTO) {
         return modelMapper.map(userRequestDTO, User.class);
     }
