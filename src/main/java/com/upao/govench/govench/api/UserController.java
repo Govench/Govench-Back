@@ -3,6 +3,7 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
+import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
@@ -40,6 +41,8 @@ public class UserController {
     private  final UserRepository userRepository;
 
     private final TokenProvider tokenProvider;
+
+    private final EventRepository eventRepository;
 
     @PostMapping("/register/participant")
     public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
@@ -253,12 +256,19 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{eventId}/ratingEvent/{userId}")
-    public ResponseEntity<String> rateEvent(@PathVariable Integer eventId,
-                                            @PathVariable Integer userId,
+    @PostMapping("/ratingEvent/{eventId}")
+    public ResponseEntity<String> rateEvent(@PathVariable int eventId,
                                             @RequestBody RatingEventRequestDTO ratingEventRequestDTO) {
+
+        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+
+        User user = userRepository.findById(authenticatedUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento no encontrado"));
+
         try{
-            userService.createRatingEvent(userId, eventId, ratingEventRequestDTO);
+            userService.createRatingEvent(user, event, ratingEventRequestDTO);
             return new ResponseEntity<>("Evento calificado correctamente", HttpStatus.OK);
         }catch (Exception e) {
             return new ResponseEntity<>("Error al calificar evento", HttpStatus.INTERNAL_SERVER_ERROR);

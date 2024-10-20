@@ -2,6 +2,7 @@ package com.upao.govench.govench.service;
 
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.Rating;
 import com.upao.govench.govench.model.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +36,9 @@ public interface UserService {
     //METODOS POR ARREGLAR
     void followUser(Integer userId, Integer followerId);
     void removeFollowUser(Integer userId, Integer followedUserId);
-
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
 
-    RatingEventResponseDTO createRatingEvent(int  userId, int eventId, RatingEventRequestDTO ratingEventRequestDTO);
+    RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
 
 }

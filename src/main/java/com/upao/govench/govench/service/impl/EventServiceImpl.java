@@ -29,7 +29,6 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
-    private final LocationMapper locationMapper;
 
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
@@ -88,8 +87,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<RatingEventResponseDTO> getRatingEvents(int eventId) {
-        List<RatingEvent> ratingEvents = ratingEventRepository.findByEventId(eventId);
+    public List<RatingEventResponseDTO> getRatingEvents(Event eventId) {
+        List<RatingEvent> ratingEvents = ratingEventRepository.findRatingEventByEventId(eventId);
         return ratingEventMapper.convertToListDTO(ratingEvents);
     }
+
 }
