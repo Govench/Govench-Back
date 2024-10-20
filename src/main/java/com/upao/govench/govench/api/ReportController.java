@@ -1,5 +1,6 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.service.impl.PDFServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +17,9 @@ import java.io.ByteArrayInputStream;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/reports")
-@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
 public class ReportController {
     private final ReportService reportService;
-    private final PDFService pdfService;
+    private final PDFServiceImpl pdfServiceImpl;
 
     @GetMapping("/user/{userId}")
     public ReportResponseDTO generateUserReport(@PathVariable Integer userId) {
@@ -29,7 +29,7 @@ public class ReportController {
     @GetMapping("/user/{userId}/pdf")
     public ResponseEntity<InputStreamResource> downloadUserReportPdf(@PathVariable Integer userId) {
         ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
-        ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO);
+        ByteArrayInputStream pdfStream = pdfServiceImpl.generateUserReportPdf(reportResponseDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=user_report_" + userId + ".pdf");

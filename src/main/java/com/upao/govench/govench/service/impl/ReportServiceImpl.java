@@ -40,14 +40,14 @@ public class ReportServiceImpl implements ReportService {
         List<UserCommunity> userCommunities = userCommunityRepository.findByUser(user);
 
         int totalEvents = userEvents.size();
-        int newFollowers = user.getOrganizer().getFollowers().size();
-        int connectionsMade = user.getOrganizer().getFollowings().size();
+        //int newFollowers = user.getOrganizer().getFollowers().size();
+        //int connectionsMade = user.getOrganizer().getFollowings().size();
         int eventsAttended = userEvents.size();
         int totalCommunities = countDistinctCommunities(userCommunities);
         int totalUsersInCommunities = countDistinctUsersInCommunities(userCommunities);
         int totalPostsInCommunities = countDistinctUsersInCommunities(userCommunities);
 
-        return reportMapper.toReportResponseDTO(user, totalEvents, newFollowers, connectionsMade,
+        return reportMapper.toReportResponseDTO(user, totalEvents, /*newFollowers, connectionsMade,*/
                 eventsAttended, totalCommunities, totalUsersInCommunities, totalPostsInCommunities);
     }
 
