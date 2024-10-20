@@ -24,4 +24,9 @@ public interface UserEventRepository extends JpaRepository<UserEvent, IdCompuest
 
     @Query("SELECT ue FROM UserEvent ue WHERE ue.user.id = :userId")
     List<UserEvent> findAllByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT ue.user FROM UserEvent ue WHERE ue.event.id = :eventId")
+    List<User> findUsersByEventId(@Param("eventId") int eventId);
+
+
 }

@@ -30,7 +30,7 @@ public class EventRequestDTO {
     private LocalDate date;
 
     @NotBlank(message = "La hora de inicio no puede estar vacía")
-    private LocalTime startTime ;
+    private LocalTime startTime;
 
     @NotBlank(message = "La hora de fin no puede estar vacía")
     private LocalTime endTime;
@@ -52,4 +52,6 @@ public class EventRequestDTO {
     @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
     private Integer maxCapacity;
 
+    @NotBlank(message = "El evento no puede estar creado sin un dueño")
+    private Integer ownerId;
 }

@@ -148,4 +148,42 @@ public class UserEventController{
         }
         return new ResponseEntity<>(eventHistory, HttpStatus.OK);
     }
+
+    @GetMapping("/events/{idevent}/participants")
+    @PreAuthorize("hasRole('ORGANIZER')")
+    public ResponseEntity<?> getParticipantsByEvent(@PathVariable int idevent) {
+        // Obtener el ID del usuario autenticado desde el token JWT
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
+        if (iduser == null) {
+            return new ResponseEntity<>("Usuario no autenticado", HttpStatus.UNAUTHORIZED);
+        }
+
+        // Consultar el usuario por su ID
+        User user = userService.getUserbyId(iduser);
+        if (user == null) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar si el evento existe
+        Event event = eventServiceImpl.getEventById(idevent);
+        if (event == null) {
+            return new ResponseEntity<>("Evento no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar que sea solo el rol organizador
+
+
+
+        // Verificar que el usuario sea el creador del evento
+        if (!user.getId().equals(event.getOwner().getId())) {
+            return new ResponseEntity<>("No tienes permisos para ver los participantes de este evento", HttpStatus.FORBIDDEN);
+        }
+
+        // Obtener la lista de participantes inscritos en el evento
+        List<User> participants = userEventService.getParticipantsByEvent(idevent);
+        return new ResponseEntity<>(participants, HttpStatus.OK);
+    }
+
+
+
 }
