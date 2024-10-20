@@ -36,4 +36,6 @@ public interface UserEventService {
 
     List<EventResponseDTO> getEventHistory(Integer userId);
 
+    public List<User> getParticipantsByEvent(int eventId);
+
 }

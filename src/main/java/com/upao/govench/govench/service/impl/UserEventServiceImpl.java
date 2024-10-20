@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserEventServiceImpl implements UserEventService {
     @Autowired
-    private final UserEventRepository userEventRepository;
+    private UserEventRepository userEventRepository;
     private final EventMapper eventMapper;
     @Autowired
     private UserRepository userRepository;
@@ -113,5 +113,11 @@ public class UserEventServiceImpl implements UserEventService {
                 .map(userEvent -> eventMapper.convertToDTO(userEvent.getEvent())) // Usamos el método existente
                 .toList();
     }
+
+    @Override
+    public List<User> getParticipantsByEvent(int eventId) {
+        return userEventRepository.findUsersByEventId(eventId);
+    }
+
 
 }
