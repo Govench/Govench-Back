@@ -14,8 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CommunityRequestDTO {
 
-    private User owner;
-
     @NotNull(message = "El nombre no puede ser vacio")
     @Size(max = 100, message = "El nombre no puede exceder los 100 caracteres")
     private String name;

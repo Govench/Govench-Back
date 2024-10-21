@@ -53,6 +53,8 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
                         .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
+                        .requestMatchers(antMatcher("/community/communities")).permitAll()
+                        .requestMatchers(antMatcher("/community/search/**")).permitAll()
                         .requestMatchers(antMatcher("/admin/payments/payment/**")).permitAll()
                         .requestMatchers(antMatcher("/mail/**")).permitAll() 
                         .requestMatchers(antMatcher("/community/**/posts")).permitAll()
