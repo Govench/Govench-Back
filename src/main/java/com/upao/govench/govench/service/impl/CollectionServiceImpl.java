@@ -34,7 +34,7 @@ public class CollectionServiceImpl implements CollectionService {
     @Transactional(readOnly = true)
     @Override
     public List<CollectionResponseDTO> getCollectionsByUserId() {
-        Integer userId = getAuthenticatedUserIdFromJWT();
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
         List<Collection> collections = collectionRepository.findByUserId(userId);
         return collectionMapper.convertToListDTO(collections);
     }
@@ -101,23 +101,4 @@ public class CollectionServiceImpl implements CollectionService {
         collectionRepository.delete(collection);
     }
 
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    private Integer getAuthenticatedUserIdFromJWT() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String token = (String) authentication.getCredentials();
-
-
-            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
-            String email = claims.getSubject();
-
-
-            User user = userRepository.findByEmail(email).orElse(null);
-            return user != null ? user.getId() : null;
-        }
-        return null;
-    }
 }
