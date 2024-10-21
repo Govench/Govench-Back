@@ -27,4 +27,5 @@ public class EventResponseDTO {
     private String exp;
     private Integer maxCapacity;
     private int registeredCount;
+    private Integer ownerId;
 }
