@@ -32,10 +32,10 @@ public class EventMapper {
         // Mapear la ubicación
         LocationResponseDTO location = locationService.getLocationById(eventRequestDTO.getLocation().getId());
         event.setLocation(locationMapper.convertToEntity(location));
-
+        User owner = userService.getUserbyId((userService.getAuthenticatedUserIdFromJWT()));
         // Mapear el propietario
-        if (eventRequestDTO.getOwnerId() != null) {
-            event.setOwner(userService.getUserbyId(eventRequestDTO.getOwnerId()));
+        if (owner != null) {
+            event.setOwner(owner);
         }
         return event;
     }
