@@ -1,6 +1,7 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
+import com.upao.govench.govench.exceptions.UserNotFoundException;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.EventRepository;
@@ -11,6 +12,7 @@ import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.mapping.TableOwner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,21 +65,18 @@ public class UserController {
         return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/upload/profile/{userId}")
-    public ResponseEntity<String> uploadProfileImage(@PathVariable int userId, @RequestParam("file") MultipartFile file) {
+    @PostMapping("/upload/profile")
+    public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
         Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
-        User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
+        User user = userRepository.findById(authenticatedUserId).orElseThrow(ResourceNotFoundException::new);
         if(user.getRole().getName().equals("ROLE_ADMIN"))
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("El admin no puede tener foto de perfil");
         }
-        if (authenticatedUserId == null || authenticatedUserId != userId) {
-            return new ResponseEntity<>("Acceso denegado: Solo el dueño del perfil puede subir una imagen.", HttpStatus.FORBIDDEN);
-        }
 
         try {
             Profile profile = profileService.saveProfileWithImage(file);
-            userService.associateProfileWithUser(userId, profile.getId());
+            userService.associateProfileWithUser(authenticatedUserId, profile.getId());
             return new ResponseEntity<>("La imagen se ha asociado al perfil correctamente", HttpStatus.OK);
 
         } catch (IOException e) {
@@ -102,17 +102,28 @@ public class UserController {
     }
 
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<byte[]> getProfileImage(@PathVariable int userId) {
-        Profile profile=null;
-        User user = userService.getUserbyId(userId);
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable @Min(1) int userId) {
+        Profile profile = null;
+
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("Usuario con ID " + userId + " no encontrado.")
+        );
 
         if(user.getParticipant()!=null) {
             String profileId=user.getParticipant().getProfileId();
-            profile = profileService.getProfile(profileId);
+            if (profileId != null) {
+                profile = profileService.getProfile(profileId);
+            } else {
+                throw new UserNotFoundException("El participante no tiene foto asociada.");
+            }
         }
         if(user.getOrganizer()!=null) {
             String profileId=user.getOrganizer().getProfileId();
-            profile = profileService.getProfile(profileId);
+            if (profileId != null) {
+                profile = profileService.getProfile(profileId);
+            } else {
+                throw new UserNotFoundException("El participante no tiene foto asociada.");
+            }
         }
 
         if (profile != null && profile.getImage() != null) {
@@ -124,16 +135,14 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/profile/{userId}")
-    public ResponseEntity<String> deleteProfileImage(@PathVariable int userId) {
+    @DeleteMapping("/delete/profile")
+    public ResponseEntity<String> deleteProfileImage() {
 
         Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
 
-        if (authenticatedUserId == null || authenticatedUserId != userId) {
-            return new ResponseEntity<>("Acceso denegado: Solo el dueño del perfil puede eliminar la imagen.", HttpStatus.FORBIDDEN);
-        }
 
-        User user = userService.getUserbyId(userId);
+
+        User user = userService.getUserbyId(authenticatedUserId);
         String profileId=null;
 
         if (user == null) {
@@ -161,7 +170,7 @@ public class UserController {
             return new ResponseEntity<>("Foto de perfil no encontrada", HttpStatus.NOT_FOUND);
         }
 
-        userService.dessasociateProfileWithUser(userId);
+        userService.dessasociateProfileWithUser(authenticatedUserId);
         profileService.deleteProfile(profileId);
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
     }
