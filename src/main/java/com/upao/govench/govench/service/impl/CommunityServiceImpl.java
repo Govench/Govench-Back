@@ -91,4 +91,10 @@ public class CommunityServiceImpl implements CommunityService {
     public Community EntityfindById(int idcommunity) {
         return communityRepository.findById(idcommunity).orElse(null);
     }
+
+    @Override
+    public List<CommunityResponseDTO> getall() {
+
+        return communityMapper.convertoToListResponseDTO(communityRepository.findAll());
+    }
 }

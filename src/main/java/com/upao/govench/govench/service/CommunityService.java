@@ -12,6 +12,7 @@ import java.util.List;
 public interface CommunityService  {
     public CommunityResponseDTO findById(int id);
     public List<CommunityResponseDTO> findByOwner_Id(int id);
+    List<CommunityResponseDTO> getall();
     List<CommunityResponseDTO> findByOwner_IdNot(int id);
     public CommunityResponseDTO save(CommunityRequestDTO community, User owner);
     public void deleteById(int id);
