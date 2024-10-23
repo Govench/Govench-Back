@@ -21,6 +21,8 @@ public interface UserService {
     UserProfileDTO uptadteUserProfile(Integer id, UserProfileDTO userProfileDTO);
     UserProfileDTO getUserProfilebyId(Integer id);
 
+    void SubscribePremium(Integer id);
+    void DesubscribePremium();
     //Autenticar el login
     AuthResponseDTO login(LoginDTO loginDTO);
 

@@ -30,15 +30,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @RestController
-@RequestMapping("/admin/payments")
+@RequestMapping("/payments")
 
 public class PaypalController {
     @Autowired
     public PaypalService paypalService;
     @Autowired
     private EventServiceImpl eventServiceImpl;
-    @Autowired
-    private UserServiceImpl userServiceImpl;
     @Autowired
     private UserEventController userEventController;
     @Autowired
@@ -69,6 +67,56 @@ public class PaypalController {
             return "/error?status=error";
         }
     }
+    @PreAuthorize("hasAnyRole('ORGANIZER','PARTICIPANT')")
+    @PostMapping("/subscribe")
+    public String  paySubscription() {
+        double totalAmount = 50; //La subscripcion valdra 50 solsitos
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
+        String returnUrl = "http://localhost:8080/api/v1/payments/subscription?userId="+userId.toString();
+        String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
+        User user = userService.getUserbyId(userId);
+        try {
+            String orderId = paypalService.createOrder(totalAmount, returnUrl, cancelUrl);
+            if (orderId == null) {
+                //return new RedirectView("/error?status=error");
+            }
+            if(user.getPremium())
+            {
+                throw new IllegalArgumentException("Ya eres usuario premium");
+            }
+            String approvalUrl = "https://www.sandbox.paypal.com/checkoutnow?token=" + orderId;
+            return approvalUrl;
+            //return new RedirectView(approvalUrl);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //return new RedirectView("/error?status=error");
+            return "/error?status=error";
+        }
+    }
+    @GetMapping("/subscription")
+    public String handleSubscription(@RequestParam String token,@RequestParam int userId) {
+        try {
+            HttpResponse<Order> response = paypalService.captureOrder(token);
+
+            if (response.statusCode() == 201) { // Pago exitoso
+                try {
+                    userService.SubscribePremium(userId);
+                    return "Pago completado con éxito e inscripción realizada.";
+                } catch (NotFoundException e) {
+                    return "Pago completado, pero hubo un problema con la subscripcion: " + e.getMessage();
+                } catch (IllegalArgumentException e) {
+                    return e.getMessage(); // Manejar errores de inscripción
+                }
+            } else {
+                return "El pago fue cancelado o fallido.";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Ocurrió un error durante el proceso de pago.";
+        }
+    }
+
 
     @GetMapping("/payment")
     public String handlePayment(@RequestParam String token, @RequestParam int eventId, @RequestParam int userId) {
@@ -99,9 +147,9 @@ public class PaypalController {
 
         // Retrieve event by ID
         Event event = eventServiceImpl.getEventById(eventId);
-        Integer userId = userServiceImpl.getAuthenticatedUserIdFromJWT();
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
         LocalDateTime localDateTime = LocalDateTime.of(event.getDate(), event.getEndTime());
-        String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment?eventId=" + eventId+"&userId="+userId.toString();
+        String returnUrl = "http://localhost:8080/api/v1/payments/payment?eventId=" + eventId+"&userId="+userId.toString();
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
 
         if (event == null)
@@ -122,6 +170,15 @@ public class PaypalController {
         if (eventPrice.compareTo(BigDecimal.ZERO) == 0) {
             return "This event is free.";
         }
+
+        User user = userService.getUserbyId(userId);
+
+        if (user.getPremium())
+        {
+            createUserEvent(userId, eventId);
+            return "Inscrito correctamente, no se te cobrara por este evento";
+        }
+
         double eventPriceDouble = eventPrice.doubleValue();
         // Generate the PayPal order for the event price
         try {
@@ -131,7 +188,6 @@ public class PaypalController {
             e.printStackTrace();
             return "Error occurred during payment process.";
         }
-
     }
 
     public void createUserEvent(int iduser, int idevent) {

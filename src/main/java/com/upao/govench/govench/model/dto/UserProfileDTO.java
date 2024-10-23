@@ -25,4 +25,6 @@ public class UserProfileDTO {
     //este solo sera para el organizador
     private int eventosCreados;
 
+    private String tipoUsuario;
+
 }

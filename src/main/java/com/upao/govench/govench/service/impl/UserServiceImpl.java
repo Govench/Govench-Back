@@ -226,6 +226,25 @@ public class UserServiceImpl implements UserService {
         return null; // Si no hay autenticación, devuelve null
     }
 
+    @Override
+    public void SubscribePremium(Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+        user.setPremiun(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void DesubscribePremium() {
+        Integer id = this.getAuthenticatedUserIdFromJWT();
+        User user = userRepository.findById(id).orElse(null);
+        if(!user.getPremium())
+        {
+            throw new IllegalArgumentException("El usuario no es premium");
+        }
+        user.setPremiun(false);
+        userRepository.save(user);
+    }
+
     ///--------Metodos pre seguridad----------///
     @Override
     public User getUserbyId(Integer userId) {

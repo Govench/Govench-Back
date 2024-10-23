@@ -31,6 +31,18 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id_in" , referencedColumnName = "rol_id")
     private Role role;
+
+    @Column(name="use_pre_bo", nullable = false)
+    private Boolean  premium;
+
+    public boolean getPremium()
+    {
+        return premium;
+    }
+    public void setPremiun(boolean valor)
+    {
+        this.premium = valor;
+    }
 }
 
 

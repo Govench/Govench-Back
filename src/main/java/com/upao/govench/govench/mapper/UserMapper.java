@@ -30,6 +30,7 @@ public class UserMapper {
             userProfileDTO.setInterest(user.getParticipant().getInterest());
             userProfileDTO.setSkills(user.getParticipant().getSkills());
             userProfileDTO.setSocialLinks(user.getParticipant().getSocialLinks());
+
         }
         if(user.getOrganizer()!=null)
         {
@@ -45,6 +46,14 @@ public class UserMapper {
         {
 
         }
+        if(!user.getPremium())
+        {
+            userProfileDTO.setTipoUsuario("No premium");
+        }
+        if (user.getPremium()) {
+            userProfileDTO.setTipoUsuario("Premium");
+        }
+
         return userProfileDTO;
 
     }
