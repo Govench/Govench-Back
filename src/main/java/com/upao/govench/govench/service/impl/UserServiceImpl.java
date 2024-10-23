@@ -139,26 +139,23 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserProfileDTO(user);
     }
 
-    private UserProfileDTO UserRegistrationWithRole(UserRegistrationDTO userRegistrationDTO,Role role)
-    {
+    private UserProfileDTO UserRegistrationWithRole(UserRegistrationDTO userRegistrationDTO,Role role) {
         boolean existByEmail = userRepository.existsByEmail(userRegistrationDTO.getEmail());
-        boolean existOrganizer = organizerRepository.existsByNameAndLastname(userRegistrationDTO.getName(),userRegistrationDTO.getLastname());
-        boolean existParticipant = participantRepository.existsByNameAndLastname(userRegistrationDTO.getName(),userRegistrationDTO.getLastname());
+        boolean existOrganizer = organizerRepository.existsByNameAndLastname(userRegistrationDTO.getName(), userRegistrationDTO.getLastname());
+        boolean existParticipant = participantRepository.existsByNameAndLastname(userRegistrationDTO.getName(), userRegistrationDTO.getLastname());
 
-        if(existByEmail)
-        {
+        if (existByEmail) {
             throw new IllegalArgumentException("Email ya esta registrado");
         }
-        if(existOrganizer || existParticipant)
-        {
+        if (existOrganizer || existParticipant) {
             throw new IllegalArgumentException("El usuario ya esta registrado");
         }
 
-       userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
         User user = userMapper.toUserEntity(userRegistrationDTO);
         user.setRole(role);
-        if(Objects.equals(role.getName(), "ROLE_PARTICIPANT"))
-        {   Participant participant = new Participant();
+        if (Objects.equals(role.getName(), "ROLE_PARTICIPANT")) {
+            Participant participant = new Participant();
             participant.setName(userRegistrationDTO.getName());
             participant.setLastname(userRegistrationDTO.getLastname());
             participant.setBirthday(userRegistrationDTO.getBirthday());
@@ -170,8 +167,7 @@ public class UserServiceImpl implements UserService {
             participant.setCreated(LocalDateTime.now());
             participant.setUser(user);
             user.setParticipant(participant);
-        }
-        else if (Objects.equals(role.getName(), "ROLE_ORGANIZER")) {
+        } else if (Objects.equals(role.getName(), "ROLE_ORGANIZER")) {
             Organizer organizer = new Organizer();
             organizer.setName(userRegistrationDTO.getName());
             organizer.setLastname(userRegistrationDTO.getLastname());
@@ -186,6 +182,7 @@ public class UserServiceImpl implements UserService {
             organizer.setUser(user);
             user.setOrganizer(organizer);
         }
+        user.setPremiun(false);
         User savedUser = userRepository.save(user);
         return userMapper.toUserProfileDTO(savedUser);
     }
@@ -389,7 +386,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Usuario a seguir no encontrado"));
 
         if (userFollower.getId() == userFollowing.getId()) {
-            throw new IllegalArgumentException("No puedes seguirte. ty");
+            throw new IllegalArgumentException("No puedes seguirte a ti mismo.");
         }
         // Verificar si la relación de seguimiento ya existe
         if (followRepository.existsByFollowerAndFollowing(userFollower, userFollowing)) {
@@ -411,14 +408,15 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         User userFollowing = userRepository.findById(followedUserId)
                 .orElseThrow(() -> new RuntimeException("Usuario a seguir no encontrado"));
-        /*
-        Follow follow = new Follow();
-        follow.setFollower(userFollower);
-        follow.setFollowing(userFollowing);
-        followRepository.delete(follow);
-        */
 
-        //followRepository.deleteByFollowerAndFollowing(userFollower, userFollowing);
+        // Verificar si la relación de seguimiento existe
+        if (!followRepository.existsByFollowerAndFollowing(userFollower, userFollowing)) {
+            throw new IllegalArgumentException("No puedes dejar de seguir a quien no sigues.");
+        }
+        Follow follow=followRepository.findByFollowerAndFollowing(userFollower, userFollowing);
+
+        followRepository.delete(follow);
+
     }
 
     @Override

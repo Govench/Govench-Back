@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -43,31 +43,12 @@ public class UserController {
 
     private  final UserRepository userRepository;
 
-    private final TokenProvider tokenProvider;
 
     private final EventRepository eventRepository;
 
-    @PostMapping("/register/participant")
-    public ResponseEntity<UserProfileDTO> registerParticipant(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
-        UserProfileDTO userProfileDTO = userService.registerParticipant(userRegistrationDTO);
-        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/register/organizer")
-    public ResponseEntity<UserProfileDTO> registerOrganizer(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
-        UserProfileDTO userProfileDTO = userService.registerOrganizer(userRegistrationDTO);
-        return new ResponseEntity<>(userProfileDTO, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
-        AuthResponseDTO authResponseDTO = userService.login(loginDTO);
-        return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
-    }
-
     @PostMapping("/upload/profile")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
-        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+        Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
         User user = userRepository.findById(authenticatedUserId).orElseThrow(ResourceNotFoundException::new);
         if(user.getRole().getName().equals("ROLE_ADMIN"))
         {
@@ -84,22 +65,6 @@ public class UserController {
         }
     }
 
-    private Integer getAuthenticatedUserIdFromJWT() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String token = (String) authentication.getCredentials(); // Obtén el token del objeto de autenticación
-
-            // Extraer el email del token
-            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
-            String email = claims.getSubject();
-
-            // Buscar el usuario usando el email
-            User user = userRepository.findByEmail(email).orElse(null); // Debes implementar este método en tu UserService
-            return user != null ? user.getId() : null;
-        }
-        return null; // Si no hay autenticación, devuelve null
-    }
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable @Min(1) int userId) {
@@ -138,7 +103,7 @@ public class UserController {
     @DeleteMapping("/delete/profile")
     public ResponseEntity<String> deleteProfileImage() {
 
-        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+        Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
 
 
 
@@ -251,7 +216,7 @@ public class UserController {
     public ResponseEntity<String> rateEvent(@PathVariable int eventId,
                                             @RequestBody RatingEventRequestDTO ratingEventRequestDTO) {
 
-        Integer authenticatedUserId = getAuthenticatedUserIdFromJWT();
+        Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
 
         User user = userRepository.findById(authenticatedUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
@@ -266,16 +231,17 @@ public class UserController {
         }
     }
 
+
     @PostMapping("/follow")
     public ResponseEntity<String> followUser(@RequestParam Integer userId){
         userService.followUser(userId);
-        return new ResponseEntity<>("Usuario seguido con éxito", HttpStatus.OK);
+        return new ResponseEntity<>("Usuario seguido con éxito", HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/unfollow")
+    @PutMapping("/unfollow")
     public ResponseEntity<String> unfollowUser(@RequestParam Integer userId){
         userService.unfollowUser(userId);
-        return new ResponseEntity<>("Has dejado de seguir al usuario", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Has dejado de seguir al usuario", HttpStatus.OK);
     }
 
     @GetMapping("/followers")
