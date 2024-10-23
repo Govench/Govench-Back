@@ -114,7 +114,7 @@ public class PostController {
 
     //Autorización de Organizador y Participante
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+
     @GetMapping("/community/{communityId}/posts")
     public ResponseEntity<List<PostResponseDTO>> obtenerPostsPorComunidadId(@PathVariable("communityId") int communityId) {
         try {

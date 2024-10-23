@@ -15,7 +15,6 @@ public class PostMapper {
 
     private final ModelMapper modelMapper;
 
-
     public Post convertToEntity(PostRequestDTO postRequestDTO) {
         return modelMapper.map(postRequestDTO, Post.class);
     }
@@ -23,18 +22,27 @@ public class PostMapper {
     public PostResponseDTO convertToDTO(Post post) {
         PostResponseDTO postResponseDTO = modelMapper.map(post, PostResponseDTO.class);
 
-        // Create a UserBasicDTO for the author
+        // Crear manualmente el UserBasicDTO para el autor
         UserBasicDTO userBasicDTO = new UserBasicDTO();
         userBasicDTO.setId(post.getAutor().getId());
-        userBasicDTO.setName(post.getAutor().getParticipant() != null ?
-                post.getAutor().getParticipant().getName() :
-                post.getAutor().getOrganizer() != null ?
-                        post.getAutor().getOrganizer().getName() :
-                        "Unknown");
         userBasicDTO.setEmail(post.getAutor().getEmail());
 
-        // Assign the UserBasicDTO to the PostResponseDTO
+        if (post.getAutor().getParticipant() != null) {
+            userBasicDTO.setName(post.getAutor().getParticipant().getName());
+        } else if (post.getAutor().getOrganizer() != null) {
+            userBasicDTO.setName(post.getAutor().getOrganizer().getName());
+        } else {
+            userBasicDTO.setName("Desconocido");
+        }
+
+        // Asignar el UserBasicDTO al PostResponseDTO
         postResponseDTO.setAutor(userBasicDTO);
+
+        // Asignar el id de la comunidad manualmente
+        if (post.getComunidad() != null) {
+            postResponseDTO.setComunidadId(post.getComunidad().getId());
+        }
+
         return postResponseDTO;
     }
 
