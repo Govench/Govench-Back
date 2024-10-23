@@ -51,7 +51,7 @@ public class WebSecurityConfig {
                         //.requestMatchers(antMatcher("/auth/register/organizer")).permitAll() // Solo el admin puede registrar organizadores , asi fue mencionado en el video.
                         .requestMatchers(antMatcher("/auth/register/participant")).permitAll()
                         .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
-                        .requestMatchers(antMatcher("/auth/profile/**")).permitAll()
+                        .requestMatchers(antMatcher("/user/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
                         .requestMatchers(antMatcher("/community/communities")).permitAll()
                         .requestMatchers(antMatcher("/community/search/**")).permitAll()

@@ -28,7 +28,7 @@ public interface UserService {
 
      Integer getAuthenticatedUserIdFromJWT();
 
-    //Metodos pre security//
+
     List<UserResponseDTO> getAllUsers();
     User getUserbyId(Integer userId);
     void deleteUser(Integer userId);

@@ -32,7 +32,7 @@ public class User {
     @JoinColumn(name = "rol_id_in" , referencedColumnName = "rol_id")
     private Role role;
 
-    @Column(name="use_pre_bo", nullable = false)
+    @Column(name="use_pre_bo", nullable = true)
     private Boolean  premium;
 
     public boolean getPremium()
