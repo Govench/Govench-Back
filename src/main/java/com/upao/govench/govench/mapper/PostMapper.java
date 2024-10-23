@@ -1,7 +1,7 @@
+// PostMapper.java
 package com.upao.govench.govench.mapper;
 
-import com.upao.govench.govench.model.dto.PostRequestDTO;
-import com.upao.govench.govench.model.dto.PostResponseDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Post;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,7 +20,30 @@ public class PostMapper {
     }
 
     public PostResponseDTO convertToDTO(Post post) {
-        return modelMapper.map(post, PostResponseDTO.class);
+        PostResponseDTO postResponseDTO = modelMapper.map(post, PostResponseDTO.class);
+
+        // Crear manualmente el UserBasicDTO para el autor
+        UserBasicDTO userBasicDTO = new UserBasicDTO();
+        userBasicDTO.setId(post.getAutor().getId());
+        userBasicDTO.setEmail(post.getAutor().getEmail());
+
+        if (post.getAutor().getParticipant() != null) {
+            userBasicDTO.setName(post.getAutor().getParticipant().getName());
+        } else if (post.getAutor().getOrganizer() != null) {
+            userBasicDTO.setName(post.getAutor().getOrganizer().getName());
+        } else {
+            userBasicDTO.setName("Desconocido");
+        }
+
+        // Asignar el UserBasicDTO al PostResponseDTO
+        postResponseDTO.setAutor(userBasicDTO);
+
+        // Asignar el id de la comunidad manualmente
+        if (post.getComunidad() != null) {
+            postResponseDTO.setComunidadId(post.getComunidad().getId());
+        }
+
+        return postResponseDTO;
     }
 
     public List<PostResponseDTO> convertToListDTO(List<Post> posts) {

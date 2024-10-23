@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class PostResponseDTO {
     private int id;
     private String body;
-    private UserResponseDTO autor;
+    private UserBasicDTO autor;
     private int comunidadId; // Agregar el ID de la comunidad
     private LocalDate created;
     private LocalDateTime updated;
