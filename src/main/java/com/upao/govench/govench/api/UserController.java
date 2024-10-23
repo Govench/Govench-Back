@@ -175,6 +175,12 @@ public class UserController {
         return new ResponseEntity<>("Foto de perfil eliminada", HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/desubscribe")
+    public ResponseEntity<?> Desubscriber()
+    {   userService.DesubscribePremium();
+        return new ResponseEntity<>("Suscripcion anulada", HttpStatus.OK);
+    }
+
     //-------Metodos pre security----------//
     @GetMapping
     public ResponseEntity<?> getAllUsers() {

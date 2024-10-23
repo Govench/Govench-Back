@@ -55,7 +55,9 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/email/**")).permitAll()
                         .requestMatchers(antMatcher("/community/communities")).permitAll()
                         .requestMatchers(antMatcher("/community/search/**")).permitAll()
-                        .requestMatchers(antMatcher("/admin/payments/payment/**")).permitAll()
+                        .requestMatchers(antMatcher("/payments/payment/**")).permitAll()
+                        .requestMatchers(antMatcher("/payments/subscribe/**")).permitAll()
+                        .requestMatchers(antMatcher("/payments/subscription/**")).permitAll()
                         .requestMatchers(antMatcher("/mail/**")).permitAll() 
                         .requestMatchers(antMatcher("/community/**/posts")).permitAll()
 
