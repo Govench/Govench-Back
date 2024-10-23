@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -111,6 +112,9 @@ public class PostController {
         }
     }
 
+    //Autorización de Organizador y Participante
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
     @GetMapping("/community/{communityId}/posts")
     public ResponseEntity<List<PostResponseDTO>> obtenerPostsPorComunidadId(@PathVariable("communityId") int communityId) {
         try {
