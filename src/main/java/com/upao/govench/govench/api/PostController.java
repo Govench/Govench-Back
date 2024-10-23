@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,8 @@ public class PostController {
     private final UserService userService;
     @Autowired
     private final CommunityService communityService;
+    @Autowired
+    private final PostService postService;
 
     @PostMapping("/community/{communityId}/posts/create")
     public ResponseEntity<Map<String, String>> createPost(@PathVariable("communityId") int communityId,
@@ -95,6 +98,7 @@ public class PostController {
         return null;
     }
 
+
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDTO> obtenerPostPorId(@PathVariable("postId") int postId) {
         try {
@@ -110,7 +114,7 @@ public class PostController {
     @GetMapping("/community/{communityId}/posts")
     public ResponseEntity<List<PostResponseDTO>> obtenerPostsPorComunidadId(@PathVariable("communityId") int communityId) {
         try {
-            List<PostResponseDTO> posts = postServiceImpl.getPostsByCommunityId(communityId);
+            List<PostResponseDTO> posts = postService.getPostsByCommunityId(communityId);
             if (posts.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -119,6 +123,8 @@ public class PostController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
     @DeleteMapping("/community/{communityId}/posts/{postId}")
