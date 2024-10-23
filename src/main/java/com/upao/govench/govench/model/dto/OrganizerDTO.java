@@ -31,4 +31,7 @@ public class OrganizerDTO {
     private List<String> socialLinks;
     private int eventosCreados;
 
+    private List<FollowUserDTO> followers;
+    private List<FollowUserDTO> following;
+
 }

@@ -198,30 +198,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/follow/{followedUserId}")
-    public ResponseEntity<String> followUser(@PathVariable Integer userId, @PathVariable Integer followedUserId) {
-        try {
-            userService.followUser(userId, followedUserId);
-            return new ResponseEntity<>("Usuario seguido correctamente", HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al seguir al usuario", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/{userId}/unfollow/{removedUserId}")
-    public ResponseEntity<String> removeFollowUser(@PathVariable Integer userId, @PathVariable Integer removedUserId) {
-        try {
-            userService.removeFollowUser(userId, removedUserId);
-            return new ResponseEntity<>("Dejado de seguir Usuario correctamente", HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al dejar de seguir al usuario", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PostMapping("/{userId}/rate/{ratedUserId}")
     public ResponseEntity<String> rateUser(
             @PathVariable Integer userId,
@@ -282,5 +258,29 @@ public class UserController {
         }catch (Exception e) {
             return new ResponseEntity<>("Error al calificar evento", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<String> followUser(@RequestParam Integer userId){
+        userService.followUser(userId);
+        return new ResponseEntity<>("Usuario seguido con éxito", HttpStatus.OK);
+    }
+
+    @PostMapping("/unfollow")
+    public ResponseEntity<String> unfollowUser(@RequestParam Integer userId){
+        userService.unfollowUser(userId);
+        return new ResponseEntity<>("Has dejado de seguir al usuario", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/followers")
+    public ResponseEntity<Integer> getFollowers() {
+        int followers = userService.getFollowersCount();
+        return new ResponseEntity<>(followers, HttpStatus.OK);
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<Integer> getFollowing() {
+        int following = userService.getFollowingCount();
+        return new ResponseEntity<>(following, HttpStatus.OK);
     }
 }

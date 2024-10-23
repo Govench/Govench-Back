@@ -46,20 +46,8 @@ public class Participant{
     @Column(name="par_cre_dt")
     private LocalDateTime created;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "followings")
-    private List<Participant> followers;
-
     @Column(name = "use_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "UserFollow",
-            joinColumns = @JoinColumn(name = "use_id_fwer_in"),
-            inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
-    private List<Participant> followings;
-
 
     @JsonIgnore
     @OneToMany(mappedBy = "raterParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -15,6 +15,7 @@ import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,38 +41,42 @@ public class UserServiceImpl implements UserService {
     //
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ParticipantRepository participantRepository;
+
     @Autowired
     private OrganizerRepository organizerRepository;
-    @Autowired
-    private AdminRepository adminRepository;
+
     @Autowired
     private  RoleRepository roleRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserMapper userMapper;
 
-    //
     @Autowired
     private RatingRepository ratingRepository;
 
     @Autowired
     private RatingEventMapper ratingEventMapper;
-    @Autowired
-    private RatingEventRepository ratingEventRepository;
 
     @Autowired
-    private EventRepository eventRepository;
+    private RatingEventRepository ratingEventRepository;
 
     @Autowired
     private UserEventRepository userEventRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private TokenProvider tokenProvider;
+
+    @Autowired
+    private FollowRepository followRepository;
 
 
     //Metodos seguridad //
@@ -241,18 +246,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.convertToListDTO(users);
     }
 
-    @Override
-    public void followUser(Integer userId, Integer followedUserId){
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        User userToFollow = userRepository.findById(followedUserId).orElseThrow(() -> new ResourceNotFoundException("Usuario a seguir no encontrado"));
-
-        user.getParticipant().getFollowings().add(userToFollow.getParticipant());
-        userToFollow.getParticipant().getFollowers().add(user.getParticipant());
-
-        userRepository.save(user);
-        userRepository.save(userToFollow);
-    }
 
     @Override
     public User associateProfileWithUser(int userId, String profileId) {
@@ -306,19 +299,6 @@ public class UserServiceImpl implements UserService {
 
         return null;
     }
-    @Override
-    public void removeFollowUser(Integer userId, Integer followedUserId){
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        User userToFollow = userRepository.findById(followedUserId).orElseThrow(() -> new ResourceNotFoundException("Usuario a dejar de seguir no encontrado"));
-
-        user.getParticipant().getFollowings().remove(userToFollow);
-        userToFollow.getParticipant().getFollowers().remove(user);
-
-        userRepository.save(user);
-        userRepository.save(userToFollow);
-    }
-
 
      @Override
      public void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment) {
@@ -377,6 +357,69 @@ public class UserServiceImpl implements UserService {
         return ratingEventMapper.convertToDTO(ratingEvent);
     }
 
+
+    //userFollower - Seguidor
+    //userFollowing - Seguido
+    @Override
+    public void followUser(Integer followedUserId) {
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        User userFollower = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User userFollowing = userRepository.findById(followedUserId)
+                .orElseThrow(() -> new RuntimeException("Usuario a seguir no encontrado"));
+
+        if (userFollower.getId() == userFollowing.getId()) {
+            throw new IllegalArgumentException("No puedes seguirte. ty");
+        }
+        // Verificar si la relación de seguimiento ya existe
+        if (followRepository.existsByFollowerAndFollowing(userFollower, userFollowing)) {
+            throw new IllegalArgumentException("Ya sigues a este usuario.");
+        }
+
+
+        Follow follow = new Follow();
+        follow.setFollower(userFollower);
+        follow.setFollowing(userFollowing);
+        followRepository.save(follow);
+    }
+
+    @Override
+    public void unfollowUser(Integer followedUserId) {
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        User userFollower = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User userFollowing = userRepository.findById(followedUserId)
+                .orElseThrow(() -> new RuntimeException("Usuario a seguir no encontrado"));
+        /*
+        Follow follow = new Follow();
+        follow.setFollower(userFollower);
+        follow.setFollowing(userFollowing);
+        followRepository.delete(follow);
+        */
+
+        //followRepository.deleteByFollowerAndFollowing(userFollower, userFollowing);
+    }
+
+    @Override
+    public int getFollowersCount() {
+
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        return followRepository.findByFollowing(user).size();
+    }
+
+    @Override
+    public int getFollowingCount() {
+
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        return followRepository.findByFollower(user).size();
+    }
 }
-
-

@@ -52,19 +52,8 @@ public class Organizer{
     @Column(name="or_up_dt")
     private LocalDateTime updated;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "followings")
-    private List<Organizer> followers;
-
     @Column(name = "or_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "UserFollow",
-            joinColumns = @JoinColumn(name = "use_id_fwer_in"),
-            inverseJoinColumns = @JoinColumn(name = "use_id_fwed_in"))
-    private List<Organizer> followings;
 
     @JsonIgnore
     @OneToMany(mappedBy = "raterOrganizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -73,6 +62,7 @@ public class Organizer{
     @JsonIgnore
     @OneToMany(mappedBy = "ratedOrganizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Rating> receivedRatingsFromParticipants;
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;

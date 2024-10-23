@@ -33,9 +33,11 @@ public interface UserService {
     User associateProfileWithUser(int userId, String profileId);
     User dessasociateProfileWithUser(int userId);
 
-    //METODOS POR ARREGLAR
-    void followUser(Integer userId, Integer followerId);
-    void removeFollowUser(Integer userId, Integer followedUserId);
+    void followUser(Integer followedUserId);
+    void unfollowUser(Integer followedUserId);
+    int getFollowersCount();
+    int getFollowingCount();
+
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
 
