@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class ParticipantDTO {
+
     private Integer id;
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -24,4 +26,8 @@ public class ParticipantDTO {
     @NotBlank(message = "La descripcion es obligatorio")
     @Size(max = 500, message = "La descripcion debe tener 500 caracteres o menos")
     private String profileDesc;
+
+    private List<FollowUserDTO> followers;
+    private List<FollowUserDTO> following;
+
 }

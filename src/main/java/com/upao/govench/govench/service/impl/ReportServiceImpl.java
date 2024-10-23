@@ -2,9 +2,11 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.mapper.ReportMapper;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
+import com.upao.govench.govench.model.entity.Follow;
 import com.upao.govench.govench.model.entity.UserCommunity;
 import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.FollowRepository;
 import com.upao.govench.govench.repository.UserCommunityRepository;
 import com.upao.govench.govench.repository.UserEventRepository;
 import com.upao.govench.govench.repository.UserRepository;
@@ -31,6 +33,8 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportMapper reportMapper;
 
+    @Autowired
+    private FollowRepository followRepository;
 
     @Override
     public ReportResponseDTO generateReport(Integer userId) {
@@ -40,8 +44,8 @@ public class ReportServiceImpl implements ReportService {
         List<UserCommunity> userCommunities = userCommunityRepository.findByUser(user);
 
         int totalEvents = userEvents.size();
-        int newFollowers = user.getOrganizer().getFollowers().size();
-        int connectionsMade = user.getOrganizer().getFollowings().size();
+        int newFollowers = followRepository.findByFollowing(user).size();
+        int connectionsMade = followRepository.findByFollower(user).size();
         int eventsAttended = userEvents.size();
         int totalCommunities = countDistinctCommunities(userCommunities);
         int totalUsersInCommunities = countDistinctUsersInCommunities(userCommunities);
