@@ -50,7 +50,7 @@ public class PasswordResetService {
                 return "Token no enviado "+e.getMessage();
             }
         }
-        return "Token no encontrado";
+        return "El correo no se encuentra registrado.";
     }
 
     public void resetPassword(String token, String newPassword) {

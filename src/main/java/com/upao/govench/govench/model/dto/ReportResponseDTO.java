@@ -16,11 +16,25 @@ public class ReportResponseDTO {
         private int eventsAttended;
         private int participationPercentage;
         private CommunityStatsDTO communityStats;
+        private EventRatingStatsDTO eventRatingStats;
+        private UserActivityStatsDTO userActivityStats;
     }
     @Data
     public static class CommunityStatsDTO {
         private int totalCommunities;
         private int totalUsersInCommunities;
         private int totalPostsInCommunities;
+    }
+
+    @Data
+    public static class EventRatingStatsDTO {
+        private int totalRatingsGiven;
+        private double averageEventRating;
+    }
+
+    @Data
+    public static class UserActivityStatsDTO {
+        private int totalPostsByUser;
+        private int totalCommentsByUser;
     }
 }
