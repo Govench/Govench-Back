@@ -1,6 +1,7 @@
 package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.Follow;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.UserEventRepository;
 import lombok.RequiredArgsConstructor;
@@ -130,7 +131,24 @@ public class UserMapper {
     public User convertToEntity(OwnerResponseDTO ownerResponseDTO) {
         return modelMapper.map(ownerResponseDTO, User.class);
     }
-    public UserRequestDTO convertToRequestDTO(User user) {
-        return modelMapper.map(user, UserRequestDTO.class);
+
+    public FollowResponseDTO convertToFollowDTO(Follow user) {
+        FollowResponseDTO followResponseDTO = modelMapper.map(user, FollowResponseDTO.class);
+        followResponseDTO.setEmail(user.getFollower().getEmail());
+        if (user.getFollower().getParticipant() != null) {
+            followResponseDTO.setName(user.getFollower().getParticipant().getName());
+            followResponseDTO.setLastname(user.getFollower().getParticipant().getLastname());
+        }
+        if (user.getFollower().getOrganizer() != null) {
+            followResponseDTO.setName(user.getFollower().getOrganizer().getName());
+            followResponseDTO.setLastname(user.getFollower().getOrganizer().getLastname());
+        }
+        return followResponseDTO;
     }
+    public List<FollowResponseDTO> converToListFollowDTO(List<Follow> followers) {
+        return followers.stream()
+                .map(this::convertToFollowDTO) // Mapear cada User a ParticipantDTO
+                .toList();
+    }
+
 }
