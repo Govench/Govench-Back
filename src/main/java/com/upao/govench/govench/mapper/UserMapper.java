@@ -145,9 +145,29 @@ public class UserMapper {
         }
         return followResponseDTO;
     }
+
     public List<FollowResponseDTO> converToListFollowDTO(List<Follow> followers) {
         return followers.stream()
                 .map(this::convertToFollowDTO) // Mapear cada User a ParticipantDTO
+                .toList();
+    }
+
+    public FollowResponseDTO convertToFollowedDTO(Follow user) {
+        FollowResponseDTO followResponseDTO = modelMapper.map(user, FollowResponseDTO.class);
+        followResponseDTO.setEmail(user.getFollowing().getEmail());
+        if (user.getFollowing().getParticipant() != null) {
+            followResponseDTO.setName(user.getFollowing().getParticipant().getName());
+            followResponseDTO.setLastname(user.getFollowing().getParticipant().getLastname());
+        }
+        if (user.getFollowing().getOrganizer() != null) {
+            followResponseDTO.setName(user.getFollowing().getOrganizer().getName());
+            followResponseDTO.setLastname(user.getFollowing().getOrganizer().getLastname());
+        }
+        return followResponseDTO;
+    }
+    public List<FollowResponseDTO> converToListFollowedDTO(List<Follow> followers) {
+        return followers.stream()
+                .map(this::convertToFollowedDTO) // Mapear cada User a ParticipantDTO
                 .toList();
     }
 

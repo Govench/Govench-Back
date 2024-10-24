@@ -446,4 +446,11 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.converToListFollowDTO(followRepository.findByFollowing_Id(userId));
     }
+
+    @Override
+    public List<FollowResponseDTO> getFollowings() {
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        return userMapper.converToListFollowDTO(followRepository.findByFollower_Id(userId));
+    }
 }

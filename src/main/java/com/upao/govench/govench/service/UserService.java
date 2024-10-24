@@ -45,5 +45,5 @@ public interface UserService {
     RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
 
     List<FollowResponseDTO> getFollowers();
-
+    List<FollowResponseDTO> getFollowings();
 }

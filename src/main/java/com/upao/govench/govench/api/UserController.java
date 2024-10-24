@@ -262,4 +262,10 @@ public class UserController {
        List<FollowResponseDTO> followers=  userService.getFollowers();
         return new ResponseEntity<>(followers, HttpStatus.OK);
     }
+    @GetMapping("/followings")
+    public ResponseEntity<?> getFollowingsDetails()
+    {
+        List<FollowResponseDTO> followers=  userService.getFollowings();
+        return new ResponseEntity<>(followers, HttpStatus.OK);
+    }
 }
