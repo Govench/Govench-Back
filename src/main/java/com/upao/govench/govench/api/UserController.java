@@ -66,7 +66,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/profile/{userId}")
+    @GetMapping("/profile-photo/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable @Min(1) int userId) {
         Profile profile = null;
 
@@ -244,15 +244,22 @@ public class UserController {
         return new ResponseEntity<>("Has dejado de seguir al usuario", HttpStatus.OK);
     }
 
-    @GetMapping("/followers")
+    @GetMapping("/quantity-followers")
     public ResponseEntity<Integer> getFollowers() {
         int followers = userService.getFollowersCount();
         return new ResponseEntity<>(followers, HttpStatus.OK);
     }
 
-    @GetMapping("/following")
+    @GetMapping("/quantity-following")
     public ResponseEntity<Integer> getFollowing() {
         int following = userService.getFollowingCount();
         return new ResponseEntity<>(following, HttpStatus.OK);
+    }
+
+    @GetMapping("/followers")
+    public ResponseEntity<?> getFollowersDetails()
+    {
+       List<FollowResponseDTO> followers=  userService.getFollowers();
+        return new ResponseEntity<>(followers, HttpStatus.OK);
     }
 }

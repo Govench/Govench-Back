@@ -23,10 +23,10 @@ public interface UserService {
 
     void SubscribePremium(Integer id);
     void DesubscribePremium();
+
     //Autenticar el login
     AuthResponseDTO login(LoginDTO loginDTO);
-
-     Integer getAuthenticatedUserIdFromJWT();
+    Integer getAuthenticatedUserIdFromJWT();
 
 
     List<UserResponseDTO> getAllUsers();
@@ -42,7 +42,8 @@ public interface UserService {
 
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
-
     RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
+
+    List<FollowResponseDTO> getFollowers();
 
 }

@@ -261,7 +261,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         return userMapper.convertToListDTO(users);
     }
-
+    ///--------------------------///
 
     @Override
     public User associateProfileWithUser(int userId, String profileId) {
@@ -375,7 +375,7 @@ public class UserServiceImpl implements UserService {
 
 
     //userFollower - Seguidor
-    //userFollowing - Seguido
+    //userFollowing - Seguido //usuario base
     @Override
     public void followUser(Integer followedUserId) {
         Integer userId = getAuthenticatedUserIdFromJWT();
@@ -438,5 +438,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         return followRepository.findByFollower(user).size();
+    }
+
+    @Override
+    public List<FollowResponseDTO> getFollowers() {
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        return userMapper.converToListFollowDTO(followRepository.findByFollowing_Id(userId));
     }
 }
