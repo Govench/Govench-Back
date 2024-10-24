@@ -29,7 +29,7 @@ public class ReportController {
     @GetMapping("/user/{userId}/pdf")
     public ResponseEntity<InputStreamResource> downloadUserReportPdf(@PathVariable Integer userId) {
         ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
-        ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO);
+        ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO, userId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=user_report_" + userId + ".pdf");
