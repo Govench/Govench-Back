@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service.impl;
 
+import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.service.GraphService;
 
 import com.upao.govench.govench.service.UserStatisticsService;
@@ -21,12 +22,19 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.data.category.DefaultCategoryDataset;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class GraphServiceImpl implements GraphService {
     @Autowired
     private UserStatisticsService userStatisticsService;
+    @Autowired
+    private RatingEventRepository ratingEventRepository;
+    @Autowired
+    private EventServiceImpl eventServiceImpl;
 
     public byte[] generateMonthlyPostChart(Long userId) {
         // Obtenemos los datos de respuestas mensuales
@@ -68,6 +76,60 @@ public class GraphServiceImpl implements GraphService {
         );
 
         return createChartImage(chart);
+    }
+
+    public byte[] generateUserStarChart(Long userId) {
+        Map<Integer, Integer> userRatings = userStatisticsService.getUserRatings(userId);
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        userRatings.forEach((stars, count) -> dataset.addValue(
+                count, "Calificaciones",
+                stars + " Estrellas"));
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Calificaciones del Usuario",
+                "Estrellas",
+                "Cantidad",
+                dataset
+        );
+
+        return createChartImage(chart);
+    }
+
+    public List<byte[]> generateEventStarCharts(Long userId) {
+        // Obtener las calificaciones de eventos por usuario
+        Map<Integer, Map<Integer, Integer>> eventStarCounts = userStatisticsService.getUserEventRatingsByEvent(userId);
+
+        List<byte[]> chartImages = new ArrayList<>();
+
+        // Crear los gráficos para cada evento
+        for (Map.Entry<Integer, Map<Integer, Integer>> entry : eventStarCounts.entrySet()) {
+            Integer eventId = entry.getKey();
+            Map<Integer, Integer> stars = entry.getValue();
+
+            // Crear el dataset para el gráfico de este evento
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+            for (Map.Entry<Integer, Integer> starEntry : stars.entrySet()) {
+                dataset.addValue(starEntry.getValue(), "Estrellas", starEntry.getKey() + " Estrellas");
+            }
+
+            // Obtener el título del evento
+            String eventTitle = eventServiceImpl.getEventById(eventId).getTittle(); // Llama al método que ya tienes
+
+            // Crear el gráfico de barras
+            JFreeChart chart = ChartFactory.createBarChart(
+                    "Calificaciones de Estrellas para " + eventTitle,
+                    "Estrellas",
+                    "Cantidad de Calificaciones",
+                    dataset
+            );
+
+            // Guardar la imagen del gráfico
+            chartImages.add(createChartImage(chart));
+        }
+
+        return chartImages; // Devuelve la lista de imágenes de gráficos
     }
 
     public byte[] createChartImage(JFreeChart chart) {

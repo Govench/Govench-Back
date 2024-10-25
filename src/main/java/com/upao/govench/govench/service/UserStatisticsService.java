@@ -11,4 +11,6 @@ import java.util.Map;
 public interface UserStatisticsService {
     Map<String, Integer>  getWeeklyPost(Long userId);
     Map<String, Integer>  getMonthlyPost(Long userId);
+    Map<Integer, Integer> getUserRatings(Long userId);
+    Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Long userId);
 }

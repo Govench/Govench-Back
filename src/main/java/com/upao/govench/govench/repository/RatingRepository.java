@@ -12,4 +12,5 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Integer> {
     List<Rating> findAllById(Integer ratedUserId);
+    int countByRatedOrganizer_IdAndRatingValue(Long organizerId, int ratingValue);
 }

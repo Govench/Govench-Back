@@ -1,11 +1,10 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.RatingEvent;
 import com.upao.govench.govench.model.entity.User;
-import com.upao.govench.govench.repository.CommunityRepository;
-import com.upao.govench.govench.repository.EventRepository;
-import com.upao.govench.govench.repository.PostRepository;
-import com.upao.govench.govench.repository.RatingRepository;
+import com.upao.govench.govench.repository.*;
 import com.upao.govench.govench.service.UserStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,8 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
     private RatingRepository ratingRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private RatingEventRepository ratingEventRepository;
 
     public Map<String, Integer> getWeeklyPost(Long userId) {
         Map<String, Integer> weeklyResponses = new HashMap<>();
@@ -62,4 +63,36 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return monthlyResponses;
     }
 
+    public Map<Integer, Integer> getUserRatings(Long organizerId) {
+        Map<Integer, Integer> starCounts = new HashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            int count = ratingRepository.countByRatedOrganizer_IdAndRatingValue(organizerId, i);
+            starCounts.put(i, count);
+        }
+        return starCounts;
+    }
+
+    public Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Long userId) {
+        Map<Integer, Map<Integer, Integer>> eventRatingsMap = new HashMap<>();
+
+        // Obtener todos los eventos creados por el usuario
+        List<Event> events = eventRepository.findByOwner_Id(userId); // Método para obtener eventos por el id del propietario
+
+        // Iterar sobre cada evento
+        for (Event event : events) {
+            int eventId = event.getId();
+            Map<Integer, Integer> starCounts = new HashMap<>();
+
+            // Contar las calificaciones para cada puntuación del 1 al 5
+            for (int i = 1; i <= 5; i++) {
+                int count = ratingEventRepository.countByEventId_IdAndValorPuntuacion(eventId, i);
+                starCounts.put(i, count);
+            }
+
+            // Agregar al mapa de eventos
+            eventRatingsMap.put(eventId, starCounts);
+        }
+
+        return eventRatingsMap;
+    }
 }

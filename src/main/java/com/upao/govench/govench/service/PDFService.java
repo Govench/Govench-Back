@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -64,7 +65,25 @@ public class PDFService {
                 System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
+            byte[] starRatingChart = graphServiceImpl.generateUserStarChart((long) userId);
+            if(starRatingChart != null){
+                ImageData charImageData = ImageDataFactory.create(starRatingChart);
+                Image chartImage = new Image(charImageData);
+                document.add(chartImage);
+            } else {
+                System.out.println("No hay datos suficientes para generar algún gráfico");
+            }
 
+            List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts((long) userId);
+            if (eventRatingCharts != null && !eventRatingCharts.isEmpty()) {
+                for (byte[] chartBytes : eventRatingCharts) {
+                    ImageData chartImageData = ImageDataFactory.create(chartBytes);
+                    Image chartImage = new Image(chartImageData);
+                    document.add(chartImage); // Agrega la imagen del gráfico al documento
+                }
+            } else {
+                System.out.println("No hay datos suficientes para generar algún gráfico");
+            }
 
 
             document.close();
