@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service;
 
+import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -43,26 +44,27 @@ public class PDFService {
             document.add(new Paragraph("Total de Usuarios en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalUsersInCommunities()));
             document.add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()));
 
-
-
-            // Obtener estadísticas del usuario
-            int totalEventsAttended = userStatisticsService.getTotalEventsAttendedByUser(userId);
-            int totalFollowers = reportResponseDTO.getSummary().getNewFollowers();
-
-            // Generar gráficos específicos
-            byte[] eventChart = graphServiceImpl.generateEventAttendanceChart(totalEventsAttended);
-            byte[] followersChart = graphServiceImpl.generateFollowersChart(totalFollowers);
-
-            // Insertar gráficos en el PDF
-            if (eventChart != null) {
-                Image eventChartImage = new Image(ImageDataFactory.create(eventChart));
-                document.add(eventChartImage);
+            // Generar gráfico de respuestas semanales
+            byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart((long) userId);
+            if (weeklyChart != null) {
+                ImageData chartImageData = ImageDataFactory.create(weeklyChart);
+                Image chartImage = new Image(chartImageData);
+                document.add(chartImage);
+            } else {
+                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
-            if (followersChart != null) {
-                Image followersChartImage = new Image(ImageDataFactory.create(followersChart));
-                document.add(followersChartImage);
+            // Generar gráfico de respuestas mensuales
+            byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart((long) userId);
+            if (monthlyChart != null) {
+                ImageData chartImageData = ImageDataFactory.create(monthlyChart);
+                Image chartImage = new Image(chartImageData);
+                document.add(chartImage);
+            } else {
+                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
+
+
 
 
             document.close();

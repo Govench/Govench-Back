@@ -2,61 +2,74 @@ package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.service.GraphService;
 
+import com.upao.govench.govench.service.UserStatisticsService;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.CategorySeriesLabelGenerator;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.data.category.DefaultCategoryDataset;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 
 @Service
 public class GraphServiceImpl implements GraphService {
+    @Autowired
+    private UserStatisticsService userStatisticsService;
 
-    public byte[] generateEventAttendanceChart(int totalEventsAttended) {
+    public byte[] generateMonthlyPostChart(Long userId) {
+        // Obtenemos los datos de respuestas mensuales
+        Map<String, Integer> monthlyResponses = userStatisticsService.getMonthlyPost(userId);
+
+        // Creamos el dataset
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        // Aquí asumimos que tenemos un total por año, en este caso solo uno
-        dataset.addValue(totalEventsAttended, "Eventos Asistidos", "2024");
+        monthlyResponses.forEach((period, count) -> dataset.addValue(count, "Publicaciones", period));
 
-        // Crear el gráfico
+        // Crear el gráfico de barras
         JFreeChart chart = ChartFactory.createBarChart(
-                "Eventos Asistidos por Usuario",
-                "Usuario",
-                "Total de Eventos",
+                "Publicaciones por Día en el Mes",
+                "Día",
+                "Cantidad de publicaciones",
                 dataset
         );
 
         return createChartImage(chart);
     }
 
-    public byte[] generateCommunitiesCreatedChart(int totalCommunitiesCreated) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(totalCommunitiesCreated, "Comunidades Creadas", "2024");
+    public byte[] generateWeeklyPostChart(Long userId) {
+        // Obtenemos los datos de respuestas semanales
+        Map<String, Integer> weeklyResponses = userStatisticsService.getWeeklyPost(userId);
 
-        // Crear el gráfico
+        // Creacion de dataset
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // Agregar los datos al dataset con traducción
+        weeklyResponses.forEach((day, count) -> {
+            dataset.addValue(count, "Publicaciones", day); // Usar el día tal como está
+        });
+
+        // Crear el gráfico de barras
         JFreeChart chart = ChartFactory.createBarChart(
-                "Comunidades Creadas por Usuario",
-                "Usuario",
-                "Total de Comunidades",
+                "Publicaciones por Día en la Semana",
+                "Día",
+                "Cantidad de Publicaciones",
                 dataset
         );
 
         return createChartImage(chart);
     }
-    public byte[] generateFollowersChart(int totalFollowers) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(totalFollowers, "Seguidores", "2024");
 
-        // Crear el gráfico de seguidores
-        JFreeChart chart = ChartFactory.createBarChart(
-                "Seguidores por Usuario",
-                "Usuario",
-                "Total de Seguidores",
-                dataset
-        );
-
-        return createChartImage(chart);
-    }
     public byte[] createChartImage(JFreeChart chart) {
         try {
             ByteArrayOutputStream chartOutputStream = new ByteArrayOutputStream();
@@ -67,4 +80,6 @@ public class GraphServiceImpl implements GraphService {
             return null;
         }
     }
+
+
 }

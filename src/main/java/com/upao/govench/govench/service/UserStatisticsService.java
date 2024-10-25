@@ -5,14 +5,10 @@ import com.upao.govench.govench.model.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface UserStatisticsService {
-    List<Community> getTotalCommunitiesUserBelongsTo(int userId);
-    int getTotalEventsAttendedByUser(Integer userId);
-    int getTotalEventsCreatedByUser(Integer userId);
-    int getTotalRatingsForAttendedEvents(Integer userId);
-    int getTotalRatingsForCreatedEvents(Integer userId);
-    int getTotalRatingsReceivedByUser(Integer userId);
-    int getTotalPostsInCreatedCommunities(Integer userId);
+    Map<String, Integer>  getWeeklyPost(Long userId);
+    Map<String, Integer>  getMonthlyPost(Long userId);
 }

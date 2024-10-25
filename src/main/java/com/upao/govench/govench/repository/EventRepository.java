@@ -21,11 +21,4 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e JOIN UserEvent ue ON e.id = ue.event.id WHERE ue.user.id = :userId AND e.date >= :now")
     List<Event> findUpcomingEventsForUser(@Param("userId") Integer userId, @Param("now") LocalDate now);
-
-    @Query("SELECT COUNT(ue) FROM UserEvent ue WHERE ue.user.id = :userId")
-    int countAttendedByUserId(@Param("userId") Integer userId);
-
-    // Contar eventos creados por un usuario específico
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.owner.id = :userId")
-    int countCreatedByUserId(@Param("userId") Integer userId);
 }

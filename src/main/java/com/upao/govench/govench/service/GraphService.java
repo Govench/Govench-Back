@@ -7,7 +7,6 @@ import java.util.Map;
 
 @Service
 public interface GraphService {
-    byte[] generateEventAttendanceChart(int totalEventsAttended);
-    byte[] generateCommunitiesCreatedChart(int totalCommunitiesCreated);
-    byte[] generateFollowersChart(int totalFollowers);
+    byte[] generateWeeklyPostChart(Long userId);
+    byte[] generateMonthlyPostChart(Long userId);
 }
