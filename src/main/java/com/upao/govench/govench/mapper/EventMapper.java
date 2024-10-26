@@ -30,7 +30,7 @@ public class EventMapper {
         Event event = modelMapper.map(eventRequestDTO, Event.class);
 
         // Mapear la ubicación
-        LocationResponseDTO location = locationService.getLocationById(eventRequestDTO.getLocation().getId());
+        LocationResponseDTO location = locationService.getLocationById(eventRequestDTO.getLocation());
         event.setLocation(locationMapper.convertToEntity(location));
         User owner = userService.getUserbyId((userService.getAuthenticatedUserIdFromJWT()));
         // Mapear el propietario

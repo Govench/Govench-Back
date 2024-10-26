@@ -32,7 +32,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
-
+    private final LocationRepository locationRepository;
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
         List<Event> events = eventRepository.findAll();
@@ -94,7 +94,7 @@ public class EventServiceImpl implements EventService {
         if(eventRequestDTO.getEndTime()!= null)event.setEndTime(eventRequestDTO.getEndTime());
         if(eventRequestDTO.getType()!= null)event.setType(eventRequestDTO.getType());
         if(eventRequestDTO.getCost()!= null)event.setCost(eventRequestDTO.getCost());
-        if(eventRequestDTO.getLocation()!= null)event.setLocation(eventRequestDTO.getLocation());
+        if(eventRequestDTO.getLocation()!= null)event.setLocation(locationRepository.findById(eventRequestDTO.getLocation()).orElse(null));
 
         event = eventRepository.save(event);
 
