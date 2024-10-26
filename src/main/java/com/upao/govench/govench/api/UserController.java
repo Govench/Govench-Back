@@ -50,6 +50,8 @@ public class UserController {
 
     private final RatingMapper ratingMapper;
 
+    @Autowired
+    private TokenProvider tokenProvider;
     @PostMapping("/upload/profile")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
         Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
@@ -173,33 +175,6 @@ public class UserController {
         }
     }
 
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @PostMapping("/rate/{ratedUserId}")
-    public ResponseEntity<String> rateUser(
-            @PathVariable Integer ratedUserId,
-            @RequestBody Rating rating
-    ) {
-        try {
-            // Obtener el ID del usuario autenticado desde el token JWT
-            Integer userId = getAuthenticatedUserIdFromJWT();
-
-            // Verificar que el usuario esté autenticado
-            if (userId == null) {
-                return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
-            }
-
-            // Usar el servicio para calificar al usuario
-            userService.rateUser(userId, ratedUserId, rating.getRatingValue(), rating.getComment());
-
-            return new ResponseEntity<>("Usuario calificado correctamente", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al calificar usuario", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     private Integer getAuthenticatedUserIdFromJWT() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -217,11 +192,10 @@ public class UserController {
         return null; // Si no hay autenticación, devuelve null
     }
 
-    //OBTIENE LAS CALIFICACIONES QUE UN USUARIO HA HECHO
-    @GetMapping("/{userId}/ratings")
-    public ResponseEntity<List<RatingResponseDTO>> getUserRatings(@PathVariable Integer userId) {
+    @GetMapping("/ratings/{userId}")
+    public ResponseEntity<List<RatingResponseDTO>> getRatingByID(@PathVariable Integer userId) {
         try {
-            // Obtener las calificaciones del usuario
+            // Obtener las calificaciones que ha hecho el usuario
             List<Rating> ratings = userService.getUserRatings(userId);
 
             // Convertir las calificaciones a RatingResponseDTO
@@ -238,7 +212,89 @@ public class UserController {
         }
     }
 
+    @GetMapping("/myratings")
+    public ResponseEntity<List<RatingResponseDTO>> getRatings() {
+        try {
+            Integer userId = userService.getAuthenticatedUserIdFromJWT();
+            // Obtener las calificaciones que ha hecho el usuario
+            List<Rating> ratings = userService.getUserRatings(userId);
 
+            // Convertir las calificaciones a RatingResponseDTO
+            List<RatingResponseDTO> ratingsDTO = ratingMapper.toRatingResponseDTOList(ratings);
+
+            // Verificar si la lista está vacía
+            if (ratingsDTO.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/myrateds")
+    public ResponseEntity<List<RatingResponseDTO>> getRateds()
+    {
+        try {
+            Integer userId = userService.getAuthenticatedUserIdFromJWT();
+            // Obtener las calificaciones que le han hecho al usuario
+            List<Rating> ratings = userService.getUserRated(userId);
+
+            // Convertir las calificaciones a RatingResponseDTO
+            List<RatingResponseDTO> ratingsDTO = ratingMapper.toRatedResponseDTOList(ratings);
+
+            // Verificar si la lista está vacía
+            if (ratingsDTO.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/rated/{userId}")
+    public ResponseEntity<List<RatingResponseDTO>> getRatedsById(@PathVariable Integer userId)
+    {
+        try {
+            // Obtener las calificaciones que le han hecho al usuario
+            List<Rating> ratings = userService.getUserRated(userId);
+
+            // Convertir las calificaciones a RatingResponseDTO
+            List<RatingResponseDTO> ratingsDTO = ratingMapper.toRatedResponseDTOList(ratings);
+
+            // Verificar si la lista está vacía
+            if (ratingsDTO.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/rate/{ratedUserId}")
+    public ResponseEntity<String> rateUser(@Valid
+            @PathVariable Integer ratedUserId,
+            @RequestBody RatingRequestDTO rating)
+    {
+            // Obtener el ID del usuario autenticado desde el token JWT
+            Integer userId = getAuthenticatedUserIdFromJWT();
+
+            // Verificar que el usuario esté autenticado
+            if (userId == null) {
+                return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
+            }
+
+            // Usar el servicio para calificar al usuario
+            userService.rateUser(userId, ratedUserId, rating.getRatingValue(), rating.getComment());
+
+            return new ResponseEntity<>("Usuario calificado correctamente", HttpStatus.OK);
+
+    }
 
     @PostMapping("/ratingEvent/{eventId}")
     public ResponseEntity<String> rateEvent(@PathVariable int eventId,

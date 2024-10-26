@@ -23,26 +23,23 @@ public class RatingMapper {
         if (rating == null) {
             return null;
         }
+
         RatingResponseDTO ratingResponseDTO = modelMapper.map(rating, RatingResponseDTO.class);
 
-
-        if (rating.getRaterUser().getParticipant() != null) {
-
-          //  ratingResponseDTO.setAutorname(rating.getRaterUser().getParticipant().getName());
-           // ratingResponseDTO.setNombreUsuarioCalificado(rating.getRatedUser().getParticipant().getName());
-            //ratingResponseDTO.setIdAutor(rating.getRaterUser().getParticipant().getId());
-
-        }
-
-        if (rating.getRaterUser().getOrganizer() != null) {
-
-         //   ratingResponseDTO.setAutorname(rating.getRaterUser().getOrganizer().getName());
-         //   ratingResponseDTO.setNombreUsuarioCalificado(rating.getRatedUser().getOrganizer().getName());
-            //  ratingResponseDTO.setIdAutor(rating.getRaterUser().getOrganizer().getId());
-        }
-
+        ratingResponseDTO.setUserCalificado(rating.getRatedUser().getEmail());
         return ratingResponseDTO;
     }
+
+    public RatingResponseDTO toRatedResponseDTO(Rating rating) {
+        if (rating == null) {
+            return null;
+        }
+
+        RatingResponseDTO ratingResponseDTO = modelMapper.map(rating, RatingResponseDTO.class);
+        ratingResponseDTO.setUserCalificado(rating.getRaterUser().getEmail());
+        return ratingResponseDTO;
+    }
+
 
     public Rating toRating(RatingRequestDTO requestDTO) {
         if (requestDTO == null) {
@@ -57,6 +54,11 @@ public class RatingMapper {
     public List<RatingResponseDTO> toRatingResponseDTOList(List<Rating> ratings) {
         return ratings.stream()
                 .map(this::toRatingResponseDTO)
+                .collect(Collectors.toList());
+    }
+    public List<RatingResponseDTO> toRatedResponseDTOList(List<Rating> ratings) {
+        return ratings.stream()
+                .map(this::toRatedResponseDTO)
                 .collect(Collectors.toList());
     }
 

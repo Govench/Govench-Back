@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Integer> {
-    List<Rating> findAllById(Integer ratedUserId);
+    List<Rating> findAllByRatedUser_Id(Integer ratedUserId);//buscar las calificaciones por autor
+    List<Rating> findAllByRaterUser_Id(Integer ratedUserId);//buscar las califiaciones por calificado
 
 }
