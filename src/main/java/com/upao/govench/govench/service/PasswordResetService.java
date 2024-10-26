@@ -38,11 +38,9 @@ public class PasswordResetService {
                 tokenRepository.save(passwordResetToken);
 
                 String titleEmail = "¡Hola, Somos Govench!";
-                String messageEmail = "\n\nHola, solicitaste un restablecimiento de contraseña para tu cuenta "+ email +", \na continuación copia y pega el siguiente token en el formulario para continuar.";
+                String messageEmail = "\n\nHola, solicitaste un restablecimiento de contraseña para tu cuenta "+ email
+                        +", \na continuación copia y pega el siguiente token en el formulario para continuar.";
                 String resetLink = titleEmail + messageEmail +" \n\nTOKEN: " + token;
-                //Para restablecimiento de contraseña, pero presionando el enlace
-                //String resetLink = "http://localhost:8080/reset-password?token=" + token;
-                //String emailBody = titleEmail + messageEmail + "\n\n" + resetLink;
                 emailService.sendEmail(user.getEmail(), "Solicitud de cambio de contraseña \uD83D\uDD12", resetLink);
                 return "Token enviado exitosamente";
             } catch (Exception e) {

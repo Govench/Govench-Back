@@ -439,4 +439,18 @@ public class UserServiceImpl implements UserService {
 
         return followRepository.findByFollower(user).size();
     }
+
+    @Override
+    public Integer getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return user.getId();
+    }
+
+    @Override
+    public Organizer getOrganizerProfileByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return user.getOrganizer();
+    }
 }

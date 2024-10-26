@@ -2,9 +2,7 @@ package com.upao.govench.govench.service;
 
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.upao.govench.govench.model.dto.*;
-import com.upao.govench.govench.model.entity.Event;
-import com.upao.govench.govench.model.entity.Rating;
-import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.model.entity.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,4 +43,6 @@ public interface UserService {
 
     RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
 
+    Integer getUserIdByEmail(String email);
+    Organizer getOrganizerProfileByEmail(String email);
 }

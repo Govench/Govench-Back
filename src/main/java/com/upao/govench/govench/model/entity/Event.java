@@ -54,15 +54,6 @@ public class Event {
     @JoinColumn(name = "loc_id_in", nullable = true )
     private Location location;
 
-    @Column(name = "eve_last_rem_da")
-    private LocalDate lastReminderSentDate;
-
-    @Column(name = "eve_same_day_rem_bo", nullable = true)
-    private boolean sameDayReminderSent = false;
-
-    @Column(name = "eve_fin_rem_bo", nullable = true)
-    private boolean finalReminderSent = false;
-
     // Nuevos atributos
     @Column(name = "eve_max_cap_in", nullable = false)
     private int maxCapacity;

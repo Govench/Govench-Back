@@ -1,6 +1,8 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.model.entity.Participant;
+import com.upao.govench.govench.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import com.upao.govench.govench.service.UserEventService;
 import com.upao.govench.govench.model.dto.ReminderRequestDTO;
@@ -9,6 +11,8 @@ import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.service.NotificationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,47 +22,32 @@ public class NotificationController {
 
     private NotificationService notificationService;
     private final UserEventService userEventService;
+    private final UserService userService;
 
-    @PostMapping("/trigger-reminders")
-    public ResponseEntity<String> triggerReminders(@RequestBody ReminderRequestDTO request) {
-        User user = request.getUser();
-        Event event = request.getEvent();
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'PARTICIPANT')")
+    @PutMapping("/update/{eventId}")
+    public ResponseEntity<String> updateNotifications(@PathVariable("eventId") Long eventId,
+                                                      @RequestParam("enableNotifications") boolean enableNotifications) {
 
-        UserEvent userEvent = userEventService.getUserEventbyUser(user).stream()
-                .filter(ue -> ue.getEvent().equals(event))
-                .findFirst()
-                .orElse(null);
+        // Obtener el usuario autenticado
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
+        User owner = userService.getUserbyId(userId);
 
-        if (userEvent != null && userEvent.isNotificationsEnabled()) {
-        notificationService.scheduleEventReminders(user, event);
-        return ResponseEntity.ok("Reminders triggered");
-        } else {
-            return ResponseEntity.status(403).body("Notifications are not enabled for this user or event.");
-        }
-    }
-
-    @PutMapping("/update-notifications")
-    public ResponseEntity<String> updateNotifications(@RequestBody UserEvent userEvent) {
-        User user = userEvent.getUser();
-        Event event = userEvent.getEvent();
-        boolean enableNotifications = userEvent.isNotificationsEnabled();
-
-        if (user == null || event == null) {
-            return ResponseEntity.status(400).body("User or Event is missing.");
+        // Verificar si el evento existe en la relación del usuario
+        UserEvent existingUserEvent = userEventService.getUserEventbyUserIdAndEventId(userId, eventId);
+        if (existingUserEvent == null) {
+            throw new EntityNotFoundException("No se encontró una relación entre el usuario y el evento.");
         }
 
-        UserEvent existingUserEvent = userEventService.getUserEventbyUser(user).stream()
-                .filter(ue -> ue.getEvent().getId() == event.getId())
-                .findFirst()
-                .orElse(null);
-
-        if (existingUserEvent != null) {
-            existingUserEvent.setNotificationsEnabled(enableNotifications);
-            userEventService.addUserEvent(existingUserEvent);
-            String status = enableNotifications ? "activated" : "deactivated";
-            return ResponseEntity.ok("Notifications " + status + " for event ID: " + event.getId());
-        } else {
-            return ResponseEntity.status(404).body("UserEvent not found.");
+        // Verificar si el usuario es el propietario de la relación UserEvent
+        if (!existingUserEvent.getUser().getId().equals(owner.getId())) {
+            throw new AccessDeniedException("No tienes permiso para modificar las notificaciones de este evento.");
         }
+
+        // Actualizar la notificación según el estado deseado
+        existingUserEvent.setNotificationsEnabled(enableNotifications);
+        userEventService.updateUserEvent(existingUserEvent);
+        String status = enableNotifications ? "activadas" : "desactivadas";
+        return ResponseEntity.ok("Notificaciones " + status + " para el evento ID: " + eventId);
     }
 }

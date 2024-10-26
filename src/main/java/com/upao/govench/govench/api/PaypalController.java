@@ -211,7 +211,15 @@ public class PaypalController {
 
             // Crear la nueva relación entre usuario y evento
             UserEvent createdUserEvent = userEventService.addUserEvent(
-                    new UserEvent(new IdCompuestoU_E(iduser, idevent), user, event, LocalDate.now(), false)
+                    new UserEvent(new IdCompuestoU_E(iduser, idevent), // ID compuesto
+                            user, // Usuario asociado
+                            event, // Evento asociado
+                            LocalDate.now(), // Fecha de registro
+                            false, // Notificaciones habilitadas (por defecto, false)
+                            null, // Fecha del último recordatorio enviado (inicialmente null)
+                            false, // Recordatorio del mismo día enviado (inicialmente false)
+                            false  // Recordatorio final enviado (inicialmente false)
+                    )
             );
 
 
