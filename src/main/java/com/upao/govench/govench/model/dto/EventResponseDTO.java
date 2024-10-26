@@ -20,7 +20,6 @@ public class EventResponseDTO {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String state;
     private String type;
     private BigDecimal cost;
     private LocationResponseDTO location;

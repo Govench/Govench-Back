@@ -35,9 +35,6 @@ public class EventRequestDTO {
     @NotBlank(message = "La hora de fin no puede estar vacía")
     private LocalTime endTime;
 
-    @NotBlank(message = "El estado no puede estar vacío")
-    private String state;
-
     @NotBlank(message = "El tipo no puede estar vacio")
     private String type;
 

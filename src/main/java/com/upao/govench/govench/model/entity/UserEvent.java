@@ -35,7 +35,6 @@ public class UserEvent {
     private boolean notificationsEnabled = false;
 
 
-
     @PrePersist
     public void prePersist() {
         this.registrationDate = LocalDate.now();

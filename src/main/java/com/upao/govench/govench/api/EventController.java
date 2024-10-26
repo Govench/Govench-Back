@@ -1,9 +1,11 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.mapper.UserEventMapper;
 import com.upao.govench.govench.model.dto.EventRequestDTO;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
 import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.service.EventService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import lombok.AllArgsConstructor;
@@ -20,11 +22,13 @@ public class EventController{
 
     private final EventServiceImpl eventServiceImpl;
 
+
     @GetMapping
     public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
         List<EventResponseDTO> events = eventServiceImpl.getAllEvents();
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
+
 
     @GetMapping("/tittle/{tittle}")
     public ResponseEntity<?> getEventByTittle(@PathVariable String tittle) {

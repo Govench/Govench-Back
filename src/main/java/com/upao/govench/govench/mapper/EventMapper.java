@@ -40,9 +40,14 @@ public class EventMapper {
         return event;
     }
 
-
     public EventResponseDTO convertToDTO(Event event) {
-        return modelMapper.map(event, EventResponseDTO.class);
+        EventResponseDTO eventResponseDTO =  modelMapper.map(event, EventResponseDTO.class);
+        User owner = userService.getUserbyId((userService.getAuthenticatedUserIdFromJWT()));
+        // Mapear el propietario
+        if (owner != null) {
+            eventResponseDTO.setOwnerId(owner.getId());
+        }
+        return eventResponseDTO;
     }
 
     public List<EventResponseDTO> convertToListDTO(List<Event> events) {
@@ -50,7 +55,6 @@ public class EventMapper {
                 .map(this::convertToDTO)
                 .toList();
     }
-
 
 
 
