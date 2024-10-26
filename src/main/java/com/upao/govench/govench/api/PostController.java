@@ -2,6 +2,7 @@ package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.CommunityMapper;
+import com.upao.govench.govench.mapper.PostMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
@@ -45,6 +46,8 @@ public class PostController {
     private final CommunityService communityService;
     @Autowired
     private final PostService postService;
+    @Autowired
+    private PostMapper postMapper;
 
     @PostMapping("/community/{communityId}/posts/create")
     public ResponseEntity<Map<String, String>> createPost(@PathVariable("communityId") int communityId,
@@ -67,13 +70,13 @@ public class PostController {
             return new ResponseEntity<>(Map.of("message", "Comunidad no encontrada"), HttpStatus.NOT_FOUND);
         }
 
-        postRequestDTO.setAutor(author);
-        postRequestDTO.setComunidad(community);
-        postRequestDTO.setCreated(LocalDate.now());
+        // Usar el PostMapper para crear la entidad Post
+        Post post = postMapper.toEntity(postRequestDTO, author, community);
 
-        postServiceImpl.publicarPost(communityId, postRequestDTO, author);
+        // Guardar el post
+        postServiceImpl.publicarPost(post);
 
-        Map<String, String> response = Map.of("body", postRequestDTO.getBody());
+        Map<String, String> response = Map.of("body", post.getBody());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
