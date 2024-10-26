@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 
 import java.time.LocalDate;
@@ -319,41 +320,37 @@ public class UserServiceImpl implements UserService {
      @Override
      public void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment) {
          User rater = userRepository.findById(raterUserId)
-                 .orElseThrow(() -> new RuntimeException("Usuario que califica no encontrado"));
+                 .orElseThrow(() -> new NotFoundException("Usuario que califica no encontrado"));
 
          User rated = userRepository.findById(ratedUserId)
-                 .orElseThrow(() -> new RuntimeException("Usuario a calificar no encontrado"));
-
+                 .orElseThrow(() -> new NotFoundException("Usuario a calificar no encontrado"));
+         if(rater==rated)
+         {
+             throw new IllegalArgumentException("No puedes calificarte a ti mismo.");
+         }
          Rating rating = new Rating();
          rating.setRatingValue(ratingValue);
          rating.setComment(comment);
 
-         // Establecer el rater y el rated según el tipo de usuario
-         if (rater.getOrganizer() != null) {
-             rating.setRaterOrganizer(rater.getOrganizer()); // Si el calificador es un organizador
-         } else if (rater.getParticipant() != null) {
-             rating.setRaterParticipant(rater.getParticipant()); // Si el calificador es un participante
-         } else {
-             throw new RuntimeException("El calificador debe ser un organizador o un participante.");
-         }
-
-         if (rated.getOrganizer() != null) {
-             rating.setRatedOrganizer(rated.getOrganizer()); // Si el calificado es un organizador
-         } else if (rated.getParticipant() != null) {
-             rating.setRatedParticipant(rated.getParticipant()); // Si el calificado es un participante
-         } else {
-             throw new RuntimeException("El usuario a calificar debe ser un organizador o un participante.");
-         }
+         rating.setRatedUser(rated);
+         rating.setRaterUser(rater);
 
          // Guardar la calificación
          ratingRepository.save(rating);
      }
 
     @Override
-    public List<Rating> getUserRatings(Integer userId) {
+    public List<Rating> getUserRatings(Integer userId) { //buscar los que yo he calificado
 
-        return ratingRepository.findAllById(userId);
+        return ratingRepository.findAllByRaterUser_Id(userId);
     }
+
+    @Override
+    public List<Rating> getUserRated(Integer userId) { //buscar quienes me han calificado
+
+        return ratingRepository.findAllByRatedUser_Id(userId);
+    }
+
 
     @Override
     public RatingEventResponseDTO createRatingEvent(User user, Event event, RatingEventRequestDTO ratingEventRequestDTO) {

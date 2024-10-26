@@ -42,6 +42,7 @@ public interface UserService {
 
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
+    List<Rating> getUserRated (Integer userId);
     RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
 
     List<FollowResponseDTO> getFollowers();

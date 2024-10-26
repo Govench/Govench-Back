@@ -49,14 +49,6 @@ public class Participant{
     @Column(name = "use_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "raterParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> givenRatingsToOrganizers;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "ratedParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> receivedRatingsFromOrganizers;
-
     @OneToOne
     @JoinColumn(name = "par_use_id_in" ,referencedColumnName = "user_id")
     private User user;
