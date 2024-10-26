@@ -2,6 +2,7 @@ package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.exceptions.UserNotFoundException;
+import com.upao.govench.govench.mapper.RatingMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.EventRepository;
@@ -10,6 +11,7 @@ import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
 import com.upao.govench.govench.service.ProfileService;
 import com.upao.govench.govench.service.UserService;
+import com.upao.govench.govench.security.TokenProvider;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -45,6 +47,8 @@ public class UserController {
 
 
     private final EventRepository eventRepository;
+
+    private final RatingMapper ratingMapper;
 
     @PostMapping("/upload/profile")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
@@ -169,13 +173,25 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/rate/{ratedUserId}")
+
+    @Autowired
+    private TokenProvider tokenProvider;
+
+    @PostMapping("/rate/{ratedUserId}")
     public ResponseEntity<String> rateUser(
-            @PathVariable Integer userId,
             @PathVariable Integer ratedUserId,
             @RequestBody Rating rating
     ) {
         try {
+            // Obtener el ID del usuario autenticado desde el token JWT
+            Integer userId = getAuthenticatedUserIdFromJWT();
+
+            // Verificar que el usuario esté autenticado
+            if (userId == null) {
+                return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
+            }
+
+            // Usar el servicio para calificar al usuario
             userService.rateUser(userId, ratedUserId, rating.getRatingValue(), rating.getComment());
 
             return new ResponseEntity<>("Usuario calificado correctamente", HttpStatus.OK);
@@ -184,33 +200,45 @@ public class UserController {
         }
     }
 
+    private Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials(); // Obtén el token del objeto de autenticación
+
+            // Extraer el email del token
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+            // Buscar el usuario usando el email
+            User user = userRepository.findByEmail(email).orElse(null);
+            return user != null ? user.getId() : null;
+        }
+        return null; // Si no hay autenticación, devuelve null
+    }
+
+    //OBTIENE LAS CALIFICACIONES QUE UN USUARIO HA HECHO
     @GetMapping("/{userId}/ratings")
-    public ResponseEntity<List<RatingRequestDTO>> getUserRatings(@PathVariable Integer userId) {
+    public ResponseEntity<List<RatingResponseDTO>> getUserRatings(@PathVariable Integer userId) {
         try {
-            // Obtener las calificaciones
+            // Obtener las calificaciones del usuario
             List<Rating> ratings = userService.getUserRatings(userId);
 
-            // Mapear a DTO
-            List<RatingRequestDTO> ratingsDTO = ratings.stream().map(rating -> {
-                String raterName = "";
+            // Convertir las calificaciones a RatingResponseDTO
+            List<RatingResponseDTO> ratingsDTO = ratingMapper.toRatingResponseDTOList(ratings);
 
-                // Verificar quién otorgó la calificación (organizador o participante)
-                if (rating.getRaterOrganizer() != null) {
-                    // Si es un organizador que califica
-                    raterName = rating.getRaterOrganizer().getName(); // Asegúrate de que 'getName()' esté implementado en Organizer
-                } else if (rating.getRaterParticipant() != null) {
-                    // Si es un participante que califica
-                    raterName = rating.getRaterParticipant().getName(); // Asegúrate de que 'getName()' esté implementado en Participant
-                }
-
-                return new RatingRequestDTO(raterName, rating.getRatingValue(), rating.getComment());
-            }).collect(Collectors.toList());
+            // Verificar si la lista está vacía
+            if (ratingsDTO.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
 
             return new ResponseEntity<>(ratingsDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     @PostMapping("/ratingEvent/{eventId}")
     public ResponseEntity<String> rateEvent(@PathVariable int eventId,

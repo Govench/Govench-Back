@@ -328,22 +328,8 @@ public class UserServiceImpl implements UserService {
          rating.setRatingValue(ratingValue);
          rating.setComment(comment);
 
-         // Establecer el rater y el rated según el tipo de usuario
-         if (rater.getOrganizer() != null) {
-             rating.setRaterOrganizer(rater.getOrganizer()); // Si el calificador es un organizador
-         } else if (rater.getParticipant() != null) {
-             rating.setRaterParticipant(rater.getParticipant()); // Si el calificador es un participante
-         } else {
-             throw new RuntimeException("El calificador debe ser un organizador o un participante.");
-         }
-
-         if (rated.getOrganizer() != null) {
-             rating.setRatedOrganizer(rated.getOrganizer()); // Si el calificado es un organizador
-         } else if (rated.getParticipant() != null) {
-             rating.setRatedParticipant(rated.getParticipant()); // Si el calificado es un participante
-         } else {
-             throw new RuntimeException("El usuario a calificar debe ser un organizador o un participante.");
-         }
+            rating.setRatedUser(rated);
+            rating.setRaterUser(rater);
 
          // Guardar la calificación
          ratingRepository.save(rating);

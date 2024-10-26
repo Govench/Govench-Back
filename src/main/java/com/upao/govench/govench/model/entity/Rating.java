@@ -14,27 +14,15 @@ public class Rating {
     @Column(name = "rating_id")
     private Integer id;
 
-
-
-    // Relación con el organizador que otorga la calificación
+    // Relación con el usuario que otorga la calificación
     @ManyToOne
-    @JoinColumn(name = "rater_organizer_id")
-    private Organizer raterOrganizer;
+    @JoinColumn(name = "rater_id", nullable = false)
+    private User raterUser;
 
-    // Relación con el participante que otorga la calificación
+    // Relación con el usuario que recibe la calificación
     @ManyToOne
-    @JoinColumn(name = "rater_participant_id")
-    private Participant raterParticipant;
-
-    // Relación con el organizador que recibe la calificación
-    @ManyToOne
-    @JoinColumn(name = "rated_organizer_id")
-    private Organizer ratedOrganizer;
-
-    // Relación con el participante que recibe la calificación
-    @ManyToOne
-    @JoinColumn(name = "rated_participant_id")
-    private Participant ratedParticipant;
+    @JoinColumn(name = "rated_id", nullable = false)
+    private User ratedUser;
 
     @Column(name = "rating_value", nullable = false)
     private Integer ratingValue; // Escala de 1 a 5, por ejemplo.

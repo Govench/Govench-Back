@@ -1,7 +1,4 @@
 package com.upao.govench.govench.model.dto;
-
-
-import com.upao.govench.govench.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class RatingRequestDTO {
-    private User ratedUser;
+public class RatingResponseDTO {
     private Integer ratingValue;
     private String comment;
-
 }
