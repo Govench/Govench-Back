@@ -21,5 +21,6 @@ public interface PostService {
 
     void save(Post existingPost);
 
+    void publicarPost(Post post); // Cambiar el parámetro a tipo Post
 }
 
