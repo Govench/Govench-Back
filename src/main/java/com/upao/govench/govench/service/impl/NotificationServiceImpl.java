@@ -105,15 +105,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     private String generateGreeting(User user) {
         if (user.getOrganizer() != null && user.getOrganizer().getName() != null) {
-            return "\uD83D\uDC4B Hola " + user.getOrganizer().getName() + "!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola " + user.getOrganizer().getName() + "!";
         } else if (user.getParticipant() != null && user.getParticipant().getName() != null) {
-            return "\uD83D\uDC4B Hola " + user.getParticipant().getName() + "!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola " + user.getParticipant().getName() + "!";
         } else {
-            return "\uD83D\uDC4B Hola Administrador!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola Administrador!";
         }
     }
 
-    private String generateEventDetails(Event event) {
+    public String generateEventDetails(Event event) {
         String location = (event.getLocation() != null) // Verifica si el evento tiene una ubicación asignada.
                 ? String.format("%s, %s, %s",  // Si es así, asigna una cadena formateada con la ubicación.
                 event.getLocation().getDepartament(),
@@ -128,7 +128,7 @@ public class NotificationServiceImpl implements NotificationService {
                 "\uD83C\uDFE6 Lugar: " + location + "\n" +
                 "\uD83D\uDCDD Descripción: " + event.getDescription();
     }
-    private String generateSignature() {
+    public String generateSignature() {
         return "Atentamente,\n" +
                 " Govench Team\n" +
                 "\uD83C\uDF10 www.govench.com\n" +

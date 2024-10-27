@@ -13,6 +13,7 @@ import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
+import com.upao.govench.govench.service.impl.RegisterConfirmationImpl;
 import com.upao.govench.govench.service.impl.UserEventServiceImpl;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;

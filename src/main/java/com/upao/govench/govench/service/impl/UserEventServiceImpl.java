@@ -28,7 +28,8 @@ public class UserEventServiceImpl implements UserEventService {
     private UserRepository userRepository;
     @Autowired
     private EventRepository eventRepository;
-
+    @Autowired
+    private RegisterConfirmationImpl registerConfirmationImpl;
 
     public UserProfileDTO registerParticipant(UserRegistrationDTO userRegistrationDTO) {
         return null;
@@ -62,6 +63,13 @@ public class UserEventServiceImpl implements UserEventService {
 
         event.setRegisteredCount(event.getRegisteredCount() + 1);
         eventRepository.save(event);
+        registerConfirmationImpl.sendReservationEmailToUser(user, event);
+
+        if(user.getId() != event.getOwner().getId()){
+            // Si el usuario que ha creado el evento, se registra a su propio evento, evita que
+            // se envie el correo de confirmación de registro.
+            registerConfirmationImpl.sendReservationEmailToOwner(user, event);
+        }
 
         userEvent.setUser(user);
         userEvent.setEvent(event);
