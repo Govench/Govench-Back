@@ -32,10 +32,14 @@ public interface UserEventService {
     public List<UserEvent> getAllUserEvents();
 
     public List<UserEvent> getUserEventbyUser(User user);
-    public  List<UserEvent> getUserEventbyEvent(Event event);
+
+    public List<UserEvent> getUserEventbyEvent(Event event);
 
     List<EventResponseDTO> getEventHistory(Integer userId);
 
     public List<User> getParticipantsByEvent(int eventId);
 
+    UserEvent updateUserEvent(UserEvent userEvent);
+
+    UserEvent getUserEventbyUserIdAndEventId(Integer userId, Long eventId);
 }

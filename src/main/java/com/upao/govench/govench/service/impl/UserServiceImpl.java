@@ -262,7 +262,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         return userMapper.convertToListDTO(users);
     }
-    ///--------------------------///
+
 
     @Override
     public User associateProfileWithUser(int userId, String profileId) {

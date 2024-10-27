@@ -51,8 +51,17 @@ public class ReportServiceImpl implements ReportService {
         int totalUsersInCommunities = countDistinctUsersInCommunities(userCommunities);
         int totalPostsInCommunities = countDistinctUsersInCommunities(userCommunities);
 
-        return reportMapper.toReportResponseDTO(user, totalEvents, newFollowers, connectionsMade,
-                eventsAttended, totalCommunities, totalUsersInCommunities, totalPostsInCommunities);
+        ReportResponseDTO.CommunityStatsDTO communityStatsDTO = new ReportResponseDTO.CommunityStatsDTO();
+        communityStatsDTO.setTotalCommunities(totalCommunities);
+        communityStatsDTO.setTotalUsersInCommunities(totalUsersInCommunities);
+        communityStatsDTO.setTotalPostsInCommunities(totalPostsInCommunities);
+
+        return reportMapper.toReportResponseDTO(
+                totalEvents,
+                newFollowers,
+                connectionsMade,
+                eventsAttended,
+                communityStatsDTO);
     }
 
     private int countDistinctCommunities(List<UserCommunity> userCommunities) {

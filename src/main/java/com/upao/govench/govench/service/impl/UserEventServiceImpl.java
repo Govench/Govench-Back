@@ -11,6 +11,7 @@ import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.UserEventRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.UserEventService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -119,5 +120,18 @@ public class UserEventServiceImpl implements UserEventService {
         return userEventRepository.findUsersByEventId(eventId);
     }
 
+    @Override
+    public UserEvent updateUserEvent(UserEvent userEvent) {
+        // Puedes hacer una verificación para asegurarte de que el evento existe
+        if (!userEventRepository.existsById(userEvent.getId())) {
+            throw new EntityNotFoundException("No se encontró el UserEvent para actualizar.");
+        }
+        return userEventRepository.save(userEvent);  // Esto realizará un update
+    }
 
+    @Override
+    public UserEvent getUserEventbyUserIdAndEventId(Integer userId, Long eventId) {
+        return userEventRepository.findByUserIdAndEventId(userId, eventId)
+                .orElse(null); // Retorna null si no encuentra el registro
+    }
 }

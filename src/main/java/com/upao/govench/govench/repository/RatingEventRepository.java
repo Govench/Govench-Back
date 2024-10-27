@@ -19,5 +19,5 @@ public interface RatingEventRepository extends JpaRepository<RatingEvent, Intege
     @Query("SELECT r FROM RatingEvent r WHERE r.eventId.id = :eventId")
     List<RatingEvent> findRatingsByEventId(@Param("eventId") int eventId);
 
-
+    int countByEventId_IdAndValorPuntuacion(Integer eventId, Integer valorPuntuacion);
 }
