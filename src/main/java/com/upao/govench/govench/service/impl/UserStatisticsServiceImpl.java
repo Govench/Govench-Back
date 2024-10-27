@@ -63,10 +63,10 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return monthlyResponses;
     }
 
-    public Map<Integer, Integer> getUserRatings(Long organizerId) {
+    public Map<Integer, Integer> getUserRatings(Long userId) {
         Map<Integer, Integer> starCounts = new HashMap<>();
         for (int i = 1; i <= 5; i++) {
-            int count = ratingRepository.countByRatedOrganizer_IdAndRatingValue(organizerId, i);
+            int count = ratingRepository.countByRatedUser_IdAndRatingValue(userId, i);
             starCounts.put(i, count);
         }
         return starCounts;
