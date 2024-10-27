@@ -24,13 +24,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final EmailService emailService;
     private final UserEventRepository userEventRepository;
-    private final OrganizerRepository organizerRepository;
-
 
     @Override
     public void sendDailyReminder(User user, Event event) {
         String subject = "\uD83D\uDD14 RECORDATORIO PARA EL EVENTO: " + event.getTittle();
-        String message = buildPersonalizedMessage(user, event, "\uD83D\uDCE8 Tienes un próximo evento.");
+        String message = buildPersonalizedMessage(user, event, "\uD83D\uDCE8 Tienes un próximo evento al que te has inscrito.");
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
@@ -48,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
-    @Scheduled(cron = "*/30 * * * * ?") // Ejecuta el metodo de manera automatica cada 30 seg
+    @Scheduled(cron = "*/10 * * * * ?") // Ejecuta el metodo de manera automatica cada 30 seg
     public void sendReminders() {
         LocalDate now = LocalDate.now();
         List<UserEvent> usersWithNotifications = userEventRepository.findUsersWithNotificationsEnabled(); // Obtiene aquellos con la notificacion activada...
@@ -98,10 +96,11 @@ public class NotificationServiceImpl implements NotificationService {
     private String buildPersonalizedMessage(User user, Event event, String reminderText) {
         String greeting = generateGreeting(user);
         String eventDetails = generateEventDetails(event);
+        String signature = generateSignature();
 
         // Combine greeting, reminder, and event details
-        return String.format("%s,\n\n%s\n\n%s",
-                greeting, reminderText, eventDetails, generateSignature());
+        return String.format("%s,\n\n%s\n\n%s\n\n\n%s",
+                greeting, reminderText, eventDetails, signature);
     }
 
     private String generateGreeting(User user) {
@@ -133,7 +132,7 @@ public class NotificationServiceImpl implements NotificationService {
         return "Atentamente,\n" +
                 " Govench Team\n" +
                 "\uD83C\uDF10 www.govench.com\n" +
-                "\uD83D\uDCDE +990 099 990\n" +
+                "\uD83D\uDCDE +51 990 099 990\n" +
                 "\uD83D\uDCE7 govench6@gmail.com";
     }
 }
