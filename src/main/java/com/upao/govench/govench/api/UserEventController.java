@@ -1,8 +1,11 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.mapper.UserEventMapper;
 import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.EventResponseDTO;
+import com.upao.govench.govench.model.dto.OwnerResponseDTO;
 import com.upao.govench.govench.model.dto.ParticipantDTO;
+import com.upao.govench.govench.model.dto.UserEventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.EventRepository;
@@ -52,28 +55,28 @@ public class UserEventController{
     private UserMapper userMapper;
 
     @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private UserRepository userRepository;
+    private UserEventMapper userEventMapper;
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping
-    public List<UserEvent> getAllUserEvents() {
-        return userEventService.getAllUserEvents();
+    @GetMapping("/myInscriptions")
+    public List<UserEventResponseDTO> getMyInscriptions() {
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
+        User user= userService.getUserbyId(iduser);
+        return userEventMapper.userEventResponseDTOList(userEventService.getUserEventbyUser(user));
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/user/{iduser}")
-    public List<UserEvent> getUserEventbyUser(@PathVariable int iduser) {
+    public List<UserEventResponseDTO> getUserEventbyUser(@PathVariable int iduser) {
         User user= userService.getUserbyId(iduser);
-        return userEventService.getUserEventbyUser(user);
+        return userEventMapper.userEventResponseDTOList(userEventService.getUserEventbyUser(user));
     }
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/event/{idevent}")
-    public List<UserEvent> getUserEventbyEvent(@PathVariable int idevent) {
+    public List<OwnerResponseDTO> getUserEventbyEvent(@PathVariable int idevent) {
         Event event= eventServiceImpl.getEventById(idevent);
-        return userEventService.getUserEventbyEvent(event);
+        return userEventMapper.userOwnerResponseDTOList(userEventService.getUserEventbyEvent(event));
     }
 
     @PostMapping("/{idevent}")
@@ -164,24 +167,11 @@ public class UserEventController{
         }
     }
 
-    private Integer getAuthenticatedUserIdFromJWT() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String token = (String) authentication.getCredentials();
-            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
-            String email = claims.getSubject();
-
-            User user = userRepository.findByEmail(email).orElse(null);
-            return user != null ? user.getId() : null;
-        }
-        return null;
-    }
 
     @GetMapping("/history")
     public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId() {
         // Obtener el ID del usuario autenticado desde el token JWT
-        Integer userId = getAuthenticatedUserIdFromJWT();
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
 
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

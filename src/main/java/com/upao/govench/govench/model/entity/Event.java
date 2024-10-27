@@ -38,9 +38,6 @@ public class Event {
     @Column(name = "eve_end_time", nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "eve_sta_vc", nullable = false)
-    private String state;
-
     @Column(name = "eve_typ_vc", nullable = false)
     private String type;
 
