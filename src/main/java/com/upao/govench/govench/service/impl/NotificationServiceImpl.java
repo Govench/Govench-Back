@@ -3,6 +3,8 @@ package com.upao.govench.govench.service.impl;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.UserEvent;
+import com.upao.govench.govench.repository.EventRepository;
+import com.upao.govench.govench.repository.OrganizerRepository;
 import com.upao.govench.govench.repository.UserEventRepository;
 import com.upao.govench.govench.service.NotificationService;
 import com.upao.govench.govench.service.EmailService;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -21,26 +24,27 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final EmailService emailService;
     private final UserEventRepository userEventRepository;
+    private final OrganizerRepository organizerRepository;
 
 
     @Override
     public void sendDailyReminder(User user, Event event) {
-        String subject = "RECORDATORIO PARA EL EVENTO: " + event.getTittle();
-        String message = buildPersonalizedMessage(user, event, "Tienes un próximo evento.");
+        String subject = "\uD83D\uDD14 RECORDATORIO PARA EL EVENTO: " + event.getTittle();
+        String message = buildPersonalizedMessage(user, event, "\uD83D\uDCE8 Tienes un próximo evento.");
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
     @Override
     public void sendSameDayReminder(User user, Event event, int hoursBeforeEvent) {
-        String subject = "RECORDATORIO PARA EL EVENTO DE HOY!";
-        String message = buildPersonalizedMessage(user, event, "¡Recuerda! El evento comenzará en " + hoursBeforeEvent + " horas.");
+        String subject = "\uD83D\uDD14 RECORDATORIO PARA EL EVENTO DE HOY!";
+        String message = buildPersonalizedMessage(user, event, "\uD83D\uDCE8 ¡Recuerda! El evento comenzará en " + hoursBeforeEvent + " horas.");
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
     @Override
     public void sendFinalReminder(User user, Event event) {
-        String subject = "¡ÚLTIMO RECORDATORIO! EL EVENTO ESTÁ POR COMENZAR";
-        String message = buildPersonalizedMessage(user, event, "El evento está a punto de comenzar. ¡Te esperamos!");
+        String subject = "\uD83D\uDD14 ¡ÚLTIMO RECORDATORIO! EL EVENTO ESTÁ POR COMENZAR";
+        String message = buildPersonalizedMessage(user, event, "\uD83D\uDCE8 El evento está a punto de comenzar. ¡Te esperamos!");
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
@@ -97,16 +101,16 @@ public class NotificationServiceImpl implements NotificationService {
 
         // Combine greeting, reminder, and event details
         return String.format("%s,\n\n%s\n\n%s",
-                greeting, reminderText, eventDetails);
+                greeting, reminderText, eventDetails, generateSignature());
     }
 
     private String generateGreeting(User user) {
         if (user.getOrganizer() != null && user.getOrganizer().getName() != null) {
-            return "Hola " + user.getOrganizer().getName() + "!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola " + user.getOrganizer().getName() + "!"; // Icono de saludo
         } else if (user.getParticipant() != null && user.getParticipant().getName() != null) {
-            return "Hola " + user.getParticipant().getName() + "!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola " + user.getParticipant().getName() + "!"; // Icono de saludo
         } else {
-            return "Hola Administrador!"; // Icono de saludo
+            return "\uD83D\uDC4B Hola Administrador!"; // Icono de saludo
         }
     }
 
@@ -119,10 +123,17 @@ public class NotificationServiceImpl implements NotificationService {
                 : "Ubicación no disponible";
 
         return "Detalles del Evento:\n" +
-                "\tTítulo: " + event.getTittle() + "\n" +
-                "\tFecha: " + event.getDate() + "\n" +
-                "\tHora: " + event.getStartTime() + "\n" +
-                "\tLugar: " + location + "\n" +
-                "\tDescripción: " + event.getDescription();
+                "\uD83C\uDF7E Título: " + event.getTittle() + "\n" +
+                "\uD83D\uDCC5 Fecha: " + event.getDate() + "\n" +
+                "\uD83D\uDD50 Hora: " + event.getStartTime() + "\n" +
+                "\uD83C\uDFE6 Lugar: " + location + "\n" +
+                "\uD83D\uDCDD Descripción: " + event.getDescription();
+    }
+    private String generateSignature() {
+        return "Atentamente,\n" +
+                " Govench Team\n" +
+                "\uD83C\uDF10 www.govench.com\n" +
+                "\uD83D\uDCDE +990 099 990\n" +
+                "\uD83D\uDCE7 govench6@gmail.com";
     }
 }
