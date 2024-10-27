@@ -53,7 +53,7 @@ public class PostController {
     public ResponseEntity<Map<String, String>> createPost(@PathVariable("communityId") int communityId,
                                                           @RequestBody PostRequestDTO postRequestDTO) {
 
-        Integer userId = getAuthenticatedUserIdFromJWT();
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
 
         if (userId == null) {
             return new ResponseEntity<>(Map.of("message", "Acceso denegado: Usuario no autenticado"), HttpStatus.FORBIDDEN);
@@ -80,30 +80,8 @@ public class PostController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @Autowired
-    private TokenProvider tokenProvider;
-    @Autowired
-    private UserRepository userRepository;
 
-    private Integer getAuthenticatedUserIdFromJWT() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String token = (String) authentication.getCredentials();
-
-
-            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
-            String email = claims.getSubject();
-
-
-            User user = userRepository.findByEmail(email).orElse(null);
-            return user != null ? user.getId() : null;
-        }
-        return null;
-    }
-
-
-    @GetMapping("/{postId}")
+    @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDTO> obtenerPostPorId(@PathVariable("postId") int postId) {
         try {
             PostResponseDTO post = postServiceImpl.getPostById(postId);
@@ -132,14 +110,12 @@ public class PostController {
     }
 
 
-
-
     @DeleteMapping("/community/{communityId}/posts/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable("communityId") int communityId,
                                              @PathVariable("postId") int postId) {
         try {
             // Obtener el ID del usuario autenticado desde el JWT
-            Integer userId = getAuthenticatedUserIdFromJWT();
+            Integer userId = userService.getAuthenticatedUserIdFromJWT();
 
             // Verificar que el usuario esté autenticado
             if (userId == null) {
@@ -172,14 +148,13 @@ public class PostController {
         }
     }
 
-
     @PutMapping("/community/{communityId}/posts/{postId}")
     public ResponseEntity<String> updatePost(@PathVariable("communityId") int communityId,
                                              @PathVariable("postId") int postId,
                                              @RequestBody PostRequestDTO postRequestDTO) {
         try {
             // Obtener el ID del usuario autenticado desde el JWT
-            Integer userId = getAuthenticatedUserIdFromJWT();
+            Integer userId = userService.getAuthenticatedUserIdFromJWT();
 
             // Verificar que el usuario esté autenticado
             if (userId == null) {

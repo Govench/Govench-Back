@@ -17,6 +17,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +32,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
-
+    private final LocationRepository locationRepository;
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
         List<Event> events = eventRepository.findAll();
@@ -57,6 +60,24 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
+        if(eventRequestDTO.getDate().isBefore(LocalDate.now()))
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con fecha pasada");
+        }
+        if(eventRequestDTO.getStartTime().isBefore(LocalTime.now()))
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con una hora pasada");
+        }
+        if (eventRequestDTO.getEndTime().isBefore(eventRequestDTO.getStartTime())) {
+            throw new IllegalArgumentException("La hora de fin del evento debe ser mayor que la del inicio");
+        }
+        if (Duration.between(eventRequestDTO.getStartTime(), eventRequestDTO.getEndTime()).toHours() < 2) {
+            throw new IllegalArgumentException("El evento debe durar mínimo 2 horas");
+        }
+        if(eventRequestDTO.getMaxCapacity() <=0)
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con una capacidad menor a 0");
+        }
         Event event = eventMapper.convertToEntity(eventRequestDTO);
         eventRepository.save(event);
         return eventMapper.convertToDTO(event);
@@ -71,10 +92,9 @@ public class EventServiceImpl implements EventService {
         if(eventRequestDTO.getDate()!= null)event.setDate(eventRequestDTO.getDate());
         if(eventRequestDTO.getStartTime()!= null)event.setStartTime(eventRequestDTO.getStartTime());
         if(eventRequestDTO.getEndTime()!= null)event.setEndTime(eventRequestDTO.getEndTime());
-        if(eventRequestDTO.getState()!= null)event.setState(eventRequestDTO.getState());
         if(eventRequestDTO.getType()!= null)event.setType(eventRequestDTO.getType());
         if(eventRequestDTO.getCost()!= null)event.setCost(eventRequestDTO.getCost());
-        if(eventRequestDTO.getLocation()!= null)event.setLocation(eventRequestDTO.getLocation());
+        if(eventRequestDTO.getLocation()!= null)event.setLocation(locationRepository.findById(eventRequestDTO.getLocation()).orElse(null));
 
         event = eventRepository.save(event);
 

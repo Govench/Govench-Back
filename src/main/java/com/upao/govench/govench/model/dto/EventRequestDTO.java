@@ -35,9 +35,6 @@ public class EventRequestDTO {
     @NotBlank(message = "La hora de fin no puede estar vacía")
     private LocalTime endTime;
 
-    @NotBlank(message = "El estado no puede estar vacío")
-    private String state;
-
     @NotBlank(message = "El tipo no puede estar vacio")
     private String type;
 
@@ -46,7 +43,7 @@ public class EventRequestDTO {
 
     private BigDecimal cost;
 
-    private Location location;
+    private Integer location;
 
     @NotNull(message = "La capacidad máxima no puede estar vacía")
     @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
