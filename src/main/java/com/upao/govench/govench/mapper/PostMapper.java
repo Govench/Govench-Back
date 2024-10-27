@@ -2,11 +2,14 @@
 package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.model.entity.Post;
+import com.upao.govench.govench.model.entity.User;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -50,5 +53,14 @@ public class PostMapper {
         return posts.stream()
                 .map(this::convertToDTO)
                 .toList();
+    }
+
+    public Post toEntity(PostRequestDTO postRequestDTO, User author, Community community) {
+        Post post = new Post();
+        post.setBody(postRequestDTO.getBody());
+        post.setAutor(author);
+        post.setComunidad(community);
+        post.setCreated(LocalDate.now());
+        return post;
     }
 }

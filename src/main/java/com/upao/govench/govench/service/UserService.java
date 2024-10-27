@@ -2,7 +2,9 @@ package com.upao.govench.govench.service;
 
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.upao.govench.govench.model.dto.*;
-import com.upao.govench.govench.model.entity.*;
+import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.Rating;
+import com.upao.govench.govench.model.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,10 +23,10 @@ public interface UserService {
 
     void SubscribePremium(Integer id);
     void DesubscribePremium();
+
     //Autenticar el login
     AuthResponseDTO login(LoginDTO loginDTO);
-
-     Integer getAuthenticatedUserIdFromJWT();
+    Integer getAuthenticatedUserIdFromJWT();
 
 
     List<UserResponseDTO> getAllUsers();
@@ -40,9 +42,9 @@ public interface UserService {
 
     void rateUser(Integer raterUserId, Integer ratedUserId, Integer ratingValue, String comment);
     List<Rating> getUserRatings(Integer userId);
-
+    List<Rating> getUserRated (Integer userId);
     RatingEventResponseDTO createRatingEvent(User  userId, Event eventId, RatingEventRequestDTO ratingEventRequestDTO);
 
-    Integer getUserIdByEmail(String email);
-    Organizer getOrganizerProfileByEmail(String email);
+    List<FollowResponseDTO> getFollowers();
+    List<FollowResponseDTO> getFollowings();
 }

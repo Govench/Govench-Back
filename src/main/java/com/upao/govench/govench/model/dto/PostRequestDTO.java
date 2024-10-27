@@ -17,14 +17,6 @@ public class PostRequestDTO {
 
     @NotBlank(message = "La Descripcion no puede estar vacia")
     private String body;
-
-    @NotNull(message = "El autor no puede ser nulo")
-    private User autor;
-
-    @NotNull(message = "La comunidad no puede ser nula")
-    private Community comunidad;
-
-    private LocalDate created;
 }
 
 

@@ -11,6 +11,7 @@ import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.service.PostService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,6 +85,11 @@ public class PostServiceImpl implements PostService {
     public void save(Post post) {
         postRepository.save(post);
     }
+
+    public void publicarPost(Post post) {
+        postRepository.save(post);
+    }
+
 
 }
 

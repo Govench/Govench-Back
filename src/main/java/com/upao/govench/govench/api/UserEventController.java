@@ -6,14 +6,19 @@ import com.upao.govench.govench.model.dto.ParticipantDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.EventRepository;
+import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
 import com.upao.govench.govench.service.impl.UserEventServiceImpl;
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
@@ -45,6 +50,12 @@ public class UserEventController{
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private TokenProvider tokenProvider;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
@@ -152,10 +163,30 @@ public class UserEventController{
             );
         }
     }
-  
-    // Este endpoint devuelve el historial de eventos de un usuario por su ID
-    @GetMapping("/history/{userId}")
-    public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId(@PathVariable Integer userId) {
+
+    private Integer getAuthenticatedUserIdFromJWT() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = (String) authentication.getCredentials();
+            Claims claims = tokenProvider.getJwtParser().parseClaimsJws(token).getBody();
+            String email = claims.getSubject();
+
+            User user = userRepository.findByEmail(email).orElse(null);
+            return user != null ? user.getId() : null;
+        }
+        return null;
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<EventResponseDTO>> getEventHistoryByUserId() {
+        // Obtener el ID del usuario autenticado desde el token JWT
+        Integer userId = getAuthenticatedUserIdFromJWT();
+
+        if (userId == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         List<EventResponseDTO> eventHistory = userEventService.getEventHistory(userId);
         if (eventHistory.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

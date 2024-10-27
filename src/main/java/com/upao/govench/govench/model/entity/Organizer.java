@@ -55,13 +55,6 @@ public class Organizer{
     @Column(name = "or_profile_id", nullable = true)
     private String profileId; // Referencia al ID del perfil en MongoDB
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "raterOrganizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> givenRatingsToParticipants;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "ratedOrganizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> receivedRatingsFromParticipants;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
