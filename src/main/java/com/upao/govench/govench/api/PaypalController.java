@@ -67,6 +67,7 @@ public class PaypalController {
             return "/error?status=error";
         }
     }
+
     @PreAuthorize("hasAnyRole('ORGANIZER','PARTICIPANT')")
     @PostMapping("/subscribe")
     public String  paySubscription() {
@@ -117,7 +118,6 @@ public class PaypalController {
         }
     }
 
-
     @GetMapping("/payment")
     public String handlePayment(@RequestParam String token, @RequestParam int eventId, @RequestParam int userId) {
         try {
@@ -138,55 +138,6 @@ public class PaypalController {
         } catch (IOException e) {
             e.printStackTrace();
             return "Ocurrió un error durante el proceso de pago.";
-        }
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER','PARTICIPANT')")
-    @GetMapping("/pay-event/{eventId}")
-    public String handleEventPayment(@PathVariable int eventId) {
-
-        // Retrieve event by ID
-        Event event = eventServiceImpl.getEventById(eventId);
-        Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        LocalDateTime localDateTime = LocalDateTime.of(event.getDate(), event.getEndTime());
-        String returnUrl = "http://localhost:8080/api/v1/payments/payment?eventId=" + eventId+"&userId="+userId.toString();
-        String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
-
-        if (event == null)
-        {
-            throw new NotFoundException("El evento no existe");
-        }
-
-        if (localDateTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("El evento ya no está disponible.");
-        }
-        UserEvent existingEvent = userEventService.searchUserEventById(new IdCompuestoU_E(userId, eventId));
-        if (existingEvent != null) {
-            throw new IllegalArgumentException("Ya estas registrado en este evento");
-        }
-        // Check if the event has a price
-        BigDecimal eventPrice = event.getCost();
-
-        if (eventPrice.compareTo(BigDecimal.ZERO) == 0) {
-            return "This event is free.";
-        }
-
-        User user = userService.getUserbyId(userId);
-
-        if (user.getPremium())
-        {
-            createUserEvent(userId, eventId);
-            return "Inscrito correctamente, no se te cobrara por este evento";
-        }
-
-        double eventPriceDouble = eventPrice.doubleValue();
-        // Generate the PayPal order for the event price
-        try {
-            String approvalUrl = paypalService.createOrder(eventPriceDouble, returnUrl, cancelUrl);
-            return "https://www.sandbox.paypal.com/checkoutnow?token=" + approvalUrl;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error occurred during payment process.";
         }
     }
 
@@ -221,8 +172,6 @@ public class PaypalController {
                             false  // Recordatorio final enviado (inicialmente false)
                     )
             );
-
-
     }
 
 }
