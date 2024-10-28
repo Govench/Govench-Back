@@ -9,20 +9,14 @@ import com.upao.govench.govench.model.dto.UserEventResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.EventRepository;
-import com.upao.govench.govench.repository.UserRepository;
-import com.upao.govench.govench.security.TokenProvider;
+import com.upao.govench.govench.service.PaypalService;
 import com.upao.govench.govench.service.UserService;
 import com.upao.govench.govench.service.impl.EventServiceImpl;
-import com.upao.govench.govench.service.impl.RegisterConfirmationImpl;
-import com.upao.govench.govench.service.impl.UserEventServiceImpl;
-import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.upao.govench.govench.model.entity.UserEvent;
 import com.upao.govench.govench.model.entity.IdCompuestoU_E;
@@ -31,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -40,6 +35,8 @@ import java.util.List;
 @RequestMapping("/inscription")
 @PreAuthorize("hasAnyRole('PARTICIPANT', 'ORGANIZER')")
 public class UserEventController{
+    @Autowired
+    public PaypalService paypalService;
     @Autowired
     private EventServiceImpl eventService;
     @Autowired
@@ -80,19 +77,18 @@ public class UserEventController{
         return userEventMapper.userOwnerResponseDTOList(userEventService.getUserEventbyEvent(event));
     }
 
-    @PostMapping("/{idevent}")
-    public ResponseEntity<String> createUserEvent(@PathVariable int idevent) {
-        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
-        // Consultar el usuario por su ID
-        User user = userService.getUserbyId(iduser);
-        if (user == null) {
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND); // Si el usuario no existe
-        }
 
-        // Consultar el evento por su ID
+    @PostMapping("/{idevent}")
+    public ResponseEntity<String> registerOrPayForEvent(@PathVariable int idevent) {
+        Integer iduser = userService.getAuthenticatedUserIdFromJWT();
+        User user = userService.getUserbyId(iduser);
         Event event = eventService.getEventById(idevent);
+
+        if (user == null) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
         if (event == null) {
-            return new ResponseEntity<>("Evento no encontrado", HttpStatus.NOT_FOUND); // Si el evento no existe
+            return new ResponseEntity<>("Evento no encontrado", HttpStatus.NOT_FOUND);
         }
 
         // Verificar si la relación ya existe
@@ -108,6 +104,10 @@ public class UserEventController{
         if (systemDate.isBefore(event.getDate()) ||
                 (systemDate.isEqual(event.getDate()) && systemTime.isBefore(event.getStartTime()))) {
 
+            if (event.getCost().doubleValue() != 0 && !user.getPremium()) {
+                String paymentUrl = handleEventPayment(idevent);
+                return new ResponseEntity<>(paymentUrl, HttpStatus.OK);
+            }
             // Crear la nueva relación entre usuario y evento
             UserEvent createdUserEvent = userEventService.addUserEvent(
                     new UserEvent(new IdCompuestoU_E(iduser, idevent), // ID compuesto
@@ -125,6 +125,21 @@ public class UserEventController{
 
         } else {
             return new ResponseEntity<>("No se puede realizar la inscripción porque el evento ya no acepta más inscripciones.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private String handleEventPayment(int eventId) {
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
+        String returnUrl = "http://localhost:8080/api/v1/payments/payment?eventId=" + eventId + "&userId=" + userId.toString();
+        String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
+
+        BigDecimal eventCost = eventService.getEventById(eventId).getCost();
+        try {
+            String approvalUrl = paypalService.createOrder(eventCost.doubleValue(), returnUrl, cancelUrl);
+            return "https://www.sandbox.paypal.com/checkoutnow?token=" + approvalUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error al procesar el pago.";
         }
     }
 
@@ -219,7 +234,5 @@ public class UserEventController{
         List<ParticipantDTO> participants = userMapper.getParticipantsByEvent(userEventService.getParticipantsByEvent(idevent));
         return new ResponseEntity<>(participants, HttpStatus.OK);
     }
-
-
 
 }

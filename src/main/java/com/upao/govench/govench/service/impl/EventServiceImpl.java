@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -64,11 +65,13 @@ public class EventServiceImpl implements EventService {
         {
             throw new IllegalArgumentException("No puedes crear un evento con fecha pasada");
         }
-        if(eventRequestDTO.getStartTime().isBefore(LocalTime.now()))
+        LocalDateTime localDateStartTime = LocalDateTime.of(eventRequestDTO.getDate(),eventRequestDTO.getStartTime());
+        LocalDateTime localDateEndTime = LocalDateTime.of(eventRequestDTO.getDate(),eventRequestDTO.getEndTime());
+        if(localDateStartTime.isBefore(LocalDateTime.now()))
         {
             throw new IllegalArgumentException("No puedes crear un evento con una hora pasada");
         }
-        if (eventRequestDTO.getEndTime().isBefore(eventRequestDTO.getStartTime())) {
+        if (localDateEndTime.isBefore(localDateStartTime)) {
             throw new IllegalArgumentException("La hora de fin del evento debe ser mayor que la del inicio");
         }
         if (Duration.between(eventRequestDTO.getStartTime(), eventRequestDTO.getEndTime()).toHours() < 2) {
