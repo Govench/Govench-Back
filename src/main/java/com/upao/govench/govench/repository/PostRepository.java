@@ -12,6 +12,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p FROM Post p WHERE p.comunidad.id = :communityId")
     List<Post> findPostsByCommunityId(@Param("communityId") int communityId);
-    int countByAutor_IdAndCreated(Long autorId, LocalDate created);
+    int countByAutor_IdAndCreated(Integer autorId, LocalDate created);
 }
 

@@ -46,7 +46,7 @@ public class PDFService {
             document.add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()));
 
             // Generar gráfico de respuestas semanales
-            byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart((long) userId);
+            byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart(userId);
             if (weeklyChart != null) {
                 ImageData chartImageData = ImageDataFactory.create(weeklyChart);
                 Image chartImage = new Image(chartImageData);
@@ -56,7 +56,7 @@ public class PDFService {
             }
 
             // Generar gráfico de respuestas mensuales
-            byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart((long) userId);
+            byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart(userId);
             if (monthlyChart != null) {
                 ImageData chartImageData = ImageDataFactory.create(monthlyChart);
                 Image chartImage = new Image(chartImageData);
@@ -65,7 +65,7 @@ public class PDFService {
                 System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
-            byte[] starRatingChart = graphServiceImpl.generateUserStarChart((long) userId);
+            byte[] starRatingChart = graphServiceImpl.generateUserStarChart(userId);
             if(starRatingChart != null){
                 ImageData charImageData = ImageDataFactory.create(starRatingChart);
                 Image chartImage = new Image(charImageData);
@@ -74,7 +74,7 @@ public class PDFService {
                 System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
-            List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts((long) userId);
+            List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts(userId);
             if (eventRatingCharts != null && !eventRatingCharts.isEmpty()) {
                 for (byte[] chartBytes : eventRatingCharts) {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
