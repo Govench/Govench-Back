@@ -4,15 +4,15 @@ import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.EventMapper;
 import com.upao.govench.govench.mapper.LocationMapper;
 import com.upao.govench.govench.mapper.RatingEventMapper;
-import com.upao.govench.govench.model.dto.EventRequestDTO;
-import com.upao.govench.govench.model.dto.EventResponseDTO;
-import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Event;
+import com.upao.govench.govench.model.entity.Location;
 import com.upao.govench.govench.model.entity.RatingEvent;
 import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.LocationRepository;
 import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.service.EventService;
+import com.upao.govench.govench.service.LocationService;
 import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,8 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
-    private final LocationRepository locationRepository;
+    private final LocationService locationService;
+    private final LocationMapper locationMapper;
     private final UserService userService;
 
     @Transactional(readOnly = true)
@@ -84,6 +85,7 @@ public class EventServiceImpl implements EventService {
         {
             throw new IllegalArgumentException("No puedes crear un evento con una capacidad menor a 0");
         }
+
         Event event = eventMapper.convertToEntity(eventRequestDTO);
         eventRepository.save(event);
         return eventMapper.convertToDTO(event);
@@ -100,10 +102,15 @@ public class EventServiceImpl implements EventService {
         if(eventRequestDTO.getEndTime()!= null)event.setEndTime(eventRequestDTO.getEndTime());
         if(eventRequestDTO.getType()!= null)event.setType(eventRequestDTO.getType());
         if(eventRequestDTO.getCost()!= null)event.setCost(eventRequestDTO.getCost());
-        if(eventRequestDTO.getLocation()!= null)event.setLocation(locationRepository.findById(eventRequestDTO.getLocation()).orElse(null));
+        LocationRequestDTO location = new LocationRequestDTO();
+        if(eventRequestDTO.getDepartment()!= null ) location.setDepartament(eventRequestDTO.getDepartment());
+        if(eventRequestDTO.getAddress()!= null ) location.setAddress(eventRequestDTO.getAddress());
+        if(eventRequestDTO.getProvince()!= null) location.setProvince(eventRequestDTO.getProvince());
+        if(eventRequestDTO.getDistrict()!= null) location.setDistrict(eventRequestDTO.getDistrict());
 
+        LocationResponseDTO locationResponseDTO =locationService.updateLocation(event.getLocation().getId(),location);
+        event.setLocation(locationMapper.convertToEntity(locationResponseDTO));
         event = eventRepository.save(event);
-
         return eventMapper.convertToDTO(event);
     }
 

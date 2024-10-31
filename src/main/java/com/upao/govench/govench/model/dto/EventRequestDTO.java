@@ -43,7 +43,10 @@ public class EventRequestDTO {
 
     private BigDecimal cost;
 
-    private Integer location;
+    private String address;
+    private String department;
+    private String province;
+    private String district;
 
     @NotNull(message = "La capacidad máxima no puede estar vacía")
     @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
