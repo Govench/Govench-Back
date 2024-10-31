@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.upao.govench</groupId>
-    <artifactId>Govench</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>Govench</name>
+    <artifactId>govench-api</artifactId>
+    <version>0.0.1</version>
+    <name>govench-api</name>
     <description>Govench</description>
     <url/>
     <licenses>

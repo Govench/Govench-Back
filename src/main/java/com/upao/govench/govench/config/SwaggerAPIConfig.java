@@ -21,13 +21,18 @@ import java.util.List;
 public class SwaggerAPIConfig {
     @Value("${Govench.openapi.dev-url}")
     private String devurl="http://localhost:8080/api/v1";
-
+    @Value("${Govench.openapi.prod-url}")
+    private String produrl = "https://govench-api.onrender.com";
 
     @Bean
     public OpenAPI myOpenAPI() {
         Server devServer = new Server();
         devServer.setUrl(devurl);
         devServer.setDescription("OpenAPI Dev Server");
+
+        Server prodServer = new Server();
+        prodServer.setUrl(produrl);
+        prodServer.setDescription("OpenAPI Prod Server");
 
         //Contacto
         Contact contact = new Contact();
@@ -59,7 +64,7 @@ public class SwaggerAPIConfig {
 
         return new OpenAPI()
                 .info(info)
-                .servers(List.of(devServer))
+                .servers(List.of(devServer,prodServer))
                 .addSecurityItem(securityRequirement)
                 .components(components);
     }

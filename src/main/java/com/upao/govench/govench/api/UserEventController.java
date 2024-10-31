@@ -130,7 +130,7 @@ public class UserEventController{
 
     private String handleEventPayment(int eventId) {
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        String returnUrl = "http://localhost:8080/api/v1/payments/payment?eventId=" + eventId + "&userId=" + userId.toString();
+        String returnUrl = "https://govench-api.onrender.com/api/v1/payments/payment?eventId=" + eventId + "&userId=" + userId.toString();
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
 
         BigDecimal eventCost = eventService.getEventById(eventId).getCost();

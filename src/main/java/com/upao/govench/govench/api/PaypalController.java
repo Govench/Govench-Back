@@ -49,7 +49,8 @@ public class PaypalController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-order")
     public String  createOrder(@RequestParam double totalAmount) {
-        String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment";
+        String returnUrl = "https://govench-api.onrender.com/api/v1/admin/payments/payment";
+        //String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment";
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         try {
             String orderId = paypalService.createOrder(totalAmount, returnUrl, cancelUrl);
@@ -73,7 +74,7 @@ public class PaypalController {
     public String  paySubscription() {
         double totalAmount = 50; //La subscripcion valdra 50 solsitos
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        String returnUrl = "http://localhost:8080/api/v1/payments/subscription?userId="+userId.toString();
+        String returnUrl = "https://govench-api.onrender.com/api/v1/payments/subscription?userId="+userId.toString();
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         User user = userService.getUserbyId(userId);
         try {
@@ -140,26 +141,22 @@ public class PaypalController {
             return "Ocurrió un error durante el proceso de pago.";
         }
     }
-
     public void createUserEvent(int iduser, int idevent) {
         // Consultar el usuario por su ID
         User user = userService.getUserbyId(iduser);
         if (user == null) {
             throw new NotFoundException("El usuario no existe");
               }
-
         // Consultar el evento por su ID
         Event event = eventService.getEventById(idevent);
         if (event == null) {
             throw new NotFoundException("El evento no existe");
              }
-
         // Verificar si la relación ya existe
         UserEvent existingEvent = userEventService.searchUserEventById(new IdCompuestoU_E(iduser, idevent));
         if (existingEvent != null) {
             throw new IllegalArgumentException("Ya estas registrado ");
                }
-
             // Crear la nueva relación entre usuario y evento
             UserEvent createdUserEvent = userEventService.addUserEvent(
                     new UserEvent(new IdCompuestoU_E(iduser, idevent), // ID compuesto
