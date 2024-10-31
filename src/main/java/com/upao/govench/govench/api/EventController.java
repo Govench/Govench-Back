@@ -53,4 +53,9 @@ public class EventController{
 
         return new ResponseEntity<>(ratingEvents, HttpStatus.OK);
     }
+    @GetMapping("/myEvents")
+    public ResponseEntity<List<EventResponseDTO>> getMyEvents() {
+        List<EventResponseDTO> myEvents = eventServiceImpl.getEventobyUser();
+        return new ResponseEntity<>(myEvents, HttpStatus.OK);
+    }
 }

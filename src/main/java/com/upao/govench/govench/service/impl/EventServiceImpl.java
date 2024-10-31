@@ -13,6 +13,7 @@ import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.LocationRepository;
 import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.service.EventService;
+import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,8 @@ public class EventServiceImpl implements EventService {
     private final RatingEventRepository ratingEventRepository;
     private final RatingEventMapper ratingEventMapper;
     private final LocationRepository locationRepository;
+    private final UserService userService;
+
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
         List<Event> events = eventRepository.findAll();
@@ -113,6 +116,13 @@ public class EventServiceImpl implements EventService {
     public List<RatingEventResponseDTO> getRatingEvents(Event eventId) {
         List<RatingEvent> ratingEvents = ratingEventRepository.findRatingEventByEventId(eventId);
         return ratingEventMapper.convertToListDTO(ratingEvents);
+    }
+
+    public List<EventResponseDTO> getEventobyUser (){
+        // Obtener todos los eventos creados por el usuario
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
+        List<Event> events = eventRepository.findByOwner_Id(userId);
+        return eventMapper.convertToListDTO(events);
     }
 
 }

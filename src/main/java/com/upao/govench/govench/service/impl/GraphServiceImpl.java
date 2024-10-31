@@ -31,7 +31,7 @@ public class GraphServiceImpl implements GraphService {
     @Autowired
     private EventServiceImpl eventServiceImpl;
 
-    public byte[] generateMonthlyPostChart(Long userId) {
+    public byte[] generateMonthlyPostChart(Integer userId) {
         // Obtenemos los datos de respuestas mensuales
         Map<String, Integer> monthlyResponses = userStatisticsService.getMonthlyPost(userId);
 
@@ -50,7 +50,7 @@ public class GraphServiceImpl implements GraphService {
         return createChartImage(chart);
     }
 
-    public byte[] generateWeeklyPostChart(Long userId) {
+    public byte[] generateWeeklyPostChart(Integer userId) {
         // Obtenemos los datos de respuestas semanales
         Map<String, Integer> weeklyResponses = userStatisticsService.getWeeklyPost(userId);
 
@@ -73,7 +73,7 @@ public class GraphServiceImpl implements GraphService {
         return createChartImage(chart);
     }
 
-    public byte[] generateUserStarChart(Long userId) {
+    public byte[] generateUserStarChart(Integer userId) {
         Map<Integer, Integer> userRatings = userStatisticsService.getUserRatings(userId);
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -91,7 +91,7 @@ public class GraphServiceImpl implements GraphService {
         return createChartImage(chart);
     }
 
-    public List<byte[]> generateEventStarCharts(Long userId) {
+    public List<byte[]> generateEventStarCharts(Integer userId) {
         // Obtener las calificaciones de eventos por usuario
         Map<Integer, Map<Integer, Integer>> eventStarCounts = userStatisticsService.getUserEventRatingsByEvent(userId);
 

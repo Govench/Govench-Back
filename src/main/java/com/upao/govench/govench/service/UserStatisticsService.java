@@ -9,8 +9,8 @@ import java.util.Map;
 
 @Service
 public interface UserStatisticsService {
-    Map<String, Integer>  getWeeklyPost(Long userId);
-    Map<String, Integer>  getMonthlyPost(Long userId);
-    Map<Integer, Integer> getUserRatings(Long userId);
-    Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Long userId);
+    Map<String, Integer>  getWeeklyPost(Integer userId);
+    Map<String, Integer>  getMonthlyPost(Integer userId);
+    Map<Integer, Integer> getUserRatings(Integer userId);
+    Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Integer userId);
 }

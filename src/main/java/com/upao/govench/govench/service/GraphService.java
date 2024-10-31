@@ -8,8 +8,8 @@ import java.util.Map;
 
 @Service
 public interface GraphService {
-    byte[] generateWeeklyPostChart(Long userId);
-    byte[] generateMonthlyPostChart(Long userId);
-    byte[] generateUserStarChart(Long userId);
-    List<byte[]> generateEventStarCharts(Long userId);
+    byte[] generateWeeklyPostChart(Integer userId);
+    byte[] generateMonthlyPostChart(Integer userId);
+    byte[] generateUserStarChart(Integer userId);
+    List<byte[]> generateEventStarCharts(Integer userId);
 }
