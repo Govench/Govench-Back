@@ -48,9 +48,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // TODO: Permitir acceso público a las rutas de login, registro y endpoints públicos como Swagger UI
                         .requestMatchers(antMatcher("/auth/login")).permitAll()
-                        //.requestMatchers(antMatcher("/auth/register/organizer")).permitAll() // Solo el admin puede registrar organizadores , asi fue mencionado en el video.
                         .requestMatchers(antMatcher("/auth/register/participant")).permitAll()
-                        .requestMatchers(antMatcher("/events/**")).permitAll() //para ver los eventos
+                        .requestMatchers(antMatcher("/events/**")).permitAll()
                         .requestMatchers(antMatcher("/user/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
                         .requestMatchers(antMatcher("/community/communities")).permitAll()
