@@ -29,7 +29,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
     @Autowired
     private RatingEventRepository ratingEventRepository;
 
-    public Map<String, Integer> getWeeklyPost(Long userId) {
+    public Map<String, Integer> getWeeklyPost(Integer userId) {
         Map<String, Integer> weeklyResponses = new HashMap<>();
 
         // Obtener el rango para la semana actual
@@ -46,7 +46,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return weeklyResponses;
     }
 
-    public Map<String, Integer> getMonthlyPost(Long userId) {
+    public Map<String, Integer> getMonthlyPost(Integer userId) {
         Map<String, Integer> monthlyResponses = new HashMap<>();
 
         // Obtener el rango para el mes actual
@@ -63,7 +63,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return monthlyResponses;
     }
 
-    public Map<Integer, Integer> getUserRatings(Long userId) {
+    public Map<Integer, Integer> getUserRatings(Integer userId) {
         Map<Integer, Integer> starCounts = new HashMap<>();
         for (int i = 1; i <= 5; i++) {
             int count = ratingRepository.countByRatedUser_IdAndRatingValue(userId, i);
@@ -72,7 +72,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return starCounts;
     }
 
-    public Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Long userId) {
+    public Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Integer userId) {
         Map<Integer, Map<Integer, Integer>> eventRatingsMap = new HashMap<>();
 
         // Obtener todos los eventos creados por el usuario
