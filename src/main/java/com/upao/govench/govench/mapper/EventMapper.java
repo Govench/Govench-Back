@@ -1,13 +1,12 @@
 package com.upao.govench.govench.mapper;
 
-import com.upao.govench.govench.model.dto.EventRequestDTO;
-import com.upao.govench.govench.model.dto.EventResponseDTO;
-import com.upao.govench.govench.model.dto.LocationResponseDTO;
-import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.Location;
 import com.upao.govench.govench.model.entity.Rating;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.LocationRepository;
+import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.EventService;
 import com.upao.govench.govench.service.LocationService;
 import com.upao.govench.govench.service.UserService;
@@ -22,17 +21,34 @@ import java.util.List;
 public class EventMapper {
 
     private final ModelMapper modelMapper;
+    private final LocationRepository locationRepository;
     private final LocationService locationService;
+    private final UserService userService;
     private final LocationMapper locationMapper;
-    private UserService userService;
 
     public Event convertToEntity(EventRequestDTO eventRequestDTO) {
         Event event = modelMapper.map(eventRequestDTO, Event.class);
 
-        // Mapear la ubicación
-        LocationResponseDTO location = locationService.getLocationById(eventRequestDTO.getLocation());
-        event.setLocation(locationMapper.convertToEntity(location));
-        User owner = userService.getUserbyId((userService.getAuthenticatedUserIdFromJWT()));
+
+        Location location = locationRepository
+                .findByAddressAndDistrictAndProvinceAndDepartament(
+                        eventRequestDTO.getAddress(),
+                        eventRequestDTO.getDistrict(),
+                        eventRequestDTO.getProvince(),
+                        eventRequestDTO.getDepartment()
+                ).orElseGet(() -> {
+                    LocationRequestDTO locationDTO = new LocationRequestDTO();
+                    locationDTO.setAddress(eventRequestDTO.getAddress());
+                    locationDTO.setDistrict(eventRequestDTO.getDistrict());
+                    locationDTO.setProvince(eventRequestDTO.getProvince());
+                    locationDTO.setDepartament(eventRequestDTO.getDepartment());
+
+                    // Crear y guardar la nueva ubicación en el repositorio
+                    Location newLocation = locationMapper.convertToEntity(locationDTO);
+                    return locationRepository.save(newLocation); // Guardar y retornar la ubicación
+                });
+        event.setLocation(location);
+         User owner = userService.getUserbyId((userService.getAuthenticatedUserIdFromJWT()));
         // Mapear el propietario
         if (owner != null) {
             event.setOwner(owner);
