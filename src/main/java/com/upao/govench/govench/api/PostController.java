@@ -191,5 +191,10 @@ public class PostController {
         }
     }
 
+    @GetMapping("/posts/mypost")
+    public ResponseEntity<List<PostResponseDTO>> obtenerMyPosts() {
+        return new ResponseEntity<>(postService.getAllPostsByUserId(), HttpStatus.OK);
+    }
+
 }
 
