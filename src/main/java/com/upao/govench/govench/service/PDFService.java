@@ -22,8 +22,6 @@ import java.util.Map;
 @Service
 public class PDFService {
     @Autowired
-    private UserStatisticsServiceImpl userStatisticsService;
-    @Autowired
     private GraphServiceImpl graphServiceImpl;
 
     public ByteArrayInputStream generateUserReportPdf(ReportResponseDTO reportResponseDTO, int userId) {

@@ -6,10 +6,8 @@ import com.upao.govench.govench.mapper.LocationMapper;
 import com.upao.govench.govench.mapper.RatingEventMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Event;
-import com.upao.govench.govench.model.entity.Location;
 import com.upao.govench.govench.model.entity.RatingEvent;
 import com.upao.govench.govench.repository.EventRepository;
-import com.upao.govench.govench.repository.LocationRepository;
 import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.service.EventService;
 import com.upao.govench.govench.service.LocationService;
@@ -21,11 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class EventServiceImpl implements EventService {
@@ -40,8 +34,8 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
-        List<Event> events = eventRepository.findAll();
-        return eventMapper.convertToListDTO(events);
+
+        return eventMapper.convertToListDTO(eventRepository.findAll());
     }
 
     @Transactional(readOnly = true)
@@ -131,5 +125,4 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findByOwner_Id(userId);
         return eventMapper.convertToListDTO(events);
     }
-
 }

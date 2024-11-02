@@ -1,18 +1,13 @@
 package com.upao.govench.govench.service;
 
-import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
+
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.Rating;
 import com.upao.govench.govench.model.entity.User;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 @Service
 public interface UserService {
 

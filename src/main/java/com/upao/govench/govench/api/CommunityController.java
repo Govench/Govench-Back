@@ -1,14 +1,9 @@
 package com.upao.govench.govench.api;
 
-import com.upao.govench.govench.mapper.CommunityMapper;
-import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.CommunityRequestDTO;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
-import com.upao.govench.govench.model.dto.OwnerRequestDTO;
 import com.upao.govench.govench.model.entity.User;
-import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.service.CommunityService;
-import com.upao.govench.govench.service.EncryptionService;
 import com.upao.govench.govench.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +23,7 @@ public class CommunityController {
     private CommunityService communityService; // Inyección del servicio de Community
     @Autowired
     private UserService userService;
+
 
     @GetMapping("/communities")
     public List<CommunityResponseDTO> getCommunitiesNotCreatedByUser() throws Exception {

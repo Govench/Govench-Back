@@ -4,21 +4,16 @@ import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.CommunityRequestDTO;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
-import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.Community;
-import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.CommunityService;
-import com.upao.govench.govench.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
