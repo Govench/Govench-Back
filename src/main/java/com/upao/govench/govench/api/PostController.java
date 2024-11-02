@@ -1,35 +1,20 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
-import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.mapper.PostMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.service.CommunityService;
-import com.upao.govench.govench.service.EncryptionService;
 import com.upao.govench.govench.service.PostService;
 import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.upao.govench.govench.model.entity.User;
-import com.upao.govench.govench.repository.UserRepository;
-import com.upao.govench.govench.security.TokenProvider;
 
-
-import java.nio.file.AccessDeniedException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

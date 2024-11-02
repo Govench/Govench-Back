@@ -1,10 +1,8 @@
 package com.upao.govench.govench.service;
 
-import com.upao.govench.govench.model.entity.Role;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.UserEvent;
-import org.springframework.scheduling.annotation.Scheduled;
 
 public interface NotificationService {
     void sendDailyReminder(User user, Event event);
