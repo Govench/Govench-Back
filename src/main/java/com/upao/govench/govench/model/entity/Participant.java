@@ -25,7 +25,7 @@ public class Participant{
     private String lastname;
 
     @Column(name="par_birth_date_dt", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name="par_gen_bi", nullable = false)
     private String gender;

@@ -52,7 +52,7 @@ public class UserController {
 
     @Autowired
     private TokenProvider tokenProvider;
-    @PostMapping("/upload/profile")
+    @PostMapping("/upload/profile-photo")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
         Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
         User user = userRepository.findById(authenticatedUserId).orElseThrow(ResourceNotFoundException::new);
@@ -80,16 +80,16 @@ public class UserController {
                 new UserNotFoundException("Usuario con ID " + userId + " no encontrado.")
         );
 
-        if(user.getParticipant()!=null) {
-            String profileId=user.getParticipant().getProfileId();
+        if (user.getParticipant() != null) {
+            String profileId = user.getParticipant().getProfileId();
             if (profileId != null) {
                 profile = profileService.getProfile(profileId);
             } else {
                 throw new UserNotFoundException("El participante no tiene foto asociada.");
             }
         }
-        if(user.getOrganizer()!=null) {
-            String profileId=user.getOrganizer().getProfileId();
+        if (user.getOrganizer() != null) {
+            String profileId = user.getOrganizer().getProfileId();
             if (profileId != null) {
                 profile = profileService.getProfile(profileId);
             } else {
@@ -106,7 +106,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/profile")
+    @DeleteMapping("/profile-photo/delete")
     public ResponseEntity<String> deleteProfileImage() {
 
         Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ParticipantDTO {
     @Size(max = 50, message = "El apellido debe tener 50 caracteres o menos")
     private String lastname;
 
-    private Date birthday;
+    private LocalDate birthday;
 
     private String gender;
     @NotBlank(message = "La descripcion es obligatorio")

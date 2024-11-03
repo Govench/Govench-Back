@@ -20,6 +20,11 @@ public class UserProfileController {
     @PutMapping("/{id}")
     private ResponseEntity <UserProfileDTO> updateProfile(@PathVariable Integer id,@Valid @RequestBody UserProfileDTO userProfileDTO)
     {
+        Integer tokenId= userService.getAuthenticatedUserIdFromJWT();
+        if(tokenId!=id)
+        {
+            throw new IllegalArgumentException("No puedes editar un perfil que no es el tuyo");
+        }
         UserProfileDTO updatedProfile = userService.uptadteUserProfile(id, userProfileDTO);
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
     }

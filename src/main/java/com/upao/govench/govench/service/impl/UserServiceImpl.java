@@ -112,6 +112,8 @@ public class UserServiceImpl implements UserService {
             if(userProfileDTO.getName()!=null)user.getParticipant().setName(userProfileDTO.getName());
             if(userProfileDTO.getLastname()!=null)user.getParticipant().setLastname(userProfileDTO.getLastname());
             if(userProfileDTO.getProfileDesc()!=null) user.getParticipant().setProfileDesc(userProfileDTO.getProfileDesc());
+            if(userProfileDTO.getGender()!=null) user.getParticipant().setGender(userProfileDTO.getGender());
+            if(userProfileDTO.getBirthday()!=null) user.getParticipant().setBirthday(userProfileDTO.getBirthday());
             if(userProfileDTO.getInterest()!=null) user.getParticipant().setInterest(userProfileDTO.getInterest());
             if(userProfileDTO.getSkills()!=null) user.getParticipant().setSkills(userProfileDTO.getSkills());
             if(userProfileDTO.getSocialLinks()!=null)user.getParticipant().setSocialLinks(userProfileDTO.getSocialLinks());
@@ -123,6 +125,8 @@ public class UserServiceImpl implements UserService {
             if(userProfileDTO.getName()!=null)user.getOrganizer().setName(userProfileDTO.getName());
             if(userProfileDTO.getLastname()!=null)user.getOrganizer().setLastname(userProfileDTO.getLastname());
             if(userProfileDTO.getProfileDesc()!=null) user.getOrganizer().setProfileDesc(userProfileDTO.getProfileDesc());
+            if(userProfileDTO.getGender()!=null) user.getOrganizer().setGender(userProfileDTO.getGender());
+            if(userProfileDTO.getBirthday()!=null) user.getOrganizer().setBirthday(userProfileDTO.getBirthday());
             if(userProfileDTO.getInterest()!=null) user.getOrganizer().setInterest(userProfileDTO.getInterest());
             if(userProfileDTO.getSkills()!=null) user.getOrganizer().setSkills(userProfileDTO.getSkills());
             if(userProfileDTO.getSocialLinks()!=null)user.getOrganizer().setSocialLinks(userProfileDTO.getSocialLinks());

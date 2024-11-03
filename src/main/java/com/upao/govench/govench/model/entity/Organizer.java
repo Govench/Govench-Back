@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public class Organizer{
     private String lastname;
 
     @Column(name="or_birth_date_dt", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name="or_gen_bi", nullable = false)
     private String gender;

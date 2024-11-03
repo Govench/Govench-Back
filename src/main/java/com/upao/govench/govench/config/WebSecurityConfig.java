@@ -50,6 +50,7 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/auth/login")).permitAll()
                         .requestMatchers(antMatcher("/auth/register/participant")).permitAll()
                         .requestMatchers(antMatcher("/user/profile/**")).permitAll()
+                        .requestMatchers(antMatcher("/user/profile-photo/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
                         .requestMatchers(antMatcher("/events/**")).permitAll()
                         .requestMatchers(antMatcher("/community/communities")).permitAll()

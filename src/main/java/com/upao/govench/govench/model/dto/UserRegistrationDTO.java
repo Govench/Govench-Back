@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class UserRegistrationDTO {
     @NotBlank(message = "El apellido es obligatorio")
     private String lastname;
 
-    private Date birthday;
+    private LocalDate birthday;
 
     @NotBlank(message = "Ingrese su genero")
     private String gender;

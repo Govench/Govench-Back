@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class UserRequestDTO {
     @Size(min = 6, max = 12, message = "La contraseña debe tener entre 6 y 12 caracteres")
     private String password;
     @NotBlank(message = "Deber ingresar una fecha de nacimiento")
-    private Date birthday;
+    private LocalDate birthday;
     private String gender;
     private String profileDesc;
     private List<String> interest;

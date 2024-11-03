@@ -3,18 +3,21 @@ package com.upao.govench.govench.mapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.Follow;
 import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.FollowRepository;
 import com.upao.govench.govench.repository.UserEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
     private final ModelMapper modelMapper;
-
+    private final FollowRepository followRepository;
 
 
     public User toUserEntity(UserRegistrationDTO registrationDTO) {
@@ -23,14 +26,19 @@ public class UserMapper {
 
     public UserProfileDTO toUserProfileDTO(User user) {
         UserProfileDTO userProfileDTO =  modelMapper.map(user, UserProfileDTO.class);
+        userProfileDTO.setSeguidores(followRepository.findByFollowing(user).size());
+        userProfileDTO.setSeguidos(followRepository.findByFollower(user).size());
         if(user.getParticipant()!=null)
         {
             userProfileDTO.setName(user.getParticipant().getName());
             userProfileDTO.setLastname(user.getParticipant().getLastname());
             userProfileDTO.setProfileDesc(user.getParticipant().getProfileDesc());
+            userProfileDTO.setGender(user.getParticipant().getGender());
+            userProfileDTO.setBirthday(user.getParticipant().getBirthday());
             userProfileDTO.setInterest(user.getParticipant().getInterest());
             userProfileDTO.setSkills(user.getParticipant().getSkills());
             userProfileDTO.setSocialLinks(user.getParticipant().getSocialLinks());
+            userProfileDTO.setEventosCreados(0);
 
         }
         if(user.getOrganizer()!=null)
@@ -38,14 +46,25 @@ public class UserMapper {
             userProfileDTO.setName(user.getOrganizer().getName());
             userProfileDTO.setLastname(user.getOrganizer().getLastname());
             userProfileDTO.setProfileDesc(user.getOrganizer().getProfileDesc());
+            userProfileDTO.setGender(user.getOrganizer().getGender());
+            userProfileDTO.setBirthday(user.getOrganizer().getBirthday());
             userProfileDTO.setInterest(user.getOrganizer().getInterest());
             userProfileDTO.setSkills(user.getOrganizer().getSkills());
             userProfileDTO.setSocialLinks(user.getOrganizer().getSocialLinks());
             userProfileDTO.setEventosCreados(user.getOrganizer().getEventosCreados());
         }
-        if(user.getAdmin()!=null)
-        {
-
+        if(user.getRole().getName().equals("ROLE_ADMIN"))
+        {   ArrayList<String> listas=new ArrayList<>();
+            listas.add("Programacion");
+            listas.add("Hackear");
+            userProfileDTO.setEventosCreados(0);
+            userProfileDTO.setName("Admin");
+            userProfileDTO.setLastname("UPAO");
+            userProfileDTO.setProfileDesc("Administrador del sistema");
+            userProfileDTO.setGender("Admin");
+            userProfileDTO.setBirthday(LocalDate.now());
+            userProfileDTO.setTipoUsuario("Insano");
+            userProfileDTO.setInterest(listas);
         }
         if(!user.getPremium())
         {
@@ -73,10 +92,9 @@ public class UserMapper {
                 (user.getOrganizer() != null) ? user.getOrganizer().getName():"ADMIN";
         String lastname = (user.getParticipant() != null ) ? user.getParticipant().getLastname() :
                 (user.getOrganizer() != null) ? user.getOrganizer().getLastname():"USER";
-
         authResponseDTO.setName(name);
         authResponseDTO.setLastname(lastname);
-
+        authResponseDTO.setId(user.getId());
         authResponseDTO.setRole(user.getRole().getName());
 
         return authResponseDTO;
