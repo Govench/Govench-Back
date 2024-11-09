@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
 
+    @Query("SELECT e FROM Event e WHERE e.date >= :date")
+    List<Event> findAllUpcomingEvents(@Param("date") LocalDate date);
+
     @Query("SELECT e FROM Event e WHERE e.tittle = :tittle")
     List<Event> findAllByEventTittle(@Param("tittle") String Tittle);
 

@@ -35,7 +35,7 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventResponseDTO> getAllEvents() {
 
-        return eventMapper.convertToListDTO(eventRepository.findAll());
+        return eventMapper.convertToListDTO(eventRepository.findAllUpcomingEvents(LocalDate.now()));
     }
 
     @Transactional(readOnly = true)

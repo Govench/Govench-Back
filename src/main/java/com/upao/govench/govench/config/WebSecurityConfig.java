@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/user/profile/**")).permitAll()
                         .requestMatchers(antMatcher("/user/profile-photo/**")).permitAll()
                         .requestMatchers(antMatcher("/email/**")).permitAll()
+                        .requestMatchers(antMatcher("/media/**")).permitAll()
                         .requestMatchers(antMatcher("/events/**")).permitAll()
                         .requestMatchers(antMatcher("/community/communities")).permitAll()
                         .requestMatchers(antMatcher("/community/search/**")).permitAll()
