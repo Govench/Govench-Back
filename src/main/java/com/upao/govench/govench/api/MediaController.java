@@ -15,10 +15,11 @@ import java.nio.file.Files;
 
 @RestController
 @RequestMapping("/media")
-@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+
 public class MediaController {
     @Autowired
     private StorageService storageService;
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
     @PostMapping("/upload")
     public UploadMediaDTO upload(@RequestParam("file") MultipartFile multipartFile) {
         String path = storageService.store(multipartFile);
