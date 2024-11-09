@@ -31,4 +31,9 @@ public class EmailController {
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Password reset successful");
     }
+
+    @PostMapping("/validation/{token}")
+    public ResponseEntity<Boolean> resetPassword(@PathVariable("token") String token) {
+        return ResponseEntity.ok(passwordResetService.tokenValidation(token));
+    }
 }

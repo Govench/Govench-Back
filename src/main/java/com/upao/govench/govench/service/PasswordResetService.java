@@ -1,5 +1,6 @@
 package com.upao.govench.govench.service;
 
+import com.upao.govench.govench.service.impl.NotificationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.upao.govench.govench.model.entity.PasswordResetToken;
@@ -26,6 +27,9 @@ public class PasswordResetService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private NotificationServiceImpl notificationServiceImpl;
+
     public String initiatePasswordReset(String email) {
         if (userRepository.existsByEmail(email)) {
             User user = userRepository.findByEmailQuery(email);
@@ -38,14 +42,16 @@ public class PasswordResetService {
                 tokenRepository.save(passwordResetToken);
 
                 String titleEmail = "¡Hola, Somos Govench!";
-                String messageEmail = "\n\nHola, solicitaste un restablecimiento de contraseña para tu cuenta "+ email
-                        +", \na continuación copia y pega el siguiente token en el formulario para continuar.";
-                String resetLink = titleEmail + messageEmail +" \n\nTOKEN: " + token;
+                String messageEmail = "\n\nHola, solicitaste un restablecimiento de contraseña para tu cuenta "
+                        + email
+                        +", \na continuación copia y pega el siguiente token en el formulario para continuar."
+                        +"\nSi has sido tú, ponte en contacto de inmediato con nuestro equipo.";
+                String resetLink = titleEmail + messageEmail +" \n\nTOKEN: " + token + "\n\n"+ notificationServiceImpl.generateSignature();
                 emailService.sendEmail(user.getEmail(), "Solicitud de cambio de contraseña \uD83D\uDD12", resetLink);
                 return "Token enviado exitosamente";
             } catch (Exception e) {
                 e.printStackTrace();
-                return "Token no enviado "+e.getMessage();
+                return "Ya se envio un correo de recuperación a esta cuenta, intente de nuevo en 1 hora";
             }
         }
         return "El correo no se encuentra registrado.";
@@ -53,14 +59,30 @@ public class PasswordResetService {
 
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken passwordResetToken = tokenRepository.findByToken(token);
-        if (passwordResetToken != null) {
-            User user = passwordResetToken.getUser();
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            user.setPassword(encodedPassword);
-            userRepository.save(user);
-            tokenRepository.delete(passwordResetToken);
-        } else {
-            throw new RuntimeException("Invalid or expired password reset token");
+
+        if (passwordResetToken == null) {
+            throw new RuntimeException("Token inválido");
         }
+
+        if (passwordResetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expirado");
+        }
+
+        User user = passwordResetToken.getUser();
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("La nueva contraseña no puede ser igual a la contraseña actual");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        tokenRepository.delete(passwordResetToken);
+
+    }
+
+    public boolean tokenValidation(String token){
+        PasswordResetToken passwordResetToken = tokenRepository.findByToken(token);
+        return passwordResetToken != null && passwordResetToken.getExpiryDate().isAfter(LocalDateTime.now());
     }
 }
