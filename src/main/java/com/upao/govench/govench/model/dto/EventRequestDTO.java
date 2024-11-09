@@ -1,7 +1,6 @@
 package com.upao.govench.govench.model.dto;
 
 
-import com.upao.govench.govench.model.entity.Location;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -40,6 +39,8 @@ public class EventRequestDTO {
 
     @NotBlank(message = "El nivel de experiencia no se puede estar vacio")
     private String exp;
+
+    private String coverPath;//ruta de la imagen
 
     private BigDecimal cost;
 

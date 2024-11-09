@@ -26,6 +26,9 @@ public class Event {
     @Column(name = "eve_tit_vc", nullable = false)
     private String tittle;
 
+    @Column(name = "eve_img_vc", nullable = true)
+    private String coverPath;
+
     @Column(name = "eve_des_vc", nullable = false)
     private String description;
 

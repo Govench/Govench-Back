@@ -24,6 +24,7 @@ public class EventResponseDTO {
     private BigDecimal cost;
     private LocationResponseDTO location;
     private String exp;
+    private String coverPath;
     private Integer maxCapacity;
     private int registeredCount;
     private Integer ownerId;
