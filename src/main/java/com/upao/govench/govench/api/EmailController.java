@@ -22,18 +22,17 @@ public class EmailController {
 
     @PostMapping("/forgot-password/{email}")
     public ResponseEntity<String> forgotPassword(@PathVariable("email") String email) {
-        System.out.println(email);
-        return ResponseEntity.ok(passwordResetService.initiatePasswordReset(email));
+        return passwordResetService.initiatePasswordReset(email);
     }
 
     @PostMapping("/reset-password/{token}/{newPass}")
     public ResponseEntity<String> resetPassword(@PathVariable("token") String token, @PathVariable("newPass") String newPassword) {
-        passwordResetService.resetPassword(token, newPassword);
-        return ResponseEntity.ok("Password reset successful");
+        return passwordResetService.resetPassword(token, newPassword);
     }
 
-    @PostMapping("/validation/{token}")
-    public ResponseEntity<Boolean> resetPassword(@PathVariable("token") String token) {
-        return ResponseEntity.ok(passwordResetService.tokenValidation(token));
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validation(@RequestParam String token) {
+        boolean isValid = passwordResetService.tokenValidation(token);
+        return ResponseEntity.ok(isValid);
     }
 }
