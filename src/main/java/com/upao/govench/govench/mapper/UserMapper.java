@@ -152,6 +152,7 @@ public class UserMapper {
 
     public FollowResponseDTO convertToFollowDTO(Follow user) {
         FollowResponseDTO followResponseDTO = modelMapper.map(user, FollowResponseDTO.class);
+        followResponseDTO.setId(user.getFollower().getId());
         followResponseDTO.setEmail(user.getFollower().getEmail());
         if (user.getFollower().getParticipant() != null) {
             followResponseDTO.setName(user.getFollower().getParticipant().getName());
@@ -172,6 +173,7 @@ public class UserMapper {
 
     public FollowResponseDTO convertToFollowedDTO(Follow user) {
         FollowResponseDTO followResponseDTO = modelMapper.map(user, FollowResponseDTO.class);
+        followResponseDTO.setId(user.getFollowing().getId());
         followResponseDTO.setEmail(user.getFollowing().getEmail());
         if (user.getFollowing().getParticipant() != null) {
             followResponseDTO.setName(user.getFollowing().getParticipant().getName());
