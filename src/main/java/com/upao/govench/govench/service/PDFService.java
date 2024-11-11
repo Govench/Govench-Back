@@ -4,9 +4,13 @@ import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.kernel.pdf.canvas.draw.DottedLine;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.service.impl.GraphServiceImpl;
 import com.upao.govench.govench.service.impl.UserStatisticsServiceImpl;
@@ -32,16 +36,44 @@ public class PDFService {
             PdfDocument pdfDocument = new PdfDocument(writer);
             Document document = new Document(pdfDocument);
 
-            document.add(new Paragraph("Reporte de Usuario"));
-            document.add(new Paragraph("Total de Eventos: " + reportResponseDTO.getSummary().getTotalEvents()));
-            document.add(new Paragraph("Nuevos Seguidores: " + reportResponseDTO.getSummary().getNewFollowers()));
-            document.add(new Paragraph("Conexiones Hechas: " + reportResponseDTO.getSummary().getConnectionsMade()));
-            document.add(new Paragraph("Eventos Asistidos: " + reportResponseDTO.getSummary().getEventsAttended()));
+            // Título principal
+            Paragraph title = new Paragraph("Reporte de Usuario")
+                    .setFontSize(20)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
+            document.add(title);
 
-            document.add(new Paragraph("Estadísticas de la Comunidad:"));
-            document.add(new Paragraph("Total de Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalCommunities()));
-            document.add(new Paragraph("Total de Usuarios en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalUsersInCommunities()));
-            document.add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()));
+            Table table = new Table(2);
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            Cell resumenCell = new Cell()
+                    .add(new Paragraph("Resumen General")
+                            .setFontSize(14)
+                            .setBold()
+                            .setTextAlignment(TextAlignment.LEFT))
+                    .add(new Paragraph("Total de Eventos: " + reportResponseDTO.getSummary().getTotalEvents()))
+                    .add(new Paragraph("Nuevos Seguidores: " + reportResponseDTO.getSummary().getNewFollowers()))
+                    .add(new Paragraph("Conexiones Hechas: " + reportResponseDTO.getSummary().getConnectionsMade()))
+                    .add(new Paragraph("Eventos Asistidos: " + reportResponseDTO.getSummary().getEventsAttended()))
+                    .setBorder(Border.NO_BORDER);
+            table.addCell(resumenCell);
+
+            Cell comunidadCell = new Cell()
+                    .add(new Paragraph("Estadísticas de la Comunidad")
+                            .setFontSize(14)
+                            .setBold()
+                            .setTextAlignment(TextAlignment.LEFT))
+                    .add(new Paragraph("Total de Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalCommunities()))
+                    .add(new Paragraph("Total de Usuarios en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalUsersInCommunities()))
+                    .add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()))
+                    .setBorder(Border.NO_BORDER);
+            table.addCell(comunidadCell);
+
+            document.add(table);
+
+            Paragraph invisibleParagraph = new Paragraph("\n");
+            document.add(invisibleParagraph);
 
             // Generar gráfico de respuestas semanales
             byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart(userId);
@@ -49,8 +81,6 @@ public class PDFService {
                 ImageData chartImageData = ImageDataFactory.create(weeklyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
             // Generar gráfico de respuestas mensuales
@@ -59,8 +89,6 @@ public class PDFService {
                 ImageData chartImageData = ImageDataFactory.create(monthlyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
             byte[] starRatingChart = graphServiceImpl.generateUserStarChart(userId);
@@ -68,8 +96,6 @@ public class PDFService {
                 ImageData charImageData = ImageDataFactory.create(starRatingChart);
                 Image chartImage = new Image(charImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
             List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts(userId);
@@ -77,10 +103,8 @@ public class PDFService {
                 for (byte[] chartBytes : eventRatingCharts) {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
                     Image chartImage = new Image(chartImageData);
-                    document.add(chartImage); // Agrega la imagen del gráfico al documento
+                    document.add(chartImage);
                 }
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
 

@@ -1,5 +1,6 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -20,14 +21,11 @@ import java.io.ByteArrayInputStream;
 public class ReportController {
     private final ReportService reportService;
     private final PDFService pdfService;
+    private final UserService userService;
 
-    @GetMapping("/user/{userId}")
-    public ReportResponseDTO generateUserReport(@PathVariable Integer userId) {
-        return reportService.generateReport(userId);
-    }
-
-    @GetMapping("/user/{userId}/pdf")
-    public ResponseEntity<InputStreamResource> downloadUserReportPdf(@PathVariable Integer userId) {
+    @GetMapping("/pdf")
+    public ResponseEntity<InputStreamResource> downloadUserReportPdf() {
+        Integer userId= userService.getAuthenticatedUserIdFromJWT();
         ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
         ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO, userId);
 
