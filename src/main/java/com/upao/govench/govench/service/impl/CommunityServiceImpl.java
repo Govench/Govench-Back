@@ -91,5 +91,6 @@ public class CommunityServiceImpl implements CommunityService {
     public List<CommunityResponseDTO> getall() {
 
         return communityMapper.convertoToListResponseDTO(communityRepository.findAll());
+
     }
 }
