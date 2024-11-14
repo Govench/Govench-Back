@@ -37,6 +37,12 @@ public class EventController{
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Integer id) {
+        EventResponseDTO event = eventService.findEventById(id);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
     @GetMapping("/exp/{exp}")
     public ResponseEntity<List<EventResponseDTO>> getEventByExp(@PathVariable String exp) {
        List<EventResponseDTO> event = eventService.getEventByExp(exp);

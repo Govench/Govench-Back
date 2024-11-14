@@ -17,5 +17,5 @@ public interface EventService {
     public void deleteEvent(Integer id);
     public List<RatingEventResponseDTO> getRatingEvents(Event eventId);
     public List<EventResponseDTO> getEventobyUser ();
-
+    public EventResponseDTO findEventById(int id);
 }
