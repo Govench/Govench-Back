@@ -144,7 +144,7 @@ public class PaypalController {
                     createdUserEvent.setNotificationsEnabled(false);
                     userEventService.addUserEvent(createdUserEvent);
 
-                    RedirectView redirectView = new RedirectView("http://localhost:4200/pago/confirmado"); // Ruta de la página de éxito
+                    RedirectView redirectView = new RedirectView("https://govench-fb742.web.app/pago/confirmado"); // Ruta de la página de éxito
                     redirectView.addStaticAttribute("message", "Pago completado con éxito e inscripción realizada.");
                     return redirectView;
                 } catch (NotFoundException e) {

@@ -132,7 +132,7 @@ public class UserEventController{
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
         String returnUrl = "https://govench-api.onrender.com/api/v1/payments/payment?eventId=" + eventId + "&userId=" + userId.toString();
         //String returnUrl = "https://govench-api.onrender.com/api/v1/payments/payment?eventId=" + eventId + "&userId=" + userId.toString();
-        String cancelUrl = "http://localhost:4200/pago/cancelado";
+        String cancelUrl = "https://govench-fb742.web.app/pago/cancelado";
         //
         BigDecimal eventCost = eventService.getEventById(eventId).getCost();
         try {
