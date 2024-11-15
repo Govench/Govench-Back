@@ -52,11 +52,31 @@ public class RegisterConfirmationImpl implements RegisterConfirmation {
 
     private String createEmailBodyToOwner(User user, Event event) {
         StringBuilder emailBody = new StringBuilder();
+        String nameParticipant="";
+        String lastNameParticipant="";
+        String nameOwner="";
+        String lastNameOwner="";
+        if(event.getOwner().getParticipant()!=null)
+        {
 
-        String nameOwner = event.getOwner().getOrganizer().getName();
-        String lastNameOwner = event.getOwner().getOrganizer().getLastname();
-        String nameParticipant = user.getParticipant().getName();
-        String lastNameParticipant = user.getParticipant().getLastname();
+        }
+        if(event.getOwner().getOrganizer()!=null)
+        {
+            nameOwner = event.getOwner().getOrganizer().getName();
+            lastNameOwner = event.getOwner().getOrganizer().getLastname();
+        }
+
+        if(user.getOrganizer()!=null)
+        {
+            nameParticipant = user.getOrganizer().getName();
+            lastNameParticipant = user.getOrganizer().getLastname();
+        }
+        if(user.getParticipant()!=null)
+        {
+            nameParticipant = user.getParticipant().getName();
+            lastNameParticipant = user.getParticipant().getLastname();
+        }
+
         String emailParticipant = user.getEmail();
 
         emailBody.append("Hola, ").append(nameOwner+" "+lastNameOwner+"\n\n")

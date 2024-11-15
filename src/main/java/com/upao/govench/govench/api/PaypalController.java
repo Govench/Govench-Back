@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 import org.webjars.NotFoundException;
 
 import java.io.IOException;
@@ -49,8 +50,8 @@ public class PaypalController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-order")
     public String  createOrder(@RequestParam double totalAmount) {
-        String returnUrl = "https://govench-api.onrender.com/api/v1/admin/payments/payment";
-        //String returnUrl = "http://localhost:8080/api/v1/admin/payments/payment";
+        //String returnUrl = "https://govench-api.onrender.com/api/v1/admin/payments/payment";
+        String returnUrl = "http://localhost:8080/api/v1/payments/payment";
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         try {
             String orderId = paypalService.createOrder(totalAmount, returnUrl, cancelUrl);
@@ -74,7 +75,7 @@ public class PaypalController {
     public String  paySubscription() {
         double totalAmount = 50; //La subscripcion valdra 50 solsitos
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        String returnUrl = "https://govench-api.onrender.com/api/v1/payments/subscription?userId="+userId.toString();
+        String returnUrl = "http://localhost:8080/api/v1/payment/subscription?userId="+userId.toString();
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         User user = userService.getUserbyId(userId);
         try {
@@ -120,56 +121,44 @@ public class PaypalController {
     }
 
     @GetMapping("/payment")
-    public String handlePayment(@RequestParam String token, @RequestParam int eventId, @RequestParam int userId) {
+    public RedirectView handlePayment(@RequestParam String token, @RequestParam int userId, @RequestParam int eventId) {
         try {
             HttpResponse<Order> response = paypalService.captureOrder(token);
 
             if (response.statusCode() == 201) { // Pago exitoso
+
                 try {
-                    createUserEvent(userId, eventId);
-                    return "Pago completado con éxito e inscripción realizada.";
+                    User user = userService.getUserbyId(userId);
+
+
+                    Event event = eventService.getEventById(eventId);
+
+                    UserEvent createdUserEvent= new UserEvent();
+                    createdUserEvent.setId(new IdCompuestoU_E(userId, eventId));
+                    createdUserEvent.setUser(user);
+                    createdUserEvent.setEvent(event);
+                    createdUserEvent.setRegistrationDate(LocalDate.now());
+                    createdUserEvent.setNotificationsEnabled(false);
+                    createdUserEvent.setFinalReminderSent(false);
+                    createdUserEvent.setLastReminderSentDate(null);
+                    createdUserEvent.setNotificationsEnabled(false);
+                    userEventService.addUserEvent(createdUserEvent);
+
+                    RedirectView redirectView = new RedirectView("http://localhost:4200/pago/confirmado"); // Ruta de la página de éxito
+                    redirectView.addStaticAttribute("message", "Pago completado con éxito e inscripción realizada.");
+                    return redirectView;
                 } catch (NotFoundException e) {
-                    return "Pago completado, pero hubo un problema con la inscripción: " + e.getMessage();
+                    return new RedirectView("/error?message=" + e.getMessage()); // Redirige con error
                 } catch (IllegalArgumentException e) {
-                    return e.getMessage(); // Manejar errores de inscripción
+                    return new RedirectView("/error?message=" + e.getMessage()); // Redirige con error
                 }
             } else {
-                return "El pago fue cancelado o fallido.";
+                return new RedirectView("/error?message=El pago fue cancelado o fallido.");
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return "Ocurrió un error durante el proceso de pago.";
+            return new RedirectView("/error?message=Ocurrió un error durante el proceso de pago.");
         }
     }
-    public void createUserEvent(int iduser, int idevent) {
-        // Consultar el usuario por su ID
-        User user = userService.getUserbyId(iduser);
-        if (user == null) {
-            throw new NotFoundException("El usuario no existe");
-              }
-        // Consultar el evento por su ID
-        Event event = eventService.getEventById(idevent);
-        if (event == null) {
-            throw new NotFoundException("El evento no existe");
-             }
-        // Verificar si la relación ya existe
-        UserEvent existingEvent = userEventService.searchUserEventById(new IdCompuestoU_E(iduser, idevent));
-        if (existingEvent != null) {
-            throw new IllegalArgumentException("Ya estas registrado ");
-               }
-            // Crear la nueva relación entre usuario y evento
-            UserEvent createdUserEvent = userEventService.addUserEvent(
-                    new UserEvent(new IdCompuestoU_E(iduser, idevent), // ID compuesto
-                            user, // Usuario asociado
-                            event, // Evento asociado
-                            LocalDate.now(), // Fecha de registro
-                            false, // Notificaciones habilitadas (por defecto, false)
-                            null, // Fecha del último recordatorio enviado (inicialmente null)
-                            false, // Recordatorio del mismo día enviado (inicialmente false)
-                            false  // Recordatorio final enviado (inicialmente false)
-                    )
-            );
-    }
-
 }
 
