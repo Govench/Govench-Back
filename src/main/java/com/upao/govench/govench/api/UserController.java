@@ -153,15 +153,16 @@ public class UserController {
     }
 
     //-------Metodos pre security----------//
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
+    @GetMapping("/all")
+    public ResponseEntity<List<UserProfileDTO>> getAllUsers() {
         try {
-            List<UserResponseDTO> users = userService.getAllUsers();
+            List<UserProfileDTO> users = userService.getAllUsers(); // Obtén los usuarios convertidos a UserProfileDTO
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>("Error al obtener la lista de usuarios", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
@@ -352,4 +353,6 @@ public class UserController {
         List<FollowResponseDTO> followers=  userService.getFollowings();
         return new ResponseEntity<>(followers, HttpStatus.OK);
     }
+
+
 }
