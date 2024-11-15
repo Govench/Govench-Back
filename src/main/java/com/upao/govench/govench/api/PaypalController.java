@@ -51,7 +51,7 @@ public class PaypalController {
     @PostMapping("/create-order")
     public String  createOrder(@RequestParam double totalAmount) {
         //String returnUrl = "https://govench-api.onrender.com/api/v1/admin/payments/payment";
-        String returnUrl = "http://localhost:8080/api/v1/payments/payment";
+        String returnUrl = "https://govench-api.onrender.com/api/v1/payments/payment";
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         try {
             String orderId = paypalService.createOrder(totalAmount, returnUrl, cancelUrl);
@@ -75,7 +75,7 @@ public class PaypalController {
     public String  paySubscription() {
         double totalAmount = 50; //La subscripcion valdra 50 solsitos
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        String returnUrl = "http://localhost:8080/api/v1/payment/subscription?userId="+userId.toString();
+        String returnUrl = "https://govench-api.onrender.com/api/v1/payment/subscription?userId="+userId.toString();
         String cancelUrl = "https://blog.fluidui.com/top-404-error-page-examples/";
         User user = userService.getUserbyId(userId);
         try {
