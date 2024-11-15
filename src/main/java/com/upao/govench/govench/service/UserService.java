@@ -24,7 +24,7 @@ public interface UserService {
     Integer getAuthenticatedUserIdFromJWT();
 
 
-    List<UserResponseDTO> getAllUsers();
+    List<UserProfileDTO> getAllUsers();
     User getUserbyId(Integer userId);
     void deleteUser(Integer userId);
     User associateProfileWithUser(int userId, String profileId);
@@ -42,4 +42,5 @@ public interface UserService {
 
     List<FollowResponseDTO> getFollowers();
     List<FollowResponseDTO> getFollowings();
+
 }

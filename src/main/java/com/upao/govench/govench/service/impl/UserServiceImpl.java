@@ -262,10 +262,11 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserResponseDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return userMapper.convertToListDTO(users);
+    public List<UserProfileDTO> getAllUsers() {
+        List<User> users = userRepository.findAll(); // Obtén todos los usuarios desde la base de datos
+        return userMapper.getAllUsers(users); // Usa el método de tu mapper para convertirlos a UserProfileDTO
     }
+
 
 
     @Override

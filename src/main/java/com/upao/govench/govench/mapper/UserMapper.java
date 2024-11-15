@@ -130,6 +130,12 @@ public class UserMapper {
                 .toList();
     }
 
+    public List<UserProfileDTO> getAllUsers(List<User> users){
+        return users.stream()
+                .map(this::toUserProfileDTO)
+                .toList();
+    }
+
 
 
     //metodos pre security//
