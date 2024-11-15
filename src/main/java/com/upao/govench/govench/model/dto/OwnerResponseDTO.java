@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OwnerResponseDTO {
+    public int id;
     public String name;
     public String email;
     public String profileDesc;

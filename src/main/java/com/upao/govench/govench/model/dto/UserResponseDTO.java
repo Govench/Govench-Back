@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class UserResponseDTO {
     private String name;
     private String email;
     private String password;
-    private Date birthday;
+    private LocalDate birthday;
     private String gender;
     private String profileDesc;
     private List<String> interest;

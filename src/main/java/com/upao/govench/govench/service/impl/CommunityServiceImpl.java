@@ -4,21 +4,16 @@ import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.mapper.UserMapper;
 import com.upao.govench.govench.model.dto.CommunityRequestDTO;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
-import com.upao.govench.govench.model.dto.UserRequestDTO;
 import com.upao.govench.govench.model.entity.Community;
-import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.CommunityService;
-import com.upao.govench.govench.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
@@ -36,7 +31,7 @@ public class CommunityServiceImpl implements CommunityService {
     public List<CommunityResponseDTO> findByOwner_Id(int userId) {
          User usuario = userRepository.findById(userId).orElse(null);
        if(usuario != null) {
-           return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_Id(userId));
+           return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_id(userId));
        }
         else
             return null;
@@ -46,7 +41,7 @@ public class CommunityServiceImpl implements CommunityService {
     public List<CommunityResponseDTO> findByOwner_IdNot(int userId) {
         User usuario = userRepository.findById(userId).orElse(null);
         if(usuario != null) {
-            return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_IdNot(userId));
+            return communityMapper.convertoToListResponseDTO(communityRepository.findByOwner_idNot(userId));
 
         }
         else {
@@ -90,5 +85,12 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public Community EntityfindById(int idcommunity) {
         return communityRepository.findById(idcommunity).orElse(null);
+    }
+
+    @Override
+    public List<CommunityResponseDTO> getall() {
+
+        return communityMapper.convertoToListResponseDTO(communityRepository.findAll());
+
     }
 }

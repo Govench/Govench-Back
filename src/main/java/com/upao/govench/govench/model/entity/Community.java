@@ -24,7 +24,7 @@ public class Community {
     private String descripcion;
 
     @ManyToOne
-    @JoinColumn(name = "com_own_vc", nullable = false)
+    @JoinColumn(name = "com_own_vc", nullable = false, referencedColumnName = "user_id")
     private User owner;
 
     @ElementCollection

@@ -6,6 +6,5 @@ import lombok.Data;
 
 @Data
 public class ReminderRequestDTO {
-    private User user;
-    private Event event;
+    private boolean enableNotifications;
 }

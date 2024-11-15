@@ -10,11 +10,14 @@ import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.repository.PostRepository;
 import com.upao.govench.govench.repository.CommunityRepository;
 import com.upao.govench.govench.service.PostService;
+import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +25,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostServiceImpl implements PostService {
 
+    private final UserService userService;
     private PostRepository postRepository;
     private CommunityRepository communityRepository;
     private PostMapper postMapper;
@@ -69,5 +73,32 @@ public class PostServiceImpl implements PostService {
 
         return postMapper.convertToDTO(post);
     }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDTO> getPostsByCommunityId(int communityId) {
+        List<Post> posts = postRepository.findPostsByCommunityId(communityId);
+        return postMapper.convertToListDTO(posts);
+    }
+
+    public Post getPostEntityById(int id) {
+        return postRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void save(Post post) {
+        postRepository.save(post);
+    }
+
+    public void publicarPost(Post post) {
+        postRepository.save(post);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDTO> getAllPostsByUserId() {
+        Integer userId = userService.getAuthenticatedUserIdFromJWT();
+        List<Post> posts = postRepository.findPostByAutor_Id(userId);
+        return postMapper.convertToListDTO(posts);
+    }
+
 }
 

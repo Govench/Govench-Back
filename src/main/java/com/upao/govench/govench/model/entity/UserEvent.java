@@ -20,7 +20,7 @@ public class UserEvent {
     private IdCompuestoU_E id;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @MapsId("use_id_in")
-    @JoinColumn(name = "use_id_in")
+    @JoinColumn(name = "use_id_in",referencedColumnName = "user_id")
     private User user;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -31,10 +31,17 @@ public class UserEvent {
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
-    @Column(name = "use_eve_notif_act_bo")
+    @Column(name = "use_eve_notif_act_bo", nullable = false) // Para la notificiones
     private boolean notificationsEnabled = false;
 
+    @Column(name = "eve_last_rem_da")  // Para la notificiones
+    private LocalDate lastReminderSentDate;
 
+    @Column(name = "eve_same_day_rem_bo", nullable = false) // Para la notificiones
+    private boolean sameDayReminderSent = false;
+
+    @Column(name = "eve_fin_rem_bo", nullable = false) // Para la notificiones
+    private boolean finalReminderSent = false;
 
     @PrePersist
     public void prePersist() {

@@ -25,11 +25,12 @@ public class RatingEvent {
     @Column(name = "rat_fech_va", nullable = false)
     private LocalDate fechaPuntuacion;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "useId", referencedColumnName = "user_id")
+    private User userId;
 
-    @Column(name = "use_id_in", nullable = false)
-    private int userId;
-
-    @Column(name = "eve_id_in", nullable = false)
-    private int eventId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId", referencedColumnName = "eve_id_in")
+    private Event eventId;
 
 }

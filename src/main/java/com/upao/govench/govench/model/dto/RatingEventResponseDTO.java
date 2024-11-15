@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.dto;
 
+
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.User;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,4 @@ public class RatingEventResponseDTO {
     private int id;
     private int valorPuntuacion;
     private LocalDate fechaPuntuacion;
-    private int userId;
-    private int eventId;
 }

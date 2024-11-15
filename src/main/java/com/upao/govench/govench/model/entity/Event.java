@@ -26,6 +26,9 @@ public class Event {
     @Column(name = "eve_tit_vc", nullable = false)
     private String tittle;
 
+    @Column(name = "eve_img_vc", nullable = true)
+    private String coverPath;
+
     @Column(name = "eve_des_vc", nullable = false)
     private String description;
 
@@ -37,9 +40,6 @@ public class Event {
 
     @Column(name = "eve_end_time", nullable = false)
     private LocalTime endTime;
-
-    @Column(name = "eve_sta_vc", nullable = false)
-    private String state;
 
     @Column(name = "eve_typ_vc", nullable = false)
     private String type;
@@ -54,13 +54,15 @@ public class Event {
     @JoinColumn(name = "loc_id_in", nullable = true )
     private Location location;
 
-    @Column(name = "eve_last_rem_da")
-    private LocalDate lastReminderSentDate;
+    // Nuevos atributos
+    @Column(name = "eve_max_cap_in", nullable = false)
+    private int maxCapacity;
 
-    @Column(name = "eve_same_day_rem_bo", nullable = true)
-    private boolean sameDayReminderSent = false;
+    @Column(name = "eve_reg_count_in", nullable = false)
+    private int registeredCount = 0;
 
-    @Column(name = "eve_fin_rem_bo", nullable = true)
-    private boolean finalReminderSent = false;
+    @ManyToOne
+    @JoinColumn(name = "com_own_vc", nullable = false, referencedColumnName = "user_id")
+    private User owner;
 
 }

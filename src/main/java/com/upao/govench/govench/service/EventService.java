@@ -8,7 +8,6 @@ import com.upao.govench.govench.model.entity.Event;
 import java.util.List;
 
 public interface EventService {
-
     public List<EventResponseDTO> getAllEvents();
     public List<EventResponseDTO> getEventByName(String tittle);
     public List<EventResponseDTO> getEventByExp(String exp);
@@ -16,6 +15,7 @@ public interface EventService {
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO);
     public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO);
     public void deleteEvent(Integer id);
-    public List<RatingEventResponseDTO> getRatingEvents(int eventId);
-
+    public List<RatingEventResponseDTO> getRatingEvents(Event eventId);
+    public List<EventResponseDTO> getEventobyUser ();
+    public EventResponseDTO findEventById(int id);
 }

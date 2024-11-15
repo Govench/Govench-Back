@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 @Data
 public class CommunityResponseDTO {
-
+    private int id;
     private String name;
     private String descripcion;
     private OwnerResponseDTO owner;

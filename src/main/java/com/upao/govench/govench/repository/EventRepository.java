@@ -7,11 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
+
+    @Query("SELECT e FROM Event e WHERE e.date >= :date")
+    List<Event> findAllUpcomingEvents(@Param("date") LocalDate date);
 
     @Query("SELECT e FROM Event e WHERE e.tittle = :tittle")
     List<Event> findAllByEventTittle(@Param("tittle") String Tittle);
@@ -22,6 +24,5 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query("SELECT e FROM Event e JOIN UserEvent ue ON e.id = ue.event.id WHERE ue.user.id = :userId AND e.date >= :now")
     List<Event> findUpcomingEventsForUser(@Param("userId") Integer userId, @Param("now") LocalDate now);
 
-
-
+    List<Event> findByOwner_Id(Integer ownerId);
 }

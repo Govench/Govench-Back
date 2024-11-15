@@ -1,8 +1,8 @@
 package com.upao.govench.govench.model.dto;
 
 
-import com.upao.govench.govench.model.entity.Location;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,13 +29,10 @@ public class EventRequestDTO {
     private LocalDate date;
 
     @NotBlank(message = "La hora de inicio no puede estar vacía")
-    private LocalTime startTime ;
+    private LocalTime startTime;
 
     @NotBlank(message = "La hora de fin no puede estar vacía")
     private LocalTime endTime;
-
-    @NotBlank(message = "El estado no puede estar vacío")
-    private String state;
 
     @NotBlank(message = "El tipo no puede estar vacio")
     private String type;
@@ -43,8 +40,18 @@ public class EventRequestDTO {
     @NotBlank(message = "El nivel de experiencia no se puede estar vacio")
     private String exp;
 
+    private String coverPath;//ruta de la imagen
+
     private BigDecimal cost;
 
-    private Location location;
+    private String address;
+    private String department;
+    private String province;
+    private String district;
 
+    @NotNull(message = "La capacidad máxima no puede estar vacía")
+    @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
+    private Integer maxCapacity;
+
+    
 }

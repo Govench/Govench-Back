@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.service.ReportService;
 import com.upao.govench.govench.service.PDFService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -15,6 +16,7 @@ import java.io.ByteArrayInputStream;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/reports")
+@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
 public class ReportController {
     private final ReportService reportService;
     private final PDFService pdfService;
@@ -27,7 +29,7 @@ public class ReportController {
     @GetMapping("/user/{userId}/pdf")
     public ResponseEntity<InputStreamResource> downloadUserReportPdf(@PathVariable Integer userId) {
         ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
-        ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO);
+        ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO, userId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=user_report_" + userId + ".pdf");

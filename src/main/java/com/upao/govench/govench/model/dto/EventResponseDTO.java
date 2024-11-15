@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,10 +20,12 @@ public class EventResponseDTO {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String state;
     private String type;
     private BigDecimal cost;
     private LocationResponseDTO location;
     private String exp;
-    private RatingEventResponseDTO rating;
+    private String coverPath;
+    private Integer maxCapacity;
+    private int registeredCount;
+    private Integer ownerId;
 }
