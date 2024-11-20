@@ -103,26 +103,14 @@ public class GraphServiceImpl implements GraphService {
 
         // Crear los gráficos para cada evento
         for (Map.Entry<Integer, Map<Integer, Integer>> entry : eventStarCounts.entrySet()) {
-            Integer eventId = entry.getKey();
-            Map<Integer, Integer> stars = entry.getValue();
-
-            if (stars.values().stream().allMatch(count -> count == 0)) { // Verificar si todas las calificaciones son 0
-                continue;
-            }
-
             // Crear el dataset para el gráfico de este evento
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-            for (Map.Entry<Integer, Integer> starEntry : stars.entrySet()) {
-                dataset.addValue(starEntry.getValue(), "Estrellas", starEntry.getKey() + " Estrellas");
-            }
-
-            // Obtener el título del evento
-            String eventTitle = eventServiceImpl.getEventById(eventId).getTittle();
+            entry.getValue().forEach((stars, count) -> dataset.addValue(count, "Estrellas", stars + " Estrellas"));
 
             // Crear el gráfico de barras
             JFreeChart chart = ChartFactory.createBarChart(
-                    "Calificaciones de Estrellas para " + eventTitle,
+                    "Calificaciones de Estrellas para " + entry.getKey(),
                     "Estrellas",
                     "Cantidad de Calificaciones",
                     dataset
@@ -136,8 +124,7 @@ public class GraphServiceImpl implements GraphService {
     }
 
     public byte[] createChartImage(JFreeChart chart) {
-        try {
-            ByteArrayOutputStream chartOutputStream = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream chartOutputStream = new ByteArrayOutputStream()) {
             ChartUtils.writeChartAsPNG(chartOutputStream, chart, 600, 400);
             return chartOutputStream.toByteArray();
         } catch (Exception e) {

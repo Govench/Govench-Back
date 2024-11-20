@@ -2,6 +2,9 @@ package com.upao.govench.govench.model.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Data
 public class ReportResponseDTO {
     private String message;
@@ -16,8 +19,7 @@ public class ReportResponseDTO {
         private int eventsAttended;
         private int participationPercentage;
         private CommunityStatsDTO communityStats;
-        private EventRatingStatsDTO eventRatingStats;
-        private UserActivityStatsDTO userActivityStats;
+        private EventStatsDTO eventStatsDTO;
     }
     @Data
     public static class CommunityStatsDTO {
@@ -27,14 +29,23 @@ public class ReportResponseDTO {
     }
 
     @Data
-    public static class EventRatingStatsDTO {
-        private int totalRatingsGiven;
-        private double averageEventRating;
+    public static class EventStatsDTO {
+        private List<SimplifiedEventDTO> createdEvents;
+        private List<EventRatingStatsDTO> eventRatings;
     }
 
     @Data
-    public static class UserActivityStatsDTO {
-        private int totalPostsByUser;
-        private int totalCommentsByUser;
+    public static class SimplifiedEventDTO {
+        private int id;
+        private String tittle;
+        private LocalDate date;
+    }
+
+    @Data
+    public static class EventRatingStatsDTO {
+        private int eventId;
+        private String eventTitle;
+        private double averageRating;
+        private int totalRatings;
     }
 }

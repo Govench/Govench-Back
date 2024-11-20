@@ -19,15 +19,12 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserStatisticsServiceImpl implements UserStatisticsService {
-    @Autowired
     private EventRepository eventRepository;
-    @Autowired
     private RatingRepository ratingRepository;
-    @Autowired
     private PostRepository postRepository;
-    @Autowired
     private RatingEventRepository ratingEventRepository;
 
+    @Override
     public Map<String, Integer> getWeeklyPost(Integer userId) {
         Map<String, Integer> weeklyResponses = new HashMap<>();
 
@@ -42,13 +39,14 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return weeklyResponses;
     }
 
+    @Override
     public Map<String, Integer> getMonthlyPost(Integer userId) {
         Map<String, Integer> monthlyResponses = new HashMap<>();
 
         LocalDate startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
 
-        for (LocalDate date = startOfMonth; !date.isEqual(endOfMonth.plusDays(1)); date = date.plusDays(1)) {
+        for (LocalDate date = startOfMonth; !date.isAfter(endOfMonth); date = date.plusDays(1)) {
             int dailyResponses = postRepository.countByAutor_IdAndCreated(userId, date);
             monthlyResponses.put(date.getDayOfMonth() + "/" + date.getMonthValue(), dailyResponses);
         }
@@ -56,6 +54,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return monthlyResponses;
     }
 
+    @Override
     public Map<Integer, Integer> getUserRatings(Integer userId) {
         Map<Integer, Integer> starCounts = new HashMap<>();
         for (int i = 1; i <= 5; i++) {
@@ -65,25 +64,25 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         return starCounts;
     }
 
+    @Override
     public Map<Integer, Map<Integer, Integer>> getUserEventRatingsByEvent(Integer userId) {
         Map<Integer, Map<Integer, Integer>> eventRatingsMap = new HashMap<>();
 
         // Obtener todos los eventos creados por el usuario
-        List<Event> events = eventRepository.findByOwner_Id(userId); // Método para obtener eventos por el id del propietario
+        List<Event> events = eventRepository.findByOwner_Id(userId);
 
         // Iterar sobre cada evento
         for (Event event : events) {
-            int eventId = event.getId();
             Map<Integer, Integer> starCounts = new HashMap<>();
 
             // Contar las calificaciones para cada puntuación del 1 al 5
             for (int i = 1; i <= 5; i++) {
-                int count = ratingEventRepository.countByEventId_IdAndValorPuntuacion(eventId, i);
+                int count = ratingEventRepository.countByEventId_IdAndValorPuntuacion(event.getId(), i);
                 starCounts.put(i, count);
             }
 
             // Agregar al mapa de eventos
-            eventRatingsMap.put(eventId, starCounts);
+            eventRatingsMap.put(event.getId(), starCounts);
         }
 
         return eventRatingsMap;

@@ -104,13 +104,14 @@ public class PDFService {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
                     Image chartImage = new Image(chartImageData);
                     document.add(chartImage);
+                    document.add(new Paragraph("\n"));
                 }
             }
 
 
             document.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error al generar el PDF", e);
         }
 
 

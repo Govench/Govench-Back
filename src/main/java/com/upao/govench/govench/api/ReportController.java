@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/reports")
-@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'PARTICIPANT')")
 public class ReportController {
     private final ReportService reportService;
     private final PDFService pdfService;
