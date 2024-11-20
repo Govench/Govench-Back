@@ -57,6 +57,12 @@ public class EventServiceImpl implements EventService {
         return event;
     }
 
+    @Transactional(readOnly = true)
+    public EventResponseDTO findEventById(int id) {
+        EventResponseDTO event = eventMapper.convertToDTO(getEventById(id));
+        return event;
+    }
+
     @Transactional
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
         if(eventRequestDTO.getDate().isBefore(LocalDate.now()))

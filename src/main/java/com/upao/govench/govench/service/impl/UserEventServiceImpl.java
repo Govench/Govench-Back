@@ -40,16 +40,14 @@ public class UserEventServiceImpl implements UserEventService {
     @Override
     public UserEvent addUserEvent(UserEvent userEvent) {
 
-        User user = userRepository.findById(userEvent.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User user =userEvent.getUser();
 
 
-        if ("ROLE_ADMIN".equals(user.getRole().getName())) {
+        if (user.getRole() == null || "ROLE_ADMIN".equals(user.getRole().getName())) {
             throw new RuntimeException("Solo participantes y organizadores pueden registrarse a un evento");
         }
 
-        Event event = eventRepository.findById(userEvent.getEvent().getId())
-                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+        Event event = userEvent.getEvent();
 
         if (event.getRegisteredCount() >= event.getMaxCapacity()) {
             throw new RuntimeException("No hay cupos disponibles para este evento");

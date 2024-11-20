@@ -14,7 +14,7 @@ import java.util.List;
 public class CommunityMapper {
 
     private final ModelMapper modelMapper;
-
+    private final PostMapper postMapper;
     public Community convertToEntity(CommunityRequestDTO communityRequestDTO)
     {
         return modelMapper.map(communityRequestDTO, Community.class);
@@ -28,6 +28,7 @@ public class CommunityMapper {
             throw new IllegalArgumentException("El objeto comunidad no puede ser nulo");
         }
         CommunityResponseDTO communityResponseDTO = modelMapper.map(community, CommunityResponseDTO.class);
+
         if(community.getOwner().getParticipant()!=null)
         {
             communityResponseDTO.getOwner().setName(community.getOwner().getParticipant().getName());
@@ -38,7 +39,8 @@ public class CommunityMapper {
             communityResponseDTO.getOwner().setName(community.getOwner().getOrganizer().getName());
             communityResponseDTO.getOwner().setProfileDesc(community.getOwner().getOrganizer().getProfileDesc());
         }
-
+        communityResponseDTO.setPost(postMapper.convertToListDTO(community.getPost()));
+        communityResponseDTO.setTags(community.getTags());
         return communityResponseDTO;
 
     }

@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEventResponseDTO {
+    
     public String tittle;
     public LocationResponseDTO location;
     public String type;

@@ -31,8 +31,10 @@ public class PostMapper {
         userBasicDTO.setEmail(post.getAutor().getEmail());
 
         if (post.getAutor().getParticipant() != null) {
+
             userBasicDTO.setName(post.getAutor().getParticipant().getName());
-        } else if (post.getAutor().getOrganizer() != null) {
+        }
+        else if (post.getAutor().getOrganizer() != null) {
             userBasicDTO.setName(post.getAutor().getOrganizer().getName());
         } else {
             userBasicDTO.setName("Desconocido");
