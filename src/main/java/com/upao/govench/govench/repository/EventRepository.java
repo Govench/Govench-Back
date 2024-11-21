@@ -32,9 +32,4 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "FROM Event e WHERE e.owner.id = :ownerId")
     List<EventBasicDTO> findSimplifiedEventsByOwnerId(@Param("ownerId") Integer ownerId);
 
-    @Query("SELECT new com.upao.govench.govench.model.dto.ReportResponseDTO.EventRatingStatsDTO(e.id, e.tittle, AVG(r.valorPuntuacion), COUNT(r.id)) " +
-            "FROM Event e LEFT JOIN RatingEvent r ON e.id = r.event.id " +
-            "WHERE e.owner.id = :ownerId " +
-            "GROUP BY e.id, e.tittle")
-    List<ReportResponseDTO.EventRatingStatsDTO> findEventRatingsByOwnerId(@Param("ownerId") Integer ownerId);
 }

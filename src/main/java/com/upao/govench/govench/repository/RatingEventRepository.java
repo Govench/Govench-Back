@@ -1,6 +1,7 @@
 package com.upao.govench.govench.repository;
 
 import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
+import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.model.entity.Event;
 import com.upao.govench.govench.model.entity.RatingEvent;
 import com.upao.govench.govench.model.entity.User;
@@ -20,4 +21,10 @@ public interface RatingEventRepository extends JpaRepository<RatingEvent, Intege
     List<RatingEvent> findRatingsByEventId(@Param("eventId") int eventId);
 
     int countByEventId_IdAndValorPuntuacion(Integer eventId, Integer valorPuntuacion);
+
+    @Query("SELECT new com.upao.govench.govench.model.dto.RatingEventResponseDTO(" +
+            "r.id, r.valorPuntuacion, r.fechaPuntuacion, r.eventId.tittle) " +
+            "FROM RatingEvent r WHERE r.eventId.id = :eventId")
+    List<RatingEventResponseDTO> findRatingsWithEventTitleByEventId(@Param("eventId") int eventId);
+
 }

@@ -32,11 +32,14 @@ public class PDFService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
+            System.out.println("Iniciando generación del PDF para el usuario con ID: " + userId);
+
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDocument = new PdfDocument(writer);
             Document document = new Document(pdfDocument);
 
             // Título principal
+            System.out.println("Agregando título principal al PDF...");
             Paragraph title = new Paragraph("Reporte de Usuario")
                     .setFontSize(20)
                     .setBold()
@@ -44,6 +47,7 @@ public class PDFService {
                     .setMarginBottom(20);
             document.add(title);
 
+            System.out.println("Agregando tabla con resumen general...");
             Table table = new Table(2);
             table.setWidth(UnitValue.createPercentValue(100));
 
@@ -63,44 +67,66 @@ public class PDFService {
             document.add(invisibleParagraph);
 
             // Generar gráfico de respuestas semanales
+            System.out.println("Generando gráfico semanal...");
             byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart(userId);
             if (weeklyChart != null) {
+                System.out.println("Gráfico semanal generado con éxito.");
                 ImageData chartImageData = ImageDataFactory.create(weeklyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
+            } else {
+                document.add(new Paragraph("\n"));
+                System.out.println("No se pudo generar el gráfico semanal.");
             }
 
             // Generar gráfico de respuestas mensuales
+            System.out.println("Generando gráfico mensual...");
             byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart(userId);
             if (monthlyChart != null) {
+                System.out.println("Gráfico mensual generado con éxito.");
                 ImageData chartImageData = ImageDataFactory.create(monthlyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
+            } else {
+                document.add(new Paragraph("\n"));
+                System.out.println("No se pudo generar el gráfico mensual.");
             }
 
+            // Generar gráfico de valoración por estrellas
+            System.out.println("Generando gráfico de valoración por estrellas...");
             byte[] starRatingChart = graphServiceImpl.generateUserStarChart(userId);
-            if(starRatingChart != null){
-                ImageData charImageData = ImageDataFactory.create(starRatingChart);
-                Image chartImage = new Image(charImageData);
+            if (starRatingChart != null) {
+                System.out.println("Gráfico de valoración por estrellas generado con éxito.");
+                ImageData chartImageData = ImageDataFactory.create(starRatingChart);
+                Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
+            } else {
+                document.add(new Paragraph("\n"));
+                System.out.println("No se pudo generar el gráfico de valoración por estrellas.");
             }
 
+            // Generar gráficos de valoración de eventos
+            System.out.println("Generando gráficos de valoración de eventos...");
             List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts(userId);
             if (eventRatingCharts != null && !eventRatingCharts.isEmpty()) {
+                System.out.println("Se generaron " + eventRatingCharts.size() + " gráficos de valoración de eventos.");
                 for (byte[] chartBytes : eventRatingCharts) {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
                     Image chartImage = new Image(chartImageData);
                     document.add(chartImage);
                     document.add(new Paragraph("\n"));
                 }
+            } else {
+                document.add(new Paragraph("\n"));
+                System.out.println("No se generaron gráficos de valoración de eventos.");
             }
 
-
             document.close();
+            System.out.println("PDF generado con éxito.");
         } catch (Exception e) {
+            System.out.println("Error al generar el PDF: " + e.getMessage());
             throw new RuntimeException("Error al generar el PDF", e);
         }
-
 
         return new ByteArrayInputStream(out.toByteArray());
     }

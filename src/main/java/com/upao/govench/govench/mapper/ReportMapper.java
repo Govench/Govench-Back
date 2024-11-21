@@ -33,17 +33,10 @@ public class ReportMapper {
                         .toList()
         );
 
-        summaryDTO.getEventStatsDTO().setEventRatings(
-                eventStatsDTOs.stream()
-                        .flatMap(eventStats -> eventStats.getEventRatings().stream())
-                        .toList()
-        );
-
         // Usar el constructor con los argumentos requeridos
         ReportResponseDTO responseDTO = new ReportResponseDTO(
                 "Reporte generado exitosamente",  // message
-                summaryDTO,                       // summary
-                "http://example.com/reporte.pdf"  // reportUrl
+                summaryDTO
         );
 
         System.out.println("ReportResponseDTO generado: " + responseDTO);
@@ -56,34 +49,14 @@ public class ReportMapper {
    //
 
     /**
-     * Método para mapear las estadísticas de calificación de eventos.
-     */
-    public ReportResponseDTO.EventRatingStatsDTO toEventRatingStatsDTO(
-            Event event,
-            double averageRating,
-            int totalRatings) {
-
-        System.out.println("Mapeando EventRatingStatsDTO para el evento ID: " + event.getId());
-        ReportResponseDTO.EventRatingStatsDTO eventRatingStatsDTO = new ReportResponseDTO.EventRatingStatsDTO();
-        eventRatingStatsDTO.setEventId(event.getId());
-        eventRatingStatsDTO.setEventTitle(event.getTittle());
-        eventRatingStatsDTO.setAverageRating(averageRating);
-        eventRatingStatsDTO.setTotalRatings(totalRatings);
-        System.out.println("EventRatingStatsDTO generado: " + eventRatingStatsDTO);
-        return eventRatingStatsDTO;
-    }
-
-    /**
      * Método para construir las estadísticas de eventos combinando eventos creados y calificados.
      */
     public ReportResponseDTO.EventStatsDTO toEventStatsDTO(
-            List<EventBasicDTO> createdEvents,
-            List<ReportResponseDTO.EventRatingStatsDTO> eventRatings) {
+            List<EventBasicDTO> createdEvents) {
 
         System.out.println("Construyendo EventStatsDTO...");
         ReportResponseDTO.EventStatsDTO eventStatsDTO = new ReportResponseDTO.EventStatsDTO();
         eventStatsDTO.setCreatedEvents(createdEvents);
-        eventStatsDTO.setEventRatings(eventRatings);
         System.out.println("EventStatsDTO generado: " + eventStatsDTO);
         return eventStatsDTO;
     }
