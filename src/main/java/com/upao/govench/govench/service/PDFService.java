@@ -52,23 +52,10 @@ public class PDFService {
                             .setFontSize(14)
                             .setBold()
                             .setTextAlignment(TextAlignment.LEFT))
-                    .add(new Paragraph("Total de Eventos: " + reportResponseDTO.getSummary().getTotalEvents()))
-                    .add(new Paragraph("Nuevos Seguidores: " + reportResponseDTO.getSummary().getNewFollowers()))
+                    .add(new Paragraph("Seguidos: " + reportResponseDTO.getSummary().getNewFollowers()))
                     .add(new Paragraph("Conexiones Hechas: " + reportResponseDTO.getSummary().getConnectionsMade()))
-                    .add(new Paragraph("Eventos Asistidos: " + reportResponseDTO.getSummary().getEventsAttended()))
                     .setBorder(Border.NO_BORDER);
             table.addCell(resumenCell);
-
-            Cell comunidadCell = new Cell()
-                    .add(new Paragraph("Estadísticas de la Comunidad")
-                            .setFontSize(14)
-                            .setBold()
-                            .setTextAlignment(TextAlignment.LEFT))
-                    .add(new Paragraph("Total de Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalCommunities()))
-                    .add(new Paragraph("Total de Usuarios en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalUsersInCommunities()))
-                    .add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()))
-                    .setBorder(Border.NO_BORDER);
-            table.addCell(comunidadCell);
 
             document.add(table);
 
