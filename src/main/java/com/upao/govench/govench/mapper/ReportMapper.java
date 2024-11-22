@@ -12,20 +12,17 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportMapper {
 
-    /**
-     * Método principal para construir el DTO de respuesta del reporte.
-     */
     public ReportResponseDTO toReportResponseDTO(
             int newFollowers,
             int connectionsMade,
+            double averageRating,
             List<ReportResponseDTO.EventStatsDTO> eventStatsDTOs) {
 
-        System.out.println("Construyendo ReportResponseDTO...");
         ReportResponseDTO.ReportSummaryDTO summaryDTO = new ReportResponseDTO.ReportSummaryDTO();
         summaryDTO.setNewFollowers(newFollowers);
         summaryDTO.setConnectionsMade(connectionsMade);
+        summaryDTO.setAverageRating(averageRating);
 
-        System.out.println("Mapeando estadísticas de eventos...");
         summaryDTO.setEventStatsDTO(new ReportResponseDTO.EventStatsDTO());
         summaryDTO.getEventStatsDTO().setCreatedEvents(
                 eventStatsDTOs.stream()
@@ -33,31 +30,18 @@ public class ReportMapper {
                         .toList()
         );
 
-        // Usar el constructor con los argumentos requeridos
         ReportResponseDTO responseDTO = new ReportResponseDTO(
-                "Reporte generado exitosamente",  // message
+                "Reporte generado exitosamente",
                 summaryDTO
         );
-
-        System.out.println("ReportResponseDTO generado: " + responseDTO);
         return responseDTO;
     }
 
-    /**
-     * Método para mapear las estadísticas simplificadas de eventos creados.
-     */
-   //
-
-    /**
-     * Método para construir las estadísticas de eventos combinando eventos creados y calificados.
-     */
     public ReportResponseDTO.EventStatsDTO toEventStatsDTO(
             List<EventBasicDTO> createdEvents) {
 
-        System.out.println("Construyendo EventStatsDTO...");
         ReportResponseDTO.EventStatsDTO eventStatsDTO = new ReportResponseDTO.EventStatsDTO();
         eventStatsDTO.setCreatedEvents(createdEvents);
-        System.out.println("EventStatsDTO generado: " + eventStatsDTO);
         return eventStatsDTO;
     }
 }

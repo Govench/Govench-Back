@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RatingEventRepository extends JpaRepository<RatingEvent, Integer> {
@@ -26,5 +27,9 @@ public interface RatingEventRepository extends JpaRepository<RatingEvent, Intege
             "r.id, r.valorPuntuacion, r.fechaPuntuacion, r.eventId.tittle) " +
             "FROM RatingEvent r WHERE r.eventId.id = :eventId")
     List<RatingEventResponseDTO> findRatingsWithEventTitleByEventId(@Param("eventId") int eventId);
+
+    @Query("SELECT AVG(r.valorPuntuacion) " +
+            "FROM RatingEvent r WHERE r.eventId.owner.id = :userId")
+    Optional<Double> findAverageRatingByUserId(@Param("userId") Integer userId);
 
 }

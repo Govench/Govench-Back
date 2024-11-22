@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 
-    @Scheduled(cron = "*/59 * * * * ?") // Ejecuta el metodo de manera automatica cada 30 seg
+    @Scheduled(cron = "0 */10 * * * ?") // Ejecuta el metodo de manera automatica cada 30 seg
     public void sendReminders() {
         LocalDate now = LocalDate.now();
         List<UserEvent> usersWithNotifications = userEventRepository.findUsersWithNotificationsEnabled(); // Obtiene aquellos con la notificacion activada...

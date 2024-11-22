@@ -19,6 +19,7 @@ public class ReportResponseDTO {
     public static class ReportSummaryDTO {
         private int newFollowers;
         private int connectionsMade;
+        private double averageRating;
         private EventStatsDTO eventStatsDTO;
     }
 

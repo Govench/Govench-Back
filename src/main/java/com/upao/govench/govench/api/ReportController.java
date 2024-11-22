@@ -24,30 +24,17 @@ public class ReportController {
 
     @GetMapping("/pdf")
     public ResponseEntity<InputStreamResource> downloadUserReportPdf() {
-        System.out.println("Iniciando generación de reporte PDF...");
-
-        // Obtener el ID del usuario autenticado
         Integer userId = userService.getAuthenticatedUserIdFromJWT();
-        System.out.println("Usuario autenticado con ID: " + userId);
 
-        // Generar el DTO del reporte
         ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
-        System.out.println("ReportResponseDTO generado: " + reportResponseDTO);
-
-        // Generar el PDF
         ByteArrayInputStream pdfStream = pdfService.generateUserReportPdf(reportResponseDTO, userId);
         if (pdfStream == null) {
-            System.out.println("Error al generar el PDF, flujo de datos nulo.");
             return ResponseEntity.internalServerError().build();
         }
 
-        System.out.println("PDF generado exitosamente para el usuario ID: " + userId);
-
-        // Configurar encabezados de respuesta HTTP
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=user_report_" + userId + ".pdf");
 
-        System.out.println("Preparando respuesta HTTP con contenido PDF...");
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_PDF)

@@ -36,54 +36,13 @@ public class User {
     @Column(name="use_pre_bo", nullable = true)
     private Boolean  premium;
 
-    public Integer getId() {
-        System.out.println("Accediendo al ID del usuario: " + id);
-        return id;
-    }
-
-    public void setId(Integer id) {
-        System.out.println("Estableciendo el ID del usuario: " + id);
-        this.id = id;
-    }
-
-    public String getEmail() {
-        System.out.println("Accediendo al email del usuario: " + email);
-        return email;
-    }
-
-    public void setEmail(String email) {
-        System.out.println("Estableciendo el email del usuario: " + email);
-        this.email = email;
-    }
-
-    public Participant getParticipant() {
-        System.out.println("Accediendo al participant del usuario.");
-        return participant;
-    }
-
-    public void setParticipant(Participant participant) {
-        System.out.println("Estableciendo el participant del usuario.");
-        this.participant = participant;
-    }
-
-    public Organizer getOrganizer() {
-        System.out.println("Accediendo al organizer del usuario.");
-        return organizer;
-    }
-
-    public void setOrganizer(Organizer organizer) {
-        System.out.println("Estableciendo el organizer del usuario.");
-        this.organizer = organizer;
-    }
-
-    public Boolean getPremium() {
-        System.out.println("Accediendo al estado premium: " + premium);
+    public boolean getPremium()
+    {
         return premium;
     }
-
-    public void setPremiun(Boolean premium) {
-        System.out.println("Estableciendo el estado premium: " + premium);
-        this.premium = premium;
+    public void setPremiun(boolean valor)
+    {
+        this.premium = valor;
     }
 }
 
