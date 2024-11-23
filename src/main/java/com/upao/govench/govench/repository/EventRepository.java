@@ -33,4 +33,10 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "FROM Event e WHERE e.owner.id = :ownerId")
     List<EventBasicDTO> findSimplifiedEventsByOwnerId(@Param("ownerId") Integer ownerId);
 
+    @Query("SELECT e.tittle, COUNT(ue.id) " +
+            "FROM Event e LEFT JOIN UserEvent ue ON e.id = ue.event.id " +
+            "WHERE e.owner.id = :userId " +
+            "GROUP BY e.tittle " +
+            "ORDER BY COUNT(ue.id) DESC")
+    List<Object[]> findEventsWithParticipantsCount(@Param("userId") Integer userId);
 }

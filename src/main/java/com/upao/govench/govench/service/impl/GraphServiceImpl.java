@@ -109,10 +109,7 @@ public class GraphServiceImpl implements GraphService {
             }
         }
 
-        if (!hasData) {
-            System.out.println("No hay datos suficientes para generar el gráfico de calificaciones del usuario.");
-            return null;
-        }
+        if (!hasData) { return null; }
 
         JFreeChart chart = ChartFactory.createBarChart(
                 "Calificaciones recibidas por otros usuarios",
@@ -150,7 +147,7 @@ public class GraphServiceImpl implements GraphService {
             }
 
             JFreeChart chart = ChartFactory.createBarChart(
-                    "Calificaciones para el evento" + entry.getKey(),
+                    "Calificaciones para el evento " + entry.getKey(),
                     "Estrellas",
                     "Cantidad de Calificaciones",
                     dataset
@@ -166,6 +163,36 @@ public class GraphServiceImpl implements GraphService {
 
         return chartImages.isEmpty() ? null : chartImages;
     }
+
+    public byte[] generateEventParticipantsChart(Integer userId) {
+        List<Object[]> eventParticipantsData = eventRepository.findEventsWithParticipantsCount(userId);
+
+        if (eventParticipantsData.isEmpty()) {
+            return null;
+        }
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for (Object[] data : eventParticipantsData) {
+            String eventTitle = (String) data[0];
+            long participantCount = (Long) data[1];
+            dataset.addValue(participantCount, "Participantes", eventTitle);
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Cantidad de Participantes por Evento",
+                "Eventos",
+                "Cantidad de Participantes",
+                dataset
+        );
+        chart.removeLegend();
+
+        BarRenderer renderer = new BarRenderer();
+        renderer.setSeriesPaint(0, Color.BLUE); // Color de la barra
+        chart.getCategoryPlot().setRenderer(renderer);
+
+        return createChartImage(chart);
+    }
+
 
     public byte[] createChartImage(JFreeChart chart) {
         try (ByteArrayOutputStream chartOutputStream = new ByteArrayOutputStream()) {

@@ -7,7 +7,6 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.service.impl.GraphServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,15 @@ import java.util.List;
 public class PDFService {
     @Autowired
     private GraphServiceImpl graphServiceImpl;
+    @Autowired
+    private ReportService reportService;
 
-    public ByteArrayInputStream generateUserReportPdf(ReportResponseDTO reportResponseDTO, int userId) {
+    public ByteArrayInputStream generateUserReportPdf(int userId) {
+
+        ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        boolean hasValidData = false; // Bandera para validar si hay al menos un grafico
 
         try {
             PdfWriter writer = new PdfWriter(out);
@@ -37,44 +42,9 @@ public class PDFService {
                     .setMarginBottom(20);
             document.add(title);
 
-            Table table = new Table(2);
-            table.setWidth(UnitValue.createPercentValue(100));
-
-            Cell resumenCell = new Cell() .add(new Paragraph("Resumen General")
-                            .setFontSize(14)
-                            .setBold()
-                            .setTextAlignment(TextAlignment.LEFT));
-
-            boolean hasData = false;
-
-            if (reportResponseDTO.getSummary().getNewFollowers() > 0) {
-                resumenCell.add(new Paragraph("Seguidos: " + reportResponseDTO.getSummary().getNewFollowers()));
-                hasData = true;
-            }
-
-            if (reportResponseDTO.getSummary().getConnectionsMade() > 0) {
-                resumenCell.add(new Paragraph("Conexiones Hechas: " + reportResponseDTO.getSummary().getConnectionsMade()));
-                hasData = true;
-            }
-
-            double averageRating = reportResponseDTO.getSummary().getAverageRating();
-            if (averageRating > 0) {
-                resumenCell.add(new Paragraph("Calificación Promedio: " + String.format("%.2f", averageRating)));
-                hasData = true;
-            }
-
-            if (hasData) {
-                table.addCell(resumenCell);
-                document.add(table);
-            } else {
-                document.add(new Paragraph("No hay datos disponibles para el resumen general.")
-                        .setFontSize(12)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setMarginBottom(10));
-            }
-
             byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart(userId);
             if (weeklyChart != null && weeklyChart.length > 0) {
+                hasValidData = true;
                 ImageData chartImageData = ImageDataFactory.create(weeklyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
@@ -82,6 +52,7 @@ public class PDFService {
 
             byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart(userId);
             if (monthlyChart != null && monthlyChart.length > 0) {
+                hasValidData = true;
                 ImageData chartImageData = ImageDataFactory.create(monthlyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
@@ -89,6 +60,7 @@ public class PDFService {
 
             byte[] starRatingChart = graphServiceImpl.generateUserStarChart(userId);
             if (starRatingChart != null) {
+                hasValidData = true;
                 ImageData chartImageData = ImageDataFactory.create(starRatingChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
@@ -96,6 +68,7 @@ public class PDFService {
 
             List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts(userId);
             if (eventRatingCharts != null && !eventRatingCharts.isEmpty()) {
+                hasValidData = true;
                 for (byte[] chartBytes : eventRatingCharts) {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
                     Image chartImage = new Image(chartImageData);
@@ -104,7 +77,17 @@ public class PDFService {
                 }
             }
 
+            byte[] eventParticipantsChart = graphServiceImpl.generateEventParticipantsChart(userId);
+            if (eventParticipantsChart != null) {
+                hasValidData = true;
+                ImageData chartImageData = ImageDataFactory.create(eventParticipantsChart);
+                Image chartImage = new Image(chartImageData);
+                document.add(chartImage);
+            }
+
             document.close();
+
+            if (!hasValidData) { return null; }
         } catch (Exception e) {
             throw new RuntimeException("Error al generar el PDF", e);
         }

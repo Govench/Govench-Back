@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor // Constructor necesario para JPQL
+@AllArgsConstructor
 @NoArgsConstructor
 public class EventBasicDTO {
     private int id;

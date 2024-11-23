@@ -31,7 +31,4 @@ public interface UserEventRepository extends JpaRepository<UserEvent, IdCompuest
 
     Optional<UserEvent> findByUserIdAndEventId(Integer userId, Long eventId);
 
-    @Query("SELECT COUNT(DISTINCT ue.event) FROM UserEvent ue WHERE ue.user.id = :userId")
-    int countDistinctEventsByUserId(@Param("userId") Integer userId);
-
 }

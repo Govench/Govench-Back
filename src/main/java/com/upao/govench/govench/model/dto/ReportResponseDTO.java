@@ -9,25 +9,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ReportResponseDTO {
     private String message;
-    private ReportSummaryDTO summary;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ReportSummaryDTO {
-        private int newFollowers;
-        private int connectionsMade;
-        private double averageRating;
-        private EventStatsDTO eventStatsDTO;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class EventStatsDTO {
-        private List<EventBasicDTO> createdEvents;
-    }
-
+    private List<EventBasicDTO> createdEvents;
 }

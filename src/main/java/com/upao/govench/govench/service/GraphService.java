@@ -11,4 +11,5 @@ public interface GraphService {
     byte[] generateMonthlyPostChart(Integer userId);
     byte[] generateUserStarChart(Integer userId);
     List<byte[]> generateEventStarCharts(Integer userId);
+    byte[] generateEventParticipantsChart(Integer userId);
 }

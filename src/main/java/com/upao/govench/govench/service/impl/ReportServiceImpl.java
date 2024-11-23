@@ -18,28 +18,12 @@ import java.util.List;
 public class ReportServiceImpl implements ReportService {
 
     private ReportMapper reportMapper;
-    private FollowRepository followRepository;
     private EventRepository eventRepository;
-    private RatingEventRepository ratingEventRepository;
 
     @Override
     public ReportResponseDTO generateReport(Integer userId) {
-
-        int newFollowing = followRepository.countByFollowingId(userId);
-        int connectionsMade = followRepository.countByFollowerId(userId);
-
         List<EventBasicDTO> createdEvents = eventRepository.findSimplifiedEventsByOwnerId(userId);
 
-        double averageRating = ratingEventRepository.findAverageRatingByUserId(userId).orElse(0.0);
-
-        // **Paso 6: Combinar datos en un `EventStatsDTO`**
-        ReportResponseDTO.EventStatsDTO eventStatsDTO = reportMapper.toEventStatsDTO(createdEvents);
-
-        return reportMapper.toReportResponseDTO(
-                newFollowing,
-                connectionsMade,
-                averageRating,
-                List.of(eventStatsDTO)
-        );
+        return reportMapper.toReportResponseDTO(createdEvents);
     }
 }
