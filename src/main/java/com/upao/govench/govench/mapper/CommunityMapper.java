@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -29,21 +30,27 @@ public class CommunityMapper {
         }
         CommunityResponseDTO communityResponseDTO = modelMapper.map(community, CommunityResponseDTO.class);
 
-        if(community.getOwner().getParticipant()!=null)
-        {
+        // Verificar si el propietario es participante u organizador
+        if (community.getOwner().getParticipant() != null) {
             communityResponseDTO.getOwner().setName(community.getOwner().getParticipant().getName());
             communityResponseDTO.getOwner().setProfileDesc(community.getOwner().getParticipant().getProfileDesc());
         }
-        if(community.getOwner().getOrganizer()!=null)
-        {
+        if (community.getOwner().getOrganizer() != null) {
             communityResponseDTO.getOwner().setName(community.getOwner().getOrganizer().getName());
             communityResponseDTO.getOwner().setProfileDesc(community.getOwner().getOrganizer().getProfileDesc());
         }
-        communityResponseDTO.setPost(postMapper.convertToListDTO(community.getPost()));
+
+        // Verificar si 'posts' es null y asignar una lista vacía si es necesario
+        if (community.getPost() != null) {
+            communityResponseDTO.setPost(postMapper.convertToListDTO(community.getPost()));
+        } else {
+            communityResponseDTO.setPost(new ArrayList<>()); // Si es null, asigna una lista vacía
+        }
+
         communityResponseDTO.setTags(community.getTags());
         return communityResponseDTO;
-
     }
+
     public CommunityRequestDTO converToRequestDTO(Community community){
         return modelMapper.map(community, CommunityRequestDTO.class);
     }
