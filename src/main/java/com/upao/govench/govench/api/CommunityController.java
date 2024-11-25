@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/community")
@@ -95,8 +96,14 @@ public class CommunityController {
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER','PARTICIPANT')")
     @PostMapping("/create")
     public ResponseEntity<?> createCommunity(@RequestBody CommunityRequestDTO community) throws Exception {
-        Integer userid= userService.getAuthenticatedUserIdFromJWT();
-        User owner= userService.getUserbyId(userid);
+        Integer userid = userService.getAuthenticatedUserIdFromJWT();
+        User owner = userService.getUserbyId(userid);
+
+        // Verificar si 'posts' es null y asignar una lista vacía si lo es
+        if (community.getPosts() == null) {
+            community.setPosts(new ArrayList<>());  // Asignar lista vacía si 'posts' es null
+        }
+
         communityService.save(community, owner);
         return new ResponseEntity<>("Comunidad creada con éxito", HttpStatus.CREATED);
     }
