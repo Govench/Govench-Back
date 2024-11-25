@@ -1,18 +1,14 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.mapper.ReportMapper;
+import com.upao.govench.govench.model.dto.EventBasicDTO;
+import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
-import com.upao.govench.govench.model.entity.Follow;
-import com.upao.govench.govench.model.entity.UserCommunity;
-import com.upao.govench.govench.model.entity.UserEvent;
-import com.upao.govench.govench.model.entity.User;
-import com.upao.govench.govench.repository.FollowRepository;
-import com.upao.govench.govench.repository.UserCommunityRepository;
-import com.upao.govench.govench.repository.UserEventRepository;
-import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.model.dto.UserBasicDTO;
+import com.upao.govench.govench.model.entity.*;
+import com.upao.govench.govench.repository.*;
 import com.upao.govench.govench.service.ReportService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,57 +17,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserEventRepository userEventRepository;
-
-    @Autowired
-    private UserCommunityRepository userCommunityRepository;
-
-    @Autowired
     private ReportMapper reportMapper;
-
-    @Autowired
-    private FollowRepository followRepository;
+    private EventRepository eventRepository;
 
     @Override
     public ReportResponseDTO generateReport(Integer userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        List<EventBasicDTO> createdEvents = eventRepository.findSimplifiedEventsByOwnerId(userId);
 
-        List<UserEvent> userEvents = userEventRepository.findByUser(user);
-        List<UserCommunity> userCommunities = userCommunityRepository.findByUser(user);
-
-        int totalEvents = userEvents.size();
-        int newFollowers = followRepository.findByFollowing(user).size();
-        int connectionsMade = followRepository.findByFollower(user).size();
-        int eventsAttended = userEvents.size();
-        int totalCommunities = countDistinctCommunities(userCommunities);
-        int totalUsersInCommunities = countDistinctUsersInCommunities(userCommunities);
-        int totalPostsInCommunities = countDistinctUsersInCommunities(userCommunities);
-
-        ReportResponseDTO.CommunityStatsDTO communityStatsDTO = new ReportResponseDTO.CommunityStatsDTO();
-        communityStatsDTO.setTotalCommunities(totalCommunities);
-        communityStatsDTO.setTotalUsersInCommunities(totalUsersInCommunities);
-        communityStatsDTO.setTotalPostsInCommunities(totalPostsInCommunities);
-
-        return reportMapper.toReportResponseDTO(
-                totalEvents,
-                newFollowers,
-                connectionsMade,
-                eventsAttended,
-                communityStatsDTO);
-    }
-
-    private int countDistinctCommunities(List<UserCommunity> userCommunities) {
-        return userCommunities.size();
-    }
-
-    private int countDistinctUsersInCommunities(List<UserCommunity> userCommunities) {
-        return (int) userCommunities.stream()
-                .map(UserCommunity::getUser)
-                .distinct()
-                .count();
+        return reportMapper.toReportResponseDTO(createdEvents);
     }
 }

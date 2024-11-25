@@ -59,5 +59,6 @@ public class Organizer{
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JsonIgnore
     private User user;
 }

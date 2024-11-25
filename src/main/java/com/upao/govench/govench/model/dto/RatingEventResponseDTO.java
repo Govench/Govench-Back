@@ -16,4 +16,5 @@ public class RatingEventResponseDTO {
     private int id;
     private int valorPuntuacion;
     private LocalDate fechaPuntuacion;
+    private String tittle;
 }
