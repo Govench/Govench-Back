@@ -1,6 +1,5 @@
 package com.upao.govench.govench.api;
 
-import com.upao.govench.govench.exceptions.UserCommunityAlreadyExistsException;
 import com.upao.govench.govench.mapper.CommunityMapper;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
 import com.upao.govench.govench.model.dto.UserCommunityResponseDTO;
@@ -52,7 +51,13 @@ public class UserCommunityController {
         return userCommunityService.searchUserCommunityById(id);
     }
 
-
+    @GetMapping("/pertains")
+    public List<UserCommunityResponseDTO> getComunitiesPertains() {
+        Integer idUser = userService.getAuthenticatedUserIdFromJWT();
+        User user = userService.getUserbyId(idUser);
+        List<UserCommunity> userCommunities = userCommunityService.getUserCommunityByUser(user);
+        return communityMapper.convertToListUserCommunityResponseDTO(userCommunities);
+    }
 
     @PostMapping("/{idcommunity}")
     @PreAuthorize("hasAnyRole('PARTICIPANT', 'ORGANIZER')")

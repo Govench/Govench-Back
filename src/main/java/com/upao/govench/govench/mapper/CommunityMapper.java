@@ -2,7 +2,9 @@ package com.upao.govench.govench.mapper;
 
 import com.upao.govench.govench.model.dto.CommunityRequestDTO;
 import com.upao.govench.govench.model.dto.CommunityResponseDTO;
+import com.upao.govench.govench.model.dto.UserCommunityResponseDTO;
 import com.upao.govench.govench.model.entity.Community;
+import com.upao.govench.govench.model.entity.UserCommunity;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -51,10 +53,26 @@ public class CommunityMapper {
         return communityResponseDTO;
     }
 
+    public UserCommunityResponseDTO toUserCommunityResponseDTO(UserCommunity userCommunity) {
+        UserCommunityResponseDTO userCommunityResponseDTO =  modelMapper.map(userCommunity, UserCommunityResponseDTO.class);
+
+        userCommunityResponseDTO.setNameCommunity(userCommunity.getCommunity().getName());
+        userCommunityResponseDTO.setDescriptionCommunity(userCommunity.getCommunity().getDescripcion());
+        userCommunityResponseDTO.setDate(userCommunity.getDate());
+
+        return userCommunityResponseDTO;
+    }
+
     public CommunityRequestDTO converToRequestDTO(Community community){
         return modelMapper.map(community, CommunityRequestDTO.class);
     }
     public List<CommunityResponseDTO> convertoToListResponseDTO(List<Community> communities){
         return communities.stream().map(this::converToResponseDTO).toList();
+    }
+
+    public List<UserCommunityResponseDTO> convertToListUserCommunityResponseDTO(List<UserCommunity> userCommunities){
+        return userCommunities.stream()
+                .map(this::toUserCommunityResponseDTO)
+                .toList();
     }
 }

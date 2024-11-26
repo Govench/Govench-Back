@@ -4,7 +4,6 @@ package com.upao.govench.govench.mapper;
 import com.upao.govench.govench.model.dto.OwnerResponseDTO;
 import com.upao.govench.govench.model.dto.UserEventResponseDTO;
 import com.upao.govench.govench.model.entity.UserEvent;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +30,7 @@ public class UserEventMapper {
         userEventResponseDTO.setRegistrationDate(userEvent.getRegistrationDate());
         return userEventResponseDTO;
     }
+
     private OwnerResponseDTO ToUserResponseDto(UserEvent userEvent) {
         OwnerResponseDTO ownerResponseDTO =  new OwnerResponseDTO();
         ownerResponseDTO.setId(userEvent.getUser().getId());
