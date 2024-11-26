@@ -1,6 +1,7 @@
 package com.upao.govench.govench.service.impl;
 
 import com.upao.govench.govench.exceptions.UserCommunityAlreadyExistsException;
+import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.UserCommunity;
 import com.upao.govench.govench.model.entity.IdCompuestoU_C;
 import com.upao.govench.govench.repository.UserCommunityRepository;
@@ -49,4 +50,8 @@ public class UserCommunityServiceImpl implements  UserCommunityService {
         return UserCommunityRepository.findAll();
     }
 
+    @Override
+    public List<UserCommunity> getUserCommunityByUser(User user) {
+        return UserCommunityRepository.findByUser(user);
+    }
 }
