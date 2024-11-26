@@ -56,6 +56,7 @@ public class CommunityMapper {
     public UserCommunityResponseDTO toUserCommunityResponseDTO(UserCommunity userCommunity) {
         UserCommunityResponseDTO userCommunityResponseDTO =  modelMapper.map(userCommunity, UserCommunityResponseDTO.class);
 
+        userCommunityResponseDTO.setIdCommunity(userCommunity.getCommunity().getId());
         userCommunityResponseDTO.setNameCommunity(userCommunity.getCommunity().getName());
         userCommunityResponseDTO.setDescriptionCommunity(userCommunity.getCommunity().getDescripcion());
         userCommunityResponseDTO.setDate(userCommunity.getDate());

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCommunityResponseDTO {
+    private Integer idCommunity;
     private String nameCommunity;
     private String descriptionCommunity;
     private LocalDate date;
