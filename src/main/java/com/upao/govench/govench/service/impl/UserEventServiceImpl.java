@@ -61,12 +61,18 @@ public class UserEventServiceImpl implements UserEventService {
 
         event.setRegisteredCount(event.getRegisteredCount() + 1);
         eventRepository.save(event);
-        registerConfirmationImpl.sendReservationEmailToUser(user, event);
+        try {
+            registerConfirmationImpl.sendReservationEmailToUser(user, event);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al enviar el correo de confirmación al usuario");
+        }
 
-        if(user.getId() != event.getOwner().getId()){
-            // Si el usuario que ha creado el evento, se registra a su propio evento, evita que
-            // se envie el correo de confirmación de registro.
-            registerConfirmationImpl.sendReservationEmailToOwner(user, event);
+        if (!user.getId().equals(event.getOwner().getId())) {
+            try {
+                registerConfirmationImpl.sendReservationEmailToOwner(user, event);
+            } catch (Exception e) {
+                throw new RuntimeException("Error al enviar el correo de notificación al organizador");
+            }
         }
 
         userEvent.setUser(user);
