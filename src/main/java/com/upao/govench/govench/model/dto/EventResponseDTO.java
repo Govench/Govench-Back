@@ -29,4 +29,5 @@ public class EventResponseDTO {
     private Integer maxCapacity;
     private int registeredCount;
     private Integer ownerId;
+    private boolean deleted;
 }

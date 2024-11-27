@@ -1,6 +1,5 @@
 package com.upao.govench.govench.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -66,4 +64,11 @@ public class Event {
     @JoinColumn(name = "com_own_vc", nullable = false, referencedColumnName = "user_id")
     private User owner;
 
+    @Column(name = "eve_deleted_bo", nullable = true)
+    private boolean deleted = false;
+
+    public  boolean getstatusdeleted()
+    {
+        return this.deleted;
+    }
 }
