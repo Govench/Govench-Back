@@ -60,7 +60,8 @@ public class Event {
 
     @Column(name = "eve_reg_count_in", nullable = false)
     private int registeredCount = 0;
-
+    @Column(name ="eve_link_vc", nullable = true)
+    private String link;
     @ManyToOne
     @JoinColumn(name = "com_own_vc", nullable = false, referencedColumnName = "user_id")
     private User owner;
