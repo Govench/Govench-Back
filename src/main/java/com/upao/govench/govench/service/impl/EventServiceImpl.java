@@ -95,6 +95,29 @@ public class EventServiceImpl implements EventService {
     public EventResponseDTO updateEvent(Integer id, EventRequestDTO eventRequestDTO) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Evento no encontrado con el numero de ID"+id));
+
+
+        if(eventRequestDTO.getDate().isBefore(LocalDate.now()))
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con fecha pasada");
+        }
+        LocalDateTime localDateStartTime = LocalDateTime.of(eventRequestDTO.getDate(),eventRequestDTO.getStartTime());
+        LocalDateTime localDateEndTime = LocalDateTime.of(eventRequestDTO.getDate(),eventRequestDTO.getEndTime());
+        if(localDateStartTime.isBefore(LocalDateTime.now()))
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con una hora pasada");
+        }
+        if (localDateEndTime.isBefore(localDateStartTime)) {
+            throw new IllegalArgumentException("La hora de fin del evento debe ser mayor que la del inicio");
+        }
+        if (Duration.between(eventRequestDTO.getStartTime(), eventRequestDTO.getEndTime()).toHours() < 2) {
+            throw new IllegalArgumentException("El evento debe durar mínimo 2 horas");
+        }
+        if(eventRequestDTO.getMaxCapacity() <=0)
+        {
+            throw new IllegalArgumentException("No puedes crear un evento con una capacidad menor a 0");
+        }
+
         if(eventRequestDTO.getTittle()!= null)event.setTittle(eventRequestDTO.getTittle());
         if(eventRequestDTO.getDescription()!= null)event.setDescription(eventRequestDTO.getDescription());
         if(eventRequestDTO.getDate()!= null)event.setDate(eventRequestDTO.getDate());
@@ -114,9 +137,24 @@ public class EventServiceImpl implements EventService {
         return eventMapper.convertToDTO(event);
     }
 
-    @Transactional
     public void deleteEvent(Integer id) {
-        eventRepository.deleteById(id);
+
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe un evento con el número de ID: " + id));
+
+
+        if (event.getstatusdeleted()) {
+            throw new IllegalArgumentException("No puedes eliminar un evento que ya está marcado como eliminado.");
+        }
+
+
+        event.setDeleted(true);
+        eventRepository.save(event);
+    }
+
+    @Override
+    public List<EventResponseDTO> findNotDeletedEvents() {
+        return eventMapper.convertToListDTO(eventRepository.findByDeletedFalse());
     }
 
     @Transactional(readOnly = true)

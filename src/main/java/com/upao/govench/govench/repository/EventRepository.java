@@ -39,4 +39,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "GROUP BY e.tittle " +
             "ORDER BY COUNT(ue.id) DESC")
     List<Object[]> findEventsWithParticipantsCount(@Param("userId") Integer userId);
+
+    List<Event> findByDeletedFalse();
 }
