@@ -29,6 +29,7 @@ public class UserEventMapper {
         userEventResponseDTO.setDate(userEvent.getEvent().getDate());
         userEventResponseDTO.setStartTime(userEvent.getEvent().getStartTime());
         userEventResponseDTO.setRegistrationDate(userEvent.getRegistrationDate());
+        userEventResponseDTO.setLink(userEvent.getEvent().getLink());
         return userEventResponseDTO;
     }
     private OwnerResponseDTO ToUserResponseDto(UserEvent userEvent) {

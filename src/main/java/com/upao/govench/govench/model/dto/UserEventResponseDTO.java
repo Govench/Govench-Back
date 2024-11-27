@@ -18,4 +18,5 @@ public class UserEventResponseDTO {
     public LocalDate date;
     public LocalTime startTime;
     public LocalDate registrationDate;
+    public String link;
 }
