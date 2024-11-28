@@ -6,6 +6,7 @@ import com.upao.govench.govench.mapper.RatingMapper;
 import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.EventRepository;
+import com.upao.govench.govench.repository.RatingEventRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
@@ -52,6 +53,9 @@ public class UserController {
 
     @Autowired
     private TokenProvider tokenProvider;
+    @Autowired
+    private RatingEventRepository ratingEventRepository;
+
     @PostMapping("/upload/profile-photo")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
         Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
@@ -308,12 +312,22 @@ public class UserController {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento no encontrado"));
 
-        try{
             userService.createRatingEvent(user, event, ratingEventRequestDTO);
             return new ResponseEntity<>("Evento calificado correctamente", HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al calificar evento", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+    }
+
+    @GetMapping("/verification/{idEvent}")
+    public boolean verification(@PathVariable int idEvent){
+
+        Integer authenticatedUserId = userService.getAuthenticatedUserIdFromJWT();
+        User user = userRepository.findById(authenticatedUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Event event = eventRepository.findById(idEvent)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento no encontrado"));
+        boolean verification = ratingEventRepository.existsByUserIdAndEventId(user,event);
+        return verification;
+
     }
 
 
@@ -353,6 +367,7 @@ public class UserController {
         List<FollowResponseDTO> followers=  userService.getFollowings();
         return new ResponseEntity<>(followers, HttpStatus.OK);
     }
+    
 
 
 }

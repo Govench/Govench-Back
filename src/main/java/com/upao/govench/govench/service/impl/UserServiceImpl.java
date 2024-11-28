@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FollowRepository followRepository;
+    private EventRepository eventRepository;
 
 
     //Metodos seguridad //
@@ -364,6 +365,12 @@ public class UserServiceImpl implements UserService {
         if(!userAsist) {
             throw new RuntimeException("Usuario no asistio al evento");
         }
+
+        boolean userRating = ratingEventRepository.existsByUserIdAndEventId(user, event);
+        if(userRating) {
+            throw new RuntimeException("El usuario ya ha calificado ese evento");
+        }
+
 
         System.out.print(ratingEventRequestDTO);
 
