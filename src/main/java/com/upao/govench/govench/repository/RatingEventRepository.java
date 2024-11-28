@@ -23,4 +23,6 @@ public interface RatingEventRepository extends JpaRepository<RatingEvent, Intege
 
     int countByEventId_IdAndValorPuntuacion(Integer eventId, Integer valorPuntuacion);
 
+    boolean existsByUserIdAndEventId(User user, Event event);
+
 }
