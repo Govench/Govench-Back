@@ -1,6 +1,7 @@
 package com.upao.govench.govench.api;
 
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
+import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.service.PasswordResetTokenService;
 import lombok.AllArgsConstructor;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class EmailController {
 
+    private final UserRepository userRepository;
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
 
@@ -51,5 +53,11 @@ public class EmailController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al verificar el token.");
         }
+    }
+
+    @GetMapping("/validation")
+    public ResponseEntity<Boolean> emailExists(@RequestParam String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        return ResponseEntity.ok(exists);
     }
 }
