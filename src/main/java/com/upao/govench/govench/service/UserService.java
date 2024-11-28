@@ -23,7 +23,6 @@ public interface UserService {
     AuthResponseDTO login(LoginDTO loginDTO);
     Integer getAuthenticatedUserIdFromJWT();
 
-
     List<UserProfileDTO> getAllUsers();
     User getUserbyId(Integer userId);
     void deleteUser(Integer userId);
@@ -43,4 +42,5 @@ public interface UserService {
     List<FollowResponseDTO> getFollowers();
     List<FollowResponseDTO> getFollowings();
 
+    String updatePassword(PasswordDTO passwordDTO);
 }
