@@ -61,7 +61,7 @@ public class UserCommunityController {
 
     @PostMapping("/{idcommunity}")
     @PreAuthorize("hasAnyRole('PARTICIPANT', 'ORGANIZER')")
-    public ResponseEntity<?> createUserCommunity(@PathVariable int idcommunity) {
+    public ResponseEntity<String> createUserCommunity(@PathVariable int idcommunity) {
         // Obtener el ID del usuario autenticado desde el token JWT
         Integer iduser = userService.getAuthenticatedUserIdFromJWT();
         if (iduser == null) {
@@ -101,7 +101,7 @@ public class UserCommunityController {
 
 
     @DeleteMapping("/{iduser}/{idcommunity}")
-    public ResponseEntity<?> deleteUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
+    public ResponseEntity<String> deleteUserCommunity(@PathVariable int iduser, @PathVariable int idcommunity) {
         IdCompuestoU_C id = new IdCompuestoU_C(iduser, idcommunity);
 
         // Verificar si la relación existe antes de intentar eliminarla

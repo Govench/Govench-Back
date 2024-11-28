@@ -367,7 +367,15 @@ public class UserController {
         List<FollowResponseDTO> followers=  userService.getFollowings();
         return new ResponseEntity<>(followers, HttpStatus.OK);
     }
-    
 
+    @PutMapping("/edit-password")
+    public ResponseEntity<?> editPassword(@Valid @RequestBody PasswordDTO passwordDTO){
+        try {
+            userService.updatePassword(passwordDTO);
+            return ResponseEntity.ok().body("Contraseña actualizada correctamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }
