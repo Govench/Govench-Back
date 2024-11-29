@@ -14,6 +14,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class RatingEventResponseDTO {
     private int id;
+    private String name;
+    private String lastname;
+    private String email;
     private int valorPuntuacion;
     private LocalDate fechaPuntuacion;
     private String tittle;
