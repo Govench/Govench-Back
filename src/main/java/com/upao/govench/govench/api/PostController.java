@@ -3,11 +3,13 @@ package com.upao.govench.govench.api;
 import com.upao.govench.govench.exceptions.ResourceNotFoundException;
 import com.upao.govench.govench.mapper.PostMapper;
 import com.upao.govench.govench.model.dto.*;
+import com.upao.govench.govench.model.entity.IdCompuestoU_C;
 import com.upao.govench.govench.model.entity.Post;
 import com.upao.govench.govench.model.entity.User;
 import com.upao.govench.govench.model.entity.Community;
 import com.upao.govench.govench.service.CommunityService;
 import com.upao.govench.govench.service.PostService;
+import com.upao.govench.govench.service.UserCommunityService;
 import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class PostController {
     private final PostService postServiceImpl;
     @Autowired
     private final UserService userService;
+    @Autowired
+    private final UserCommunityService userCommunityService;
     @Autowired
     private final CommunityService communityService;
     @Autowired
@@ -54,7 +58,10 @@ public class PostController {
         if (community == null) {
             return new ResponseEntity<>(Map.of("message", "Comunidad no encontrada"), HttpStatus.NOT_FOUND);
         }
-
+        if(userCommunityService.searchUserCommunityById(new IdCompuestoU_C(userId, communityId))==null)
+        {
+            throw new IllegalArgumentException("Debes unirte a la comunidad antes de comentar");
+        }
         // Usar el PostMapper para crear la entidad Post
         Post post = postMapper.toEntity(postRequestDTO, author, community);
 
