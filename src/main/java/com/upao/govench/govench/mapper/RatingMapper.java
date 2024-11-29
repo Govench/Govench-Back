@@ -26,7 +26,8 @@ public class RatingMapper {
 
         RatingResponseDTO ratingResponseDTO = modelMapper.map(rating, RatingResponseDTO.class);
 
-        ratingResponseDTO.setUserCalificado(rating.getRatedUser().getEmail());
+        ratingResponseDTO.setUserCalificador(rating.getRaterUser().getEmail());
+        ratingResponseDTO.setIdUserCalificador(rating.getRaterUser().getId());
         return ratingResponseDTO;
     }
 
@@ -36,7 +37,8 @@ public class RatingMapper {
         }
 
         RatingResponseDTO ratingResponseDTO = modelMapper.map(rating, RatingResponseDTO.class);
-        ratingResponseDTO.setUserCalificado(rating.getRaterUser().getEmail());
+        ratingResponseDTO.setUserCalificador(rating.getRaterUser().getEmail());
+        ratingResponseDTO.setIdUserCalificador(rating.getRaterUser().getId());
         return ratingResponseDTO;
     }
 

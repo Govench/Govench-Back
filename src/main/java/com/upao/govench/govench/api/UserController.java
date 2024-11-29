@@ -7,6 +7,7 @@ import com.upao.govench.govench.model.dto.*;
 import com.upao.govench.govench.model.entity.*;
 import com.upao.govench.govench.repository.EventRepository;
 import com.upao.govench.govench.repository.RatingEventRepository;
+import com.upao.govench.govench.repository.RatingRepository;
 import com.upao.govench.govench.repository.UserRepository;
 import com.upao.govench.govench.security.TokenProvider;
 import com.upao.govench.govench.security.UserPrincipal;
@@ -55,6 +56,8 @@ public class UserController {
     private TokenProvider tokenProvider;
     @Autowired
     private RatingEventRepository ratingEventRepository;
+    @Autowired
+    private RatingRepository ratingRepository;
 
     @PostMapping("/upload/profile-photo")
     public ResponseEntity<String> uploadProfileImage( @RequestParam("file") MultipartFile file) {
@@ -280,7 +283,11 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @GetMapping("existRate/{ratedUserId}")
+    public boolean existRating(@PathVariable Integer ratedUserId)
+    {   Integer userId = getAuthenticatedUserIdFromJWT();
+        return ratingRepository.existsByRatedUser_IdAndRaterUser_Id(ratedUserId,userId);
+    }
     @PostMapping("/rate/{ratedUserId}")
     public ResponseEntity<String> rateUser(@Valid
             @PathVariable Integer ratedUserId,
@@ -293,7 +300,10 @@ public class UserController {
             if (userId == null) {
                 return new ResponseEntity<>("Acceso denegado: Usuario no autenticado", HttpStatus.FORBIDDEN);
             }
-
+            if(ratingRepository.existsByRatedUser_IdAndRaterUser_Id(ratedUserId, userId))
+            {
+                throw new IllegalArgumentException("Ya has calificado a este usuario");
+            }
             // Usar el servicio para calificar al usuario
             userService.rateUser(userId, ratedUserId, rating.getRatingValue(), rating.getComment());
 

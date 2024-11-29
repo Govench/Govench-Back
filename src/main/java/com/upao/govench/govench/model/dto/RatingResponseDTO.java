@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 public class RatingResponseDTO {
     private Integer ratingValue;
-    private String UserCalificado;
+    private Integer idUserCalificador;
+    private String UserCalificador;
     private String comment;
 }
