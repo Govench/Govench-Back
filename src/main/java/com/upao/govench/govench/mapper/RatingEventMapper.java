@@ -3,6 +3,9 @@ package com.upao.govench.govench.mapper;
 import com.upao.govench.govench.model.dto.RatingEventRequestDTO;
 import com.upao.govench.govench.model.dto.RatingEventResponseDTO;
 import com.upao.govench.govench.model.entity.RatingEvent;
+import com.upao.govench.govench.model.entity.User;
+import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -21,7 +24,20 @@ public class RatingEventMapper {
     }
 
     public RatingEventResponseDTO convertToDTO(RatingEvent ratingEvent) {
-        return modelMapper.map(ratingEvent, RatingEventResponseDTO.class);
+        User user =ratingEvent.getUserId();
+        RatingEventResponseDTO ratingEventResponseDTO = modelMapper.map(ratingEvent, RatingEventResponseDTO.class);
+        ratingEventResponseDTO.setEmail(user.getEmail());
+        if(user.getOrganizer()!=null)
+        {
+            ratingEventResponseDTO.setName(user.getOrganizer().getName());
+            ratingEventResponseDTO.setLastname(user.getOrganizer().getLastname());
+        }
+        if(user.getParticipant()!=null)
+        {
+            ratingEventResponseDTO.setName(user.getParticipant().getName());
+            ratingEventResponseDTO.setLastname(user.getParticipant().getLastname());
+        }
+        return ratingEventResponseDTO;
     }
 
     public List<RatingEventResponseDTO> convertToListDTO(List<RatingEvent> ratingEvents) {

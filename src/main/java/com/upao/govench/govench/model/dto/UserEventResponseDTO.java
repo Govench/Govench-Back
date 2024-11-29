@@ -20,4 +20,5 @@ public class UserEventResponseDTO {
     public LocalDate registrationDate;
     public String link;
     public boolean deleted;
+    public int eventId;
 }
