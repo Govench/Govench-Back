@@ -30,4 +30,5 @@ public interface UserEventRepository extends JpaRepository<UserEvent, IdCompuest
     List<User> findUsersByEventId(@Param("eventId") int eventId);
 
     Optional<UserEvent> findByUserIdAndEventId(Integer userId, Long eventId);
+
 }

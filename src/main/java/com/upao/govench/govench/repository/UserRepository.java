@@ -1,5 +1,6 @@
 package com.upao.govench.govench.repository;
 
+import com.upao.govench.govench.model.dto.UserBasicDTO;
 import com.upao.govench.govench.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email")
     boolean existsByEmail(@Param("email") String email);
+
+    @Query("SELECT u.role.name FROM User u WHERE u.id = :userId")
+    String findRoleByUserId(@Param("userId") Integer userId);
 
 }

@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.entity;
 
+import com.itextpdf.io.util.StreamUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

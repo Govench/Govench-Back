@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Recordatorio</title>
+</head>
+<body style="background-color: #f6f6f6; font-family: Arial, sans-serif; margin: 0; padding: 0; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased;">
+<table role="presentation" style="width: 100%; background-color: #f6f6f6; margin: 0; padding: 0; border-collapse: collapse;">
+  <tr>
+    <td>&nbsp;</td>
+    <td style="display: block; max-width: 580px; padding: 10px; margin: 0 auto;">
+      <div style="max-width: 580px; padding: 20px; background-color: #ffffff; border-radius: 5px;">
+
+        <!-- Header -->
+        <h1 style="font-size: 24px; color: #084AAA; text-align: center; margin-bottom: 20px;" th:text="${title}"></h1>
+
+        <!-- Cuerpo del mensaje -->
+        <p style="font-size: 14px; margin: 0 0 15px;">
+          <span>Hola!</span><span th:text="${userName}"></span>,
+        </p>
+        <p style="font-size: 14px; margin: 0 0 15px;" th:text="${reminderText}"></p>
+
+        <!-- Detalles del evento -->
+        <p style="font-size: 14px; margin: 15px 0;"><strong>Detalles del Evento:</strong></p>
+        <ul style="font-size: 14px; margin: 15px 0 15px; padding: 0;">
+          <li><strong>Título:</strong> <span th:text="${eventDetails.title}"></span></li>
+          <li><strong>Fecha:</strong> <span th:text="${eventDetails.date}"></span></li>
+          <li><strong>Hora:</strong> <span th:text="${eventDetails.time}"></span></li>
+          <li><strong>Lugar:</strong> <span th:text="${eventDetails.location}"></span></li>
+          <li><strong>Descripción:</strong> <span th:text="${eventDetails.description}"></span></li>
+        </ul>
+
+        <!-- Firma -->
+        <footer style="text-align: center; margin-top: 20px; font-size: 12px; color: #999999;">
+          <p style="margin: 5px;">Atentamente,</p>
+          <p style="margin: 5px;"><strong>Govench Team</strong></p>
+          <p style="margin: 5px;">
+            🌐 <a href="https://govench-fb742.web.app/inicio" style="color: #084AAA; text-decoration: none;">https://govench-fb742.web.app/inicio</a> <br>
+            📞 +51 990 099 990 <br>
+            ✉️ govench6@gmail.com
+          </p>
+        </footer>
+      </div>
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

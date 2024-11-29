@@ -1,5 +1,6 @@
 package com.upao.govench.govench.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class Admin {
 
     @OneToOne
     @JoinColumn(name = "ad_use_id_in" ,referencedColumnName = "user_id")
+    @JsonIgnore
     private User user;
 
 }

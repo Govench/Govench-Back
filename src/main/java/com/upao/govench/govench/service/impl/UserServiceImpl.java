@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FollowRepository followRepository;
+    private EventRepository eventRepository;
 
 
     //Metodos seguridad //
@@ -365,6 +366,12 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Usuario no asistio al evento");
         }
 
+        boolean userRating = ratingEventRepository.existsByUserIdAndEventId(user, event);
+        if(userRating) {
+            throw new RuntimeException("El usuario ya ha calificado ese evento");
+        }
+
+
         System.out.print(ratingEventRequestDTO);
 
         RatingEvent ratingEvent = ratingEventMapper.convertToEntity(ratingEventRequestDTO);
@@ -454,5 +461,30 @@ public class UserServiceImpl implements UserService {
         Integer userId = getAuthenticatedUserIdFromJWT();
 
         return userMapper.converToListFollowedDTO(followRepository.findByFollower_Id(userId));
+    }
+
+    @Override
+    public String updatePassword(PasswordDTO passwordDTO) {
+        Integer userId = getAuthenticatedUserIdFromJWT();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(passwordDTO.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Contraseña actual incorrecta");
+        }
+
+        if (passwordDTO.getNewPassword() == null || passwordDTO.getNewPassword().isEmpty()) {
+            throw new IllegalArgumentException("Nueva contraseña es requerida");
+        }
+
+        if (!passwordDTO.getNewPassword().equals(passwordDTO.getConfirmPassword())) {
+            throw new IllegalArgumentException("La nueva contraseña y la confirmación no coinciden.");
+        }
+
+        user = userMapper.updateUserPassword(user, passwordDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+
+        return "Contraseña Actualizada";
     }
 }

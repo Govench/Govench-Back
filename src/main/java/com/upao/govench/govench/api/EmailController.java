@@ -1,14 +1,13 @@
 package com.upao.govench.govench.api;
 
+import com.upao.govench.govench.exceptions.ResourceNotFoundException;
+import com.upao.govench.govench.repository.UserRepository;
+import com.upao.govench.govench.service.PasswordResetTokenService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-import com.upao.govench.govench.model.dto.EmailRequestDTO;
-import com.upao.govench.govench.service.PasswordResetService;
-import com.upao.govench.govench.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,22 +16,48 @@ import org.springframework.web.bind.annotation.*;
 
 public class EmailController {
 
+    private final UserRepository userRepository;
     @Autowired
-    private PasswordResetService passwordResetService;
+    private PasswordResetTokenService passwordResetTokenService;
 
-    @PostMapping("/forgot-password/{email}")
-    public ResponseEntity<String> forgotPassword(@PathVariable("email") String email) {
-        return passwordResetService.initiatePasswordReset(email);
+    @PostMapping("/sendMail")
+    public ResponseEntity<?> sendPasswordResetMail(@RequestBody String email) {
+        try {
+            passwordResetTokenService.createAndSendPasswordResetToken(email);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo.");
+        }
     }
 
-    @PostMapping("/reset-password/{token}/{newPass}")
-    public ResponseEntity<String> resetPassword(@PathVariable("token") String token, @PathVariable("newPass") String newPassword) {
-        return passwordResetService.resetPassword(token, newPassword);
+    @PostMapping("/reset/{token}")
+    public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestBody String newPassword) {
+        try {
+            return passwordResetTokenService.resetPassword(token, newPassword);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al restablecer la contraseña.");
+        }
     }
 
-    @GetMapping("/validate")
-    public ResponseEntity<Boolean> validation(@RequestParam String token) {
-        boolean isValid = passwordResetService.tokenValidation(token);
-        return ResponseEntity.ok(isValid);
+    @GetMapping("/reset/check/{token}")
+    public ResponseEntity<?> checkTokenValidity(@PathVariable("token") String token) {
+        try {
+            boolean isValid = passwordResetTokenService.isValidToken(token);
+            return new ResponseEntity<>(isValid, HttpStatus.OK);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al verificar el token.");
+        }
+    }
+
+    @GetMapping("/validation")
+    public ResponseEntity<Boolean> emailExists(@RequestParam String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        return ResponseEntity.ok(exists);
     }
 }

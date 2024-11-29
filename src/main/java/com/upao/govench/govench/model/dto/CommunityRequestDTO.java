@@ -21,5 +21,8 @@ public class CommunityRequestDTO {
     private String descripcion;
 
     private List<String> tags;
+
+    private List<String> posts;  // Esta es la lista de posts que podrías recibir en el cuerpo de la solicitud
+
 }
 

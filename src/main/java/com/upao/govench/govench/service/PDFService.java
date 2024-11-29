@@ -4,91 +4,93 @@ import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.upao.govench.govench.model.dto.ReportResponseDTO;
 import com.upao.govench.govench.service.impl.GraphServiceImpl;
-import com.upao.govench.govench.service.impl.UserStatisticsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PDFService {
     @Autowired
     private GraphServiceImpl graphServiceImpl;
+    @Autowired
+    private ReportService reportService;
 
-    public ByteArrayInputStream generateUserReportPdf(ReportResponseDTO reportResponseDTO, int userId) {
+    public ByteArrayInputStream generateUserReportPdf(int userId) {
+
+        ReportResponseDTO reportResponseDTO = reportService.generateReport(userId);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        boolean hasValidData = false; // Bandera para validar si hay al menos un grafico
 
         try {
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDocument = new PdfDocument(writer);
             Document document = new Document(pdfDocument);
 
-            document.add(new Paragraph("Reporte de Usuario"));
-            document.add(new Paragraph("Total de Eventos: " + reportResponseDTO.getSummary().getTotalEvents()));
-            document.add(new Paragraph("Nuevos Seguidores: " + reportResponseDTO.getSummary().getNewFollowers()));
-            document.add(new Paragraph("Conexiones Hechas: " + reportResponseDTO.getSummary().getConnectionsMade()));
-            document.add(new Paragraph("Eventos Asistidos: " + reportResponseDTO.getSummary().getEventsAttended()));
+            Paragraph title = new Paragraph("Reporte de Usuario")
+                    .setFontSize(20)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
+            document.add(title);
 
-            document.add(new Paragraph("Estadísticas de la Comunidad:"));
-            document.add(new Paragraph("Total de Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalCommunities()));
-            document.add(new Paragraph("Total de Usuarios en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalUsersInCommunities()));
-            document.add(new Paragraph("Total de Publicaciones en Comunidades: " + reportResponseDTO.getSummary().getCommunityStats().getTotalPostsInCommunities()));
-
-            // Generar gráfico de respuestas semanales
             byte[] weeklyChart = graphServiceImpl.generateWeeklyPostChart(userId);
-            if (weeklyChart != null) {
+            if (weeklyChart != null && weeklyChart.length > 0) {
+                hasValidData = true;
                 ImageData chartImageData = ImageDataFactory.create(weeklyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
-            // Generar gráfico de respuestas mensuales
             byte[] monthlyChart = graphServiceImpl.generateMonthlyPostChart(userId);
-            if (monthlyChart != null) {
+            if (monthlyChart != null && monthlyChart.length > 0) {
+                hasValidData = true;
                 ImageData chartImageData = ImageDataFactory.create(monthlyChart);
                 Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
             byte[] starRatingChart = graphServiceImpl.generateUserStarChart(userId);
-            if(starRatingChart != null){
-                ImageData charImageData = ImageDataFactory.create(starRatingChart);
-                Image chartImage = new Image(charImageData);
+            if (starRatingChart != null) {
+                hasValidData = true;
+                ImageData chartImageData = ImageDataFactory.create(starRatingChart);
+                Image chartImage = new Image(chartImageData);
                 document.add(chartImage);
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
             List<byte[]> eventRatingCharts = graphServiceImpl.generateEventStarCharts(userId);
             if (eventRatingCharts != null && !eventRatingCharts.isEmpty()) {
+                hasValidData = true;
                 for (byte[] chartBytes : eventRatingCharts) {
                     ImageData chartImageData = ImageDataFactory.create(chartBytes);
                     Image chartImage = new Image(chartImageData);
-                    document.add(chartImage); // Agrega la imagen del gráfico al documento
+                    document.add(chartImage);
+                    document.add(new Paragraph("\n"));
                 }
-            } else {
-                System.out.println("No hay datos suficientes para generar algún gráfico");
             }
 
+            byte[] eventParticipantsChart = graphServiceImpl.generateEventParticipantsChart(userId);
+            if (eventParticipantsChart != null) {
+                hasValidData = true;
+                ImageData chartImageData = ImageDataFactory.create(eventParticipantsChart);
+                Image chartImage = new Image(chartImageData);
+                document.add(chartImage);
+            }
 
             document.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
+            if (!hasValidData) { return null; }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar el PDF", e);
+        }
 
         return new ByteArrayInputStream(out.toByteArray());
     }

@@ -1,6 +1,8 @@
 package com.upao.govench.govench.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,8 @@ public class PasswordResetToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
+    @Size(min=32, max=64)
     @Column(nullable = false)
     private String token;
 
@@ -25,5 +29,13 @@ public class PasswordResetToken {
     private User user;
 
     @Column(nullable = false)
-    private LocalDateTime expiryDate;
+    private LocalDateTime expiration;
+
+    public void setExpiration(int minutes) {
+        this.expiration = LocalDateTime.now().plusMinutes(minutes);
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expiration);
+    }
 }

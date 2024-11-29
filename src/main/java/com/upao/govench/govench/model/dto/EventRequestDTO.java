@@ -48,7 +48,7 @@ public class EventRequestDTO {
     private String department;
     private String province;
     private String district;
-
+    private String link;
     @NotNull(message = "La capacidad máxima no puede estar vacía")
     @Min(value = 1, message = "La capacidad máxima debe ser mayor a 0")
     private Integer maxCapacity;

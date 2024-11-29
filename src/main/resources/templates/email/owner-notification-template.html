@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificación de Registro</title>
+</head>
+<body style="background-color: #f6f6f6; font-family: Arial, sans-serif; margin: 0; padding: 0; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased;">
+<table role="presentation" style="width: 100%; background-color: #f6f6f6; margin: 0; padding: 0; border-collapse: collapse;">
+  <tr>
+    <td style="display: block; max-width: 580px; padding: 10px; margin: 0 auto;">
+      <div style="max-width: 580px; padding: 20px; background-color: #ffffff; border-radius: 5px;">
+        <!-- Header -->
+        <h1 style="font-size: 28px; color: #333333; text-align: center; margin-bottom: 20px;">Notificación de Registro</h1>
+
+        <!-- Saludo -->
+        <p style="font-size: 14px; margin: 0 0 15px;">Hola, <span th:text="${ownerName}"></span>!</p>
+        <p style="font-size: 14px; margin: 0 0 15px;">El usuario <strong th:text="${participantName}"></strong> (<span th:text="${participantEmail}"></span>) se ha inscrito en tu evento.</p>
+
+        <!-- Detalles del Evento -->
+        <table style="width: 100%; margin: 20px 0; font-size: 14px; line-height: 1.6;">
+          <tr>
+            <td style="font-weight: bold; padding: 5px 0;">📌 Título:</td>
+            <td th:text="${eventDetails.title}"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 5px 0;">📅 Fecha:</td>
+            <td th:text="${eventDetails.date}"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 5px 0;">⏰ Hora:</td>
+            <td th:text="${eventDetails.time}"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 5px 0;">📍 Lugar:</td>
+            <td th:text="${eventDetails.location}"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 5px 0;">📝 Descripción:</td>
+            <td th:text="${eventDetails.description}"></td>
+          </tr>
+        </table>
+
+        <!-- Footer -->
+        <footer style="text-align: center; margin-top: 20px; font-size: 12px; color: #999999;">
+          <p style="margin: 5px;">Atentamente,</p>
+          <p style="margin: 5px;"><strong>Govench Team</strong></p>
+          <p style="margin: 5px;">
+            🌐 <a href="https://govench-fb742.web.app/inicio" style="color: #084AAA; text-decoration: none;">https://govench-fb742.web.app/inicio</a> <br>
+            📞 +51 990 099 990 <br>
+            ✉️ govench6@gmail.com
+          </p>
+        </footer>
+      </div>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

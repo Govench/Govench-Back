@@ -51,6 +51,7 @@ public class Participant{
 
     @OneToOne
     @JoinColumn(name = "par_use_id_in" ,referencedColumnName = "user_id")
+    @JsonIgnore
     private User user;
 
 }

@@ -197,4 +197,8 @@ public class UserMapper {
                 .toList();
     }
 
+    public User updateUserPassword(User user, PasswordDTO passwordDTO) {
+        user.setPassword(passwordDTO.getNewPassword());
+        return user;
+    }
 }
